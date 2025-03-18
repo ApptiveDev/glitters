@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "glitters",
-    "slug": "glitters",
+    "name": "반짝이",
+    "slug": "banjjak",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,13 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "me.banjjak.Banjjak"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "me.banjjak.Banjjak"
     },
     "web": {
       "bundler": "metro",
