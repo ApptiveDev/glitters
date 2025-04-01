@@ -1,9 +1,21 @@
-import React, { useCallback, useRef } from 'react';
-import { Text, StyleSheet } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import React, { useCallback, useRef } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-const Pins = () => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'grey',
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 36,
+    alignItems: 'center',
+  },
+});
+
+function Pins() {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -22,18 +34,6 @@ const Pins = () => {
       </BottomSheet>
     </GestureHandlerRootView>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'grey',
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 36,
-    alignItems: 'center',
-  },
-});
+}
 
 export default Pins;
