@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router';
 import { useEffect, useCallback, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { View } from 'react-native';
-import RootLayout from './_layout';
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 400, fade: true });
@@ -10,6 +9,8 @@ SplashScreen.setOptions({ duration: 400, fade: true });
 export default function Index() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+
+  console.log('Index 컴포넌트 렌더링');
 
   useEffect(() => {
     setIsReady(true);
