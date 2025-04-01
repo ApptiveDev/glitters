@@ -3,35 +3,19 @@ import Mapbox from '@rnmapbox/maps';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as SplashScreen from 'expo-splash-screen';
+import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import pinIcon from '@/assets/images/pin.png';
+import mock from '@/utils/markers';
 
 import mapStyles, { mapPinLayer } from './mapStyles';
 
 const defaultCamera = {
   centerCoordinate: [129.082794, 35.231154],
   zoomLevel: 17.4,
-};
-
-const featureCollection: GeoJSON.FeatureCollection<GeoJSON.Geometry> = {
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      id: '9d10456e-bdda-4aa9-9269-04c1667d4552',
-      properties: {
-        icon: 'example',
-        message: 'Hello!',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [129.082794, 35.231154],
-      },
-    },
-  ],
 };
 
 const token = Constants.expoConfig?.extra?.mapboxAccessToken;
@@ -43,6 +27,7 @@ function Example() {
   const [location, setLocation] = useState<Location.LocationObject>();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [disableMode, setDisableMode] = useState(false);
+  const [features, setFeatures] = useState<Feature<Point, GeoJsonProperties>[]>(mock);
 
   useEffect(() => {
     (async () => {
@@ -52,7 +37,6 @@ function Example() {
       if (permission.status === 'granted') {
         const currentLocation = await Location.getCurrentPositionAsync({});
         setLocation(currentLocation);
-        console.log('Location:', location);
       }
     })();
   }, [location]);
@@ -84,13 +68,27 @@ function Example() {
     cameraRef.current?.setCamera({ zoomLevel: zoom });
   };
 
+  const handleMapPress = (feature: Feature<Geometry, GeoJsonProperties>) => {
+    if (feature.geometry.type === 'Point') {
+      setFeatures((prev) => {
+        const newFeatures = [...prev];
+        newFeatures.push(feature as Feature<Point, GeoJsonProperties>);
+        console.log('마커 클릭 좌표:', features);
+        if (feature.geometry.type === 'Point') {
+          console.log('마커 클릭 좌표:', feature.geometry.coordinates);
+        }
+        return newFeatures;
+      });
+    }
+  };
+
   return (
     <View style={mapStyles.container}>
-      <Mapbox.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false}>
+      <Mapbox.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false} onPress={handleMapPress}>
         <Mapbox.UserLocation visible />
         <Mapbox.Camera defaultSettings={defaultCamera} ref={cameraRef} zoomLevel={zoom} />
         <Mapbox.Images images={{ exampleIcon: pinIcon }} />
-        <Mapbox.ShapeSource id="mapPinsSource" shape={featureCollection} onPress={handlePress}>
+        <Mapbox.ShapeSource id="mapPinsSource" shape={{ type: 'FeatureCollection', features }} onPress={handlePress}>
           <Mapbox.SymbolLayer id="mapPinsLayer" style={mapPinLayer} />
         </Mapbox.ShapeSource>
       </Mapbox.MapView>
