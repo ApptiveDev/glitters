@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
@@ -15,10 +15,7 @@ const Pins = () => {
   // renders
   return (
     <GestureHandlerRootView style={styles.container}>
-      <BottomSheet
-        ref={bottomSheetRef}
-        onChange={handleSheetChanges}
-      >
+      <BottomSheet ref={bottomSheetRef} onChange={handleSheetChanges}>
         <BottomSheetView style={styles.contentContainer}>
           <Text>Awesome 🎉</Text>
         </BottomSheetView>
