@@ -5,13 +5,10 @@ import { StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import pinIcon from '../../assets/images/pin.png';
 import Constants from 'expo-constants';
-import { Alert, StyleSheet } from "react-native";
 import { useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
-import { LatLng, LeafletView, WebviewLeafletMessage } from 'react-native-leaflet-view';
 import * as Location from 'expo-location';
-import BottomSheet, { BottomSheetView, BottomSheetModalProvider }  from '@gorhom/bottom-sheet';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import * as SplashScreen from 'expo-splash-screen';
 
 const defaultCamera = {
@@ -60,27 +57,27 @@ const Example = () => {
   const router = useRouter();
   const [disableMode, setDisableMode] = useState(false);
 
-    useEffect(() => {
-      (async () => {
-        const permission = await Location.requestForegroundPermissionsAsync();
-        if (permission.status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({});
-          setLocation(location);
-        }
-      })();
-    }, []);
+  useEffect(() => {
+    (async () => {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      }
+    })();
+  }, []);
 
-    useEffect(() => {
-        (async () => {
-          await SplashScreen.hideAsync();
-      
-          const permission = await Location.requestForegroundPermissionsAsync();
-          if (permission.status === 'granted') {
-            const location = await Location.getCurrentPositionAsync({});
-            setLocation(location);
-          }
-        })();
-      }, []);
+  useEffect(() => {
+    (async () => {
+      await SplashScreen.hideAsync();
+
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      }
+    })();
+  }, []);
 
   const handlePress = () => {
     bottomSheetRef.current?.expand();
@@ -99,7 +96,6 @@ const Example = () => {
     cameraRef.current?.setCamera({ zoomLevel: zoom });
   };
 
-
   const handleZoomOut = () => {
     if (zoom <= 14) {
       return;
@@ -108,10 +104,9 @@ const Example = () => {
     cameraRef.current?.setCamera({ zoomLevel: zoom });
   };
 
-  const [selectedFeature, setSelectedFeature] =
-    useState<GeoJSON.Feature<GeoJSON.Point>>();
+  const [selectedFeature, setSelectedFeature] = useState<GeoJSON.Feature<GeoJSON.Point>>();
 
-  const onPinPress = (e: { features: Array<GeoJSON.Feature> }): void => {
+  const onPinPress = (e: { features: GeoJSON.Feature[] }): void => {
     if (selectedFeature) {
       setSelectedFeature(undefined);
       return;
@@ -123,33 +118,19 @@ const Example = () => {
 
   return (
     <View style={styles.container}>
-    <Mapbox.MapView 
-      style={{ flex : 1 }}
-      logoEnabled={false}
-      attributionEnabled={false}
-      >
-      <Mapbox.Camera 
-        defaultSettings={defaultCamera}
-        ref={cameraRef}
-        zoomLevel={zoom}
-      />
-      <Mapbox.Images 
-        images={{ exampleIcon: pinIcon }}
-      />
-      <Mapbox.ShapeSource
-        id="mapPinsSource"
-        shape={featureCollection}
-        onPress={onPinPress}
-      >
-        <Mapbox.SymbolLayer id="mapPinsLayer" style={styles.mapPinLayer} />
-      </Mapbox.ShapeSource>
-      {selectedFeature && (
-        <Mapbox.MarkerView coordinate={selectedFeature.geometry.coordinates}>
-          <CustomCalloutView message={selectedFeature?.properties?.message} />
-        </Mapbox.MarkerView>
-      )}
-    </Mapbox.MapView>
-    <View style={{ position: 'absolute', right: 20, bottom: 100 }}>
+      <Mapbox.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false}>
+        <Mapbox.Camera defaultSettings={defaultCamera} ref={cameraRef} zoomLevel={zoom} />
+        <Mapbox.Images images={{ exampleIcon: pinIcon }} />
+        <Mapbox.ShapeSource id="mapPinsSource" shape={featureCollection} onPress={onPinPress}>
+          <Mapbox.SymbolLayer id="mapPinsLayer" style={styles.mapPinLayer} />
+        </Mapbox.ShapeSource>
+        {selectedFeature && (
+          <Mapbox.MarkerView coordinate={selectedFeature.geometry.coordinates}>
+            <CustomCalloutView message={selectedFeature?.properties?.message} />
+          </Mapbox.MarkerView>
+        )}
+      </Mapbox.MapView>
+      <View style={{ position: 'absolute', right: 20, bottom: 100 }}>
         <TouchableOpacity
           onPress={handleZoomIn}
           style={{

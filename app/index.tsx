@@ -26,10 +26,5 @@ export default function Index() {
 
   if (!isReady) return null;
 
-  return (
-    <View
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-      onLayout={onLayoutRootView}
-    />
-  );
+  return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} onLayout={onLayoutRootView} />;
 }
