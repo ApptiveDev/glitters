@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useCallback, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
@@ -10,8 +10,6 @@ export default function Index() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
 
-  console.log('Index 컴포넌트 렌더링');
-
   useEffect(() => {
     setIsReady(true);
   }, []);
@@ -20,9 +18,8 @@ export default function Index() {
     if (isReady) {
       await SplashScreen.hideAsync();
       router.replace('/maps');
-      console.log(`onLayout 완료 → /maps로 이동`);
     }
-  }, [isReady]);
+  }, [isReady, router]);
 
   if (!isReady) return null;
 
