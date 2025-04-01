@@ -1,8 +1,7 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useCallback, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import RootLayout from './_layout';
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 400, fade: true });
@@ -19,16 +18,10 @@ export default function Index() {
     if (isReady) {
       await SplashScreen.hideAsync();
       router.replace('/maps');
-      console.log(`onLayout 완료 → /maps로 이동`);
     }
-  }, [isReady]);
+  }, [isReady, router]);
 
   if (!isReady) return null;
 
-  return (
-    <View
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-      onLayout={onLayoutRootView}
-    />
-  );
+  return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} onLayout={onLayoutRootView} />;
 }
