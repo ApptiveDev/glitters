@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import pinIcon from '../../assets/images/pin.png';
+import pinIcon from '@/assets/pin.png';
 
 const styles: {
   matchParent: StyleProp<ViewStyle>;
