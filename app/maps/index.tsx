@@ -1,68 +1,15 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import Mapbox, { type SymbolLayerStyle } from '@rnmapbox/maps';
+import Mapbox from '@rnmapbox/maps';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import pinIcon from '@/assets/pin.png';
+import pinIcon from '@/assets/images/pin.png';
 
-const styles: {
-  matchParent: StyleProp<ViewStyle>;
-  mapPinLayer: SymbolLayerStyle;
-  customCalloutText: StyleProp<TextStyle>;
-  calloutContainerStyle: StyleProp<ViewStyle>;
-  contentContainer: StyleProp<ViewStyle>;
-  container: StyleProp<ViewStyle>;
-  button: StyleProp<ViewStyle>;
-  buttonText: StyleProp<TextStyle>;
-} = {
-  matchParent: {
-    flex: 1,
-  },
-  mapPinLayer: {
-    iconAllowOverlap: true,
-    iconAnchor: 'bottom',
-    iconSize: 0.05,
-    iconImage: 'exampleIcon',
-  },
-  customCalloutText: {
-    color: 'black',
-    fontSize: 16,
-  },
-  calloutContainerStyle: {
-    backgroundColor: 'white',
-    width: 60,
-    height: 40,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  contentContainer: {
-    padding: 36,
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  button: {
-    position: 'absolute',
-    bottom: 50,
-    alignSelf: 'center',
-    backgroundColor: '#354BA5',
-    padding: 10,
-    borderRadius: 8,
-    zIndex: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-};
+import mapStyles, { mapPinLayer } from './mapStyles';
 
 const defaultCamera = {
   centerCoordinate: [129.082794, 35.231154],
@@ -138,13 +85,13 @@ function Example() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={mapStyles.container}>
       <Mapbox.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false}>
         <Mapbox.UserLocation visible />
         <Mapbox.Camera defaultSettings={defaultCamera} ref={cameraRef} zoomLevel={zoom} />
         <Mapbox.Images images={{ exampleIcon: pinIcon }} />
         <Mapbox.ShapeSource id="mapPinsSource" shape={featureCollection} onPress={handlePress}>
-          <Mapbox.SymbolLayer id="mapPinsLayer" style={styles.mapPinLayer} />
+          <Mapbox.SymbolLayer id="mapPinsLayer" style={mapPinLayer} />
         </Mapbox.ShapeSource>
       </Mapbox.MapView>
       <View style={{ position: 'absolute', right: 20, bottom: 100 }}>
@@ -174,8 +121,8 @@ function Example() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handlePress} disabled={disableMode}>
-        <Text style={styles.buttonText}>등록하기</Text>
+      <TouchableOpacity style={mapStyles.button} onPress={handlePress} disabled={disableMode}>
+        <Text style={mapStyles.buttonText}>등록하기</Text>
       </TouchableOpacity>
       <BottomSheet
         ref={bottomSheetRef}
@@ -184,7 +131,7 @@ function Example() {
         backgroundStyle={{ backgroundColor: '#fff' }}
         index={-1}
       >
-        <BottomSheetView style={styles.contentContainer}>
+        <BottomSheetView style={mapStyles.contentContainer}>
           <Text>Awesome 🎉</Text>
         </BottomSheetView>
       </BottomSheet>

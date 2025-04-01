@@ -5,11 +5,15 @@ module.exports = function (api) {
     plugins: [
       'react-native-reanimated/plugin',
       'expo-router/babel',
-      'module-resolver',
+      [
+        'module-resolver',
         {
           root: ['./'],
           alias: {
             '@': './src',
+            '@assets': './assets',
+            '@components': './src/components',
+            '@hooks': './src/hooks',
           },
           extensions: [
             '.ios.ts',
@@ -22,7 +26,8 @@ module.exports = function (api) {
             '.js',
             '.json',
           ],
-        }
+        },
+      ],
     ],
   };
 };
