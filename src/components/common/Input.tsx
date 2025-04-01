@@ -46,9 +46,9 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
   (
     {
       width = '100%',
-      height = 'auto',
+      height = 40,
       placeholder = 'Enter text',
-      defaultValue = '',
+      defaultValue = '기본값',
       fontSize = 16,
       padding = 12,
       backgroundColor = 'transparent',
