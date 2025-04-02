@@ -21,7 +21,7 @@ const defaultCamera = {
 const token = Constants.expoConfig?.extra?.mapboxAccessToken;
 Mapbox.setAccessToken(token);
 
-function Example() {
+const Example = () => {
   const cameraRef = React.useRef<Mapbox.Camera>(null);
   const [zoom, setZoom] = useState<number>(defaultCamera.zoomLevel);
   const [location, setLocation] = useState<Location.LocationObject>();
@@ -135,6 +135,6 @@ function Example() {
       </BottomSheet>
     </View>
   );
-}
+};
 
 export default Example;

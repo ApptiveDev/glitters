@@ -8,12 +8,13 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
-    'react/function-component-definition': [
-    {
-      namedComponents: 'arrow-function',
-      unnamedComponents: 'arrow-function',
-    },
-  ],
+    "react/function-component-definition": [
+      2, 
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
+    ],
   },
   parserOptions: {
     project: './tsconfig.json',
