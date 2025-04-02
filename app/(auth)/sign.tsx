@@ -1,18 +1,51 @@
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { getSchoolList, SchoolListResponse } from '@/api/login';
 import DropdownComponent from '@/components/common/Dropdown';
-import { schoolList } from '@/utils/mocks';
+import CommonInput from '@/components/common/Input';
+
+const styles = StyleSheet.create({
+  view: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 100,
+    gap: 20,
+  },
+});
 
 export const Sign = () => {
-  const memoizedList = useMemo(() => schoolList, []);
-  const [value, setValue] = useState<string | null>(null);
-  console.log('value', value);
+  const [domain, setDomain] = useState<string | null>(null);
+  const [value, setValue] = useState<string>('');
+  const [valid, setValid] = useState<boolean>(false);
+
+  const { data } = useQuery<SchoolListResponse>({
+    queryKey: ['school_list'],
+    queryFn: () => getSchoolList(),
+    enabled: true,
+  });
+
+  const formattedList = useMemo(() => {
+    const list = data?.institutions;
+    return list?.map((item) => ({
+      label: item.name,
+      value: item.email_domain,
+    }));
+  }, [data]);
+
+  const onChangeText = (text: string) => {
+    setValue(text);
+    setValid(text.endsWith(domain || ''));
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: '#404C7A' }}>
-      <View style={{ width: '100%', height: '100%', backgroundColor: '#404C7A', marginTop: 100, alignItems: 'center' }}>
-        <DropdownComponent data={memoizedList} value={value} setValue={setValue} />
-        {/* <CommonInput width={346} /> */}
+      <View style={styles.view}>
+        <DropdownComponent data={formattedList || []} value={domain} setValue={setDomain} />
+        {domain && (
+          <CommonInput width={346} defaultValue={domain} isValid={valid} value={value} onChangeText={onChangeText} />
+        )}
       </View>
     </View>
   );
