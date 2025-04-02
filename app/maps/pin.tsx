@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function Pins() {
+const Pins = () => {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -34,6 +34,6 @@ function Pins() {
       </BottomSheet>
     </GestureHandlerRootView>
   );
-}
+};
 
 export default Pins;
