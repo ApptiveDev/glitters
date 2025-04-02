@@ -14,6 +14,7 @@ interface CommonInputProps extends TextInputProps {
   isError?: boolean;
   isGuide?: boolean;
   guideText?: string;
+  onChangeText?: (text: string) => void;
 }
 
 const styles = StyleSheet.create({
@@ -31,7 +32,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   component: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
@@ -47,7 +47,7 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
     {
       width = '100%',
       height = 40,
-      placeholder = 'Enter text',
+      placeholder = '',
       defaultValue = '기본값',
       fontSize = 16,
       padding = 12,
@@ -66,8 +66,8 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
     const dynamicStyles: TextStyle = {
       width,
       backgroundColor,
-      color: isValid ? '#8793C2' : '#FFF',
-      borderColor: disable ? '#8793C2' : '#FFF',
+      color: isValid ? '#FFF' : '#8793C2',
+      borderColor: disable ? '#FFF' : '#8793C2',
       height,
       fontSize,
       padding,
