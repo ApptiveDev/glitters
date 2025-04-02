@@ -6,7 +6,7 @@ import { View } from 'react-native';
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 400, fade: true });
 
-export default function Index() {
+export const Index = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
 
@@ -24,4 +24,6 @@ export default function Index() {
   if (!isReady) return null;
 
   return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} onLayout={onLayoutRootView} />;
-}
+};
+
+export default Index;
