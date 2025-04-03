@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
+  map: { flex: 1, zIndex: -1 },
   overlay: { position: 'absolute', top: 50, left: 20 },
   loadingContainer: {
     flex: 1,
@@ -25,6 +25,33 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  contentContainer: {
+    padding: 20,
+  },
+  bottomSheetContainer: {},
+  bottomSheetButton: {
+    backgroundColor: '#FFE9A1',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 20,
+    marginBottom: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomSheetButtonText: {
+    color: '#404C7A',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  bottomSheetMainText: {
+    fontSize: 16,
+    color: '#FBFBFB',
+  },
+  bottomSheetSubText: {
+    fontSize: 12,
+    color: '#B2B4BF',
   },
 });
 
