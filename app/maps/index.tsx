@@ -1,14 +1,33 @@
-import { ActivityIndicator, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
+import fetchNearestPlaceName from '@/lib/googlePlaces';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
 import styles from './mapStyles';
 
 const MapSearch = () => {
   const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
-  console.log('location', location);
+
+  const [placeName, setPlaceName] = useState<string | null>(null);
+  const [createMode, setCreateMode] = useState(false);
+
+  const handleMapPress = async (e: any) => {
+    if (!createMode) {
+      console.log('Create mode is enabled');
+      return;
+    }
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    const name = await fetchNearestPlaceName(latitude, longitude);
+    setPlaceName(name);
+    console.log('Nearest place name:', name);
+  };
+
+  const handleButtonPress = () => {
+    setCreateMode((prev) => !prev);
+  };
 
   if (!location) {
     return (
@@ -31,9 +50,17 @@ const MapSearch = () => {
           longitudeDelta: 0.005,
         }}
         showsUserLocation
+        onPress={handleMapPress}
       />
-      <View style={styles.overlay}>
-        <Text style={{ color: 'white' }}>Search</Text>
+      {placeName && (
+        <Text style={{ position: 'absolute', top: 50, left: 20, backgroundColor: 'white', padding: 10 }}>
+          {placeName}
+        </Text>
+      )}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+          <Text style={styles.buttonText}>누르기</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

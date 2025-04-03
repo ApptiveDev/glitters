@@ -42,7 +42,7 @@ export default {
       typedRoutes: true,
     },
     extra: {
-      mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN,
+      googleApiKey: process.env.GOOGLE_API_KEY,
     },
   },
 };
