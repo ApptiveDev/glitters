@@ -1,15 +1,17 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import Mapbox from '@rnmapbox/maps';
+import { useQuery } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as SplashScreen from 'expo-splash-screen';
-import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
+import { Feature, GeoJsonProperties, Point } from 'geojson';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+import { getMarkers } from '@/api/markers';
 import pinIcon from '@/assets/images/pin.png';
-import mock from '@/utils/markers';
+import { MapMarker, MapMarkers, MarkerResponse } from '@/types/markers';
 
 import mapStyles, { mapPinLayer } from './mapStyles';
 
@@ -27,7 +29,36 @@ const Example = () => {
   const [location, setLocation] = useState<Location.LocationObject>();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [disableMode, setDisableMode] = useState(false);
-  const [features, setFeatures] = useState<Feature<Point, GeoJsonProperties>[]>(mock);
+  const [markers, setMarkers] = useState<MapMarkers>([]);
+
+  const { data } = useQuery<MarkerResponse>({
+    queryKey: ['markers'],
+    queryFn: getMarkers,
+    enabled: true,
+  });
+
+  console.log('location:', location);
+
+  useEffect(() => {
+    if (data) {
+      data.markers.forEach((marker) => {
+        const newFeature: Feature<Point, GeoJsonProperties> = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [marker.longitude, marker.latitude],
+          },
+          properties: {
+            screenPointX: 10,
+            screenPointY: 30,
+          },
+        };
+        setMarkers((prev) => [...prev, newFeature]);
+      });
+    }
+  }, [data]);
+
+  console.log('마커:', markers);
 
   useEffect(() => {
     (async () => {
@@ -39,7 +70,7 @@ const Example = () => {
         setLocation(currentLocation);
       }
     })();
-  }, [location]);
+  }, []);
 
   const handlePress = () => {
     bottomSheetRef.current?.expand();
@@ -68,16 +99,13 @@ const Example = () => {
     cameraRef.current?.setCamera({ zoomLevel: zoom });
   };
 
-  const handleMapPress = (feature: Feature<Geometry, GeoJsonProperties>) => {
-    if (feature.geometry.type === 'Point') {
-      setFeatures((prev) => {
-        const newFeatures = [...prev];
-        newFeatures.push(feature as Feature<Point, GeoJsonProperties>);
-        console.log('마커 클릭 좌표:', features);
-        if (feature.geometry.type === 'Point') {
-          console.log('마커 클릭 좌표:', feature.geometry.coordinates);
-        }
-        return newFeatures;
+  const handleMapPress = (marker: MapMarker) => {
+    if (marker.geometry.type === 'Point') {
+      setMarkers((prev) => {
+        const newMarkers = [...prev];
+        newMarkers.push(marker as MapMarker);
+        console.log('마커 클릭 좌표:', markers);
+        return newMarkers;
       });
     }
   };
@@ -88,7 +116,11 @@ const Example = () => {
         <Mapbox.UserLocation visible />
         <Mapbox.Camera defaultSettings={defaultCamera} ref={cameraRef} zoomLevel={zoom} />
         <Mapbox.Images images={{ exampleIcon: pinIcon }} />
-        <Mapbox.ShapeSource id="mapPinsSource" shape={{ type: 'FeatureCollection', features }} onPress={handlePress}>
+        <Mapbox.ShapeSource
+          id="mapPinsSource"
+          shape={{ type: 'FeatureCollection', features: markers }}
+          onPress={handlePress}
+        >
           <Mapbox.SymbolLayer id="mapPinsLayer" style={mapPinLayer} />
         </Mapbox.ShapeSource>
       </Mapbox.MapView>

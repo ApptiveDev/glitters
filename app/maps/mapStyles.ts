@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const mapPinLayer: SymbolLayerStyle = {
   iconAllowOverlap: true,
   iconAnchor: 'bottom',
-  iconSize: 0.05,
+  iconSize: 1,
   iconImage: 'exampleIcon',
 };
 
