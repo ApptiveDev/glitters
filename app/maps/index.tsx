@@ -2,11 +2,12 @@ import { ActivityIndicator, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
+import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
 import styles from './mapStyles';
 
 const MapSearch = () => {
-  const { location } = useCurrentLocation();
+  const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
   console.log('location', location);
 
   if (!location) {
@@ -26,8 +27,8 @@ const MapSearch = () => {
         initialRegion={{
           latitude: location.latitude,
           longitude: location.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
         }}
         showsUserLocation
       />

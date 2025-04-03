@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { MarkerResponse } from '@/types/markers';
+import { MarkerResponse } from '@/types/maps';
 
 export const getMarkers = async (): Promise<MarkerResponse> => {
   try {

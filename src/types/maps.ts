@@ -10,6 +10,8 @@ export type InstitutionBound = {
   startLon: number;
   endLat: number;
   endLon: number;
+  defaultLat: number;
+  defaultLon: number;
   createdAt: string;
   updatedAt: string;
 };
