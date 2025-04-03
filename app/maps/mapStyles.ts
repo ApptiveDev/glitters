@@ -1,51 +1,15 @@
-import { type SymbolLayerStyle } from '@rnmapbox/maps';
 import { StyleSheet } from 'react-native';
 
-export const mapPinLayer: SymbolLayerStyle = {
-  iconAllowOverlap: true,
-  iconAnchor: 'bottom',
-  iconSize: 1,
-  iconImage: 'exampleIcon',
-};
-
-const mapStyles = StyleSheet.create({
-  matchParent: {
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#404C7A' },
+  map: { flex: 1 },
+  overlay: { position: 'absolute', top: 50, left: 20 },
+  loadingContainer: {
     flex: 1,
-  },
-  customCalloutText: {
-    color: 'black',
-    fontSize: 16,
-  },
-  calloutContainerStyle: {
-    backgroundColor: 'white',
-    width: 60,
-    height: 40,
-    display: 'flex',
+    backgroundColor: '#404C7A',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  contentContainer: {
-    padding: 36,
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  button: {
-    position: 'absolute',
-    bottom: 50,
-    alignSelf: 'center',
-    backgroundColor: '#354BA5',
-    padding: 10,
-    borderRadius: 8,
-    zIndex: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
 });
 
-export default mapStyles;
+export default styles;
