@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { getSchoolList, SchoolListResponse } from '@/api/login';
+import { getSchoolList } from '@/api/sign';
 import DropdownComponent from '@/components/common/Dropdown';
 import CommonInput from '@/components/common/Input';
+import { SchoolListResponse } from '@/types/sign';
 
 const styles = StyleSheet.create({
   view: {
@@ -30,7 +31,7 @@ export const Sign = () => {
     const list = data?.institutions;
     return list?.map((item) => ({
       label: item.name,
-      value: item.email_domain,
+      value: item.emailDomain,
     }));
   }, [data]);
 

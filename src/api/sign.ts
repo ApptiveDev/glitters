@@ -1,17 +1,5 @@
-import apiInstance from './apiInstance';
-
-interface SchoolListType {
-  id: number;
-  name: string;
-  email_domain: string;
-  is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface SchoolListResponse {
-  institutions: SchoolListType[];
-}
+import apiInstance from '@/api/apiInstance';
+import { SchoolListResponse } from '@/types/sign';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
   try {
