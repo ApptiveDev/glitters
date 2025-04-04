@@ -11,7 +11,7 @@ import fetchNearestPlaceName from '@/lib/googlePlaces';
 import { MarkerType } from '@/types/maps';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
-import styles from './mapStyles';
+import styles from './styles';
 
 const MapSearch = () => {
   const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });

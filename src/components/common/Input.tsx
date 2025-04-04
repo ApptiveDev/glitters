@@ -2,6 +2,8 @@
 import React from 'react';
 import { DimensionValue, StyleSheet, Text, TextInput, TextInputProps, TextStyle, View } from 'react-native';
 
+import colors from '@/types/colors';
+
 interface CommonInputProps extends TextInputProps {
   width?: DimensionValue;
   height?: DimensionValue;
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
   },
   errerText: {
-    color: '#FFA0A0',
+    color: `${colors.error}`,
     paddingLeft: 8,
     fontSize: 12,
   },
@@ -36,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   guideText: {
-    color: '#FFF7C1',
+    color: `${colors.guide}`,
     fontSize: 12,
     paddingLeft: 8,
   },
@@ -66,8 +68,8 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
     const dynamicStyles: TextStyle = {
       width,
       backgroundColor,
-      color: isValid ? '#FFF' : '#8793C2',
-      borderColor: disable ? '#FFF' : '#8793C2',
+      color: isValid ? '#FFF' : `${colors.primary.main}`,
+      borderColor: disable ? '#FFF' : `${colors.primary.main}`,
       height,
       fontSize,
       padding,
