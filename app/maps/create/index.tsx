@@ -30,13 +30,12 @@ export const CreateMarker = () => {
 
     try {
       const data = await fetchNearestPlaceName(latitude, longitude);
-      console.log('data', data);
       setPlaceName(data.name);
       setvicinity(data.vicinity);
     } catch (err) {
       console.error('장소 불러오기 실패', err);
     } finally {
-      setIsFetchingPlace(false); // 로딩 종료
+      setIsFetchingPlace(false);
     }
   };
 

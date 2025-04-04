@@ -2,11 +2,12 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useRef } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
 import markerIcon from '@/assets/images/marker.png';
+import Loading from '@/components/common/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
@@ -29,12 +30,7 @@ const MapSearch = () => {
   };
 
   if (!location || isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.absolute.white} />
-        <Text style={{ color: 'white' }}>위치 정보를 불러오는 중...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   return (
