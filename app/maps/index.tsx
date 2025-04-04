@@ -1,13 +1,13 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
-import React, { useRef, useState } from 'react';
+import { router } from 'expo-router';
+import React, { useRef } from 'react';
 import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
 import markerIcon from '@/assets/images/marker.png';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
-import fetchNearestPlaceName from '@/lib/googlePlaces';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
@@ -17,10 +17,6 @@ import styles from './styles';
 const MapSearch = () => {
   const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
 
-  const [placeName, setPlaceName] = useState<string | null>(null);
-  const [vicinity, setvicinity] = useState<string | null>(null);
-  const [createMode, setCreateMode] = useState(false);
-
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const { data: markers, isLoading } = useQuery({
@@ -28,23 +24,8 @@ const MapSearch = () => {
     queryFn: getMarkers,
   });
 
-  const handleMapPress = async (e: any) => {
-    if (!createMode) return;
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    const data = await fetchNearestPlaceName(latitude, longitude);
-    setPlaceName(data.name);
-    setvicinity(data.vicinity);
-
-    bottomSheetRef.current?.snapToIndex(0);
-  };
-
   const handleButtonPress = () => {
-    setCreateMode((prev) => !prev);
-    if (createMode) {
-      bottomSheetRef.current?.close();
-    } else {
-      bottomSheetRef.current?.snapToIndex(0);
-    }
+    router.push('/maps/create');
   };
 
   if (!location || isLoading) {
@@ -68,7 +49,6 @@ const MapSearch = () => {
           longitudeDelta: 0.003,
         }}
         showsUserLocation
-        onPress={handleMapPress}
       >
         {markers &&
           markers.map((marker: MarkerType) => (
@@ -91,20 +71,15 @@ const MapSearch = () => {
         backgroundStyle={{ backgroundColor: `${colors.background}` }}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <Text style={styles.bottomSheetMainText}>{placeName}</Text>
-          <Text style={styles.bottomSheetSubText}>{vicinity}</Text>
-          <TouchableOpacity style={styles.bottomSheetButton} onPress={handleButtonPress}>
-            <Text style={styles.bottomSheetButtonText}>반짝이 기록하기</Text>
-          </TouchableOpacity>
+          <Text style={styles.bottomSheetMainText}>여기에 포스트 내용 들어감</Text>
+          <Text style={styles.bottomSheetSubText}>포스트 여기다가 써야지</Text>
         </BottomSheetView>
       </BottomSheet>
-      {!createMode && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
-            <Text style={styles.buttonText}>기록하기</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+          <Text style={styles.buttonText}>기록하기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

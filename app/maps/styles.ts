@@ -4,7 +4,7 @@ import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1, zIndex: -1 },
+  map: { flex: 1 },
   overlay: { position: 'absolute', top: 50, left: 20 },
   loadingContainer: {
     flex: 1,
@@ -41,6 +41,10 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bottomContentView: {
+    height: 200,
+    backgroundColor: 'transparent',
   },
   bottomSheetButtonText: {
     color: `${colors.background}`,
