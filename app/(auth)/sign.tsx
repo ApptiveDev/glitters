@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { getSchoolList } from '@/api/sign';
 import DropdownComponent from '@/components/common/Dropdown';
 import CommonInput from '@/components/common/Input';
+import colors from '@/types/colors';
 import { SchoolListResponse } from '@/types/sign';
 
 const styles = StyleSheet.create({
@@ -41,7 +42,7 @@ export const Sign = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#404C7A' }}>
+    <View style={{ flex: 1, backgroundColor: `${colors.background}` }}>
       <View style={styles.view}>
         <DropdownComponent data={formattedList || []} value={domain} setValue={setDomain} />
         {domain && (

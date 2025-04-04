@@ -8,6 +8,7 @@ import { getMarkers } from '@/api/markers';
 import markerIcon from '@/assets/images/marker.png';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
+import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
@@ -49,7 +50,7 @@ const MapSearch = () => {
   if (!location || isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ffffff" />
+        <ActivityIndicator size="large" color={colors.absolute.white} />
         <Text style={{ color: 'white' }}>위치 정보를 불러오는 중...</Text>
       </View>
     );
@@ -87,7 +88,7 @@ const MapSearch = () => {
         ref={bottomSheetRef}
         snapPoints={['25%', '50%']}
         index={-1}
-        backgroundStyle={{ backgroundColor: '#404C7A' }}
+        backgroundStyle={{ backgroundColor: `${colors.background}` }}
       >
         <BottomSheetView style={styles.contentContainer}>
           <Text style={styles.bottomSheetMainText}>{placeName}</Text>

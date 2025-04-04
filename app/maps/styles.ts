@@ -1,12 +1,14 @@
 import { StyleSheet } from 'react-native';
 
+import colors from '@/types/colors';
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1, zIndex: -1 },
   overlay: { position: 'absolute', top: 50, left: 20 },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#404C7A',
+    backgroundColor: `${colors.background}`,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -23,7 +25,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
-    color: '#fff',
+    color: `${colors.absolute.white}`,
     fontSize: 16,
   },
   contentContainer: {
@@ -31,7 +33,7 @@ const styles = StyleSheet.create({
   },
   bottomSheetContainer: {},
   bottomSheetButton: {
-    backgroundColor: '#FFE9A1',
+    backgroundColor: `${colors.yellow.dark}`,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomSheetButtonText: {
-    color: '#404C7A',
+    color: `${colors.background}`,
     fontSize: 12,
     fontWeight: 'bold',
   },
