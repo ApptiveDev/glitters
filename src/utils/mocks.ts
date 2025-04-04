@@ -13,8 +13,8 @@ export const PNU_BOUND_MOCK: InstitutionBound = {
   startLon: 129.08,
   endLat: 35.2455,
   endLon: 129.096,
-  defaultLat: 35.232255,
-  defaultLon: 129.082802,
+  defaultLat: 35.2345,
+  defaultLon: 129.0798,
   createdAt: '2025-04-04T00:00:00Z',
   updatedAt: '2025-04-04T00:00:00Z',
 };

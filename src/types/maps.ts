@@ -15,3 +15,12 @@ export type InstitutionBound = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type MarkerType = {
+  id: number;
+  postId: number;
+  latitude: number;
+  longitude: number;
+  expiresAt: string;
+  isWrittenBySelf: boolean;
+};

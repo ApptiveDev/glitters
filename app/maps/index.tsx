@@ -1,10 +1,14 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { useQuery } from '@tanstack/react-query';
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
+import { getMarkers } from '@/api/markers';
+import markerIcon from '@/assets/images/marker.png';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
+import { MarkerType } from '@/types/maps';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
 import styles from './mapStyles';
@@ -18,12 +22,15 @@ const MapSearch = () => {
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
+  const { data: markers, isLoading } = useQuery({
+    queryKey: ['markers'],
+    queryFn: getMarkers,
+  });
+
   const handleMapPress = async (e: any) => {
     if (!createMode) return;
-
     const { latitude, longitude } = e.nativeEvent.coordinate;
     const data = await fetchNearestPlaceName(latitude, longitude);
-    console.log(data);
     setPlaceName(data.name);
     setvicinity(data.vicinity);
 
@@ -39,7 +46,7 @@ const MapSearch = () => {
     }
   };
 
-  if (!location) {
+  if (!location || isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#ffffff" />
@@ -61,7 +68,20 @@ const MapSearch = () => {
         }}
         showsUserLocation
         onPress={handleMapPress}
-      />
+      >
+        {markers &&
+          markers.map((marker: MarkerType) => (
+            <Marker
+              key={marker.id}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+            >
+              <Image source={markerIcon} style={{ width: 40, height: 40 }} resizeMode="contain" />
+            </Marker>
+          ))}
+      </MapView>
 
       <BottomSheet
         ref={bottomSheetRef}
