@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -53,6 +54,10 @@ export const CreateMarker = () => {
     return <Loading />;
   }
 
+  const handleButtonPress = () => {
+    router.replace('/maps/create/write');
+  };
+
   return (
     <View style={styles.container}>
       {location && (
@@ -95,7 +100,7 @@ export const CreateMarker = () => {
             <View style={styles.bottomContentView}>
               <Text style={styles.bottomSheetMainText}>{placeName}</Text>
               <Text style={styles.bottomSheetSubText}>{vicinity}</Text>
-              <TouchableOpacity style={styles.bottomSheetButton}>
+              <TouchableOpacity style={styles.bottomSheetButton} onPress={handleButtonPress}>
                 <Text style={styles.bottomSheetButtonText}>반짝이 기록하기</Text>
               </TouchableOpacity>
             </View>
