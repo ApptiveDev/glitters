@@ -8,10 +8,17 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    "react/function-component-definition": [
+      2, 
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
+    ],
   },
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
-  "ignorePatterns": ["babel.config.js", ".eslintrc.js"]
+  "ignorePatterns": ["babel.config.js", ".eslintrc.js", "app.config.js", "metro.config.js", "prettier.config.js", "tsconfig.json"],
 };

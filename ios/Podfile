@@ -26,10 +26,10 @@ node_require('react-native-permissions/scripts/setup.rb')
 
 target 'app' do
   use_expo_modules!
-
-  pre_install do |installer|
-    $RNMapboxMaps.pre_install(installer)
-  end
+  pod 'Google-Maps-iOS-Utils', '5.0.0'
+  rn_maps_path = '../node_modules/react-native-maps'
+  pod 'react-native-google-maps', :path => rn_maps_path
+  config = use_native_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
     config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"];
@@ -66,7 +66,6 @@ target 'app' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
-    $RNMapboxMaps.post_install(installer)
 
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
