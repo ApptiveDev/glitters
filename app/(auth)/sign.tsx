@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 
 import { getSchoolList } from '@/api/sign';
 import DropdownComponent from '@/components/common/Dropdown';
@@ -14,6 +14,7 @@ export const Sign = () => {
   const [domain, setDomain] = useState<string | null>(null);
   const [value, setValue] = useState<string>('');
   const [valid, setValid] = useState<boolean>(false);
+  const { width } = Dimensions.get('window');
 
   const { data } = useQuery<SchoolListResponse>({
     queryKey: ['school_list'],
@@ -31,7 +32,9 @@ export const Sign = () => {
 
   const onChangeText = (text: string) => {
     setValue(text);
-    setValid(text.endsWith(domain || ''));
+    if (text.length > 0) {
+      setValid(true);
+    }
   };
 
   return (
@@ -39,7 +42,17 @@ export const Sign = () => {
       <View style={styles.view}>
         <DropdownComponent data={formattedList || []} value={domain} setValue={setDomain} />
         {domain && (
-          <CommonInput width={346} defaultValue={domain} isValid={valid} value={value} onChangeText={onChangeText} />
+          <View style={styles.inputContainer}>
+            <CommonInput
+              style={{ width: width / 2 - 28 }}
+              placeholder="이메일을 입력하세요"
+              isValid={valid}
+              defaultValue=""
+              value={value}
+              onChangeText={onChangeText}
+            />
+            <CommonInput style={{ width: width / 2 - 28 }} defaultValue={domain} editable={false} />
+          </View>
         )}
       </View>
     </View>

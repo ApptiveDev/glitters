@@ -4,8 +4,13 @@ const styles = StyleSheet.create({
   view: {
     flex: 1,
     alignItems: 'center',
-    padding: 28,
     gap: 20,
+  },
+  inputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 28,
   },
 });
 
