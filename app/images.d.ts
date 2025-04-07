@@ -11,6 +11,9 @@ declare module '*.jpeg' {
   export default value;
 }
 declare module '*.svg' {
-  const content: any;
+  import React from 'react';
+  import { SvgProps } from 'react-native-svg';
+
+  const content: React.FC<SvgProps>;
   export default content;
 }

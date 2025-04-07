@@ -1,10 +1,10 @@
+import MarkerIcon from '@assets/icons/marker.svg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import markerIcon from '@/assets/images/marker.png';
 import Loading from '@/components/common/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
@@ -80,7 +80,7 @@ export const CreateMarker = () => {
                 longitude: markerPlace.longitude,
               }}
             >
-              <Image source={markerIcon} style={{ width: 40, height: 40 }} resizeMode="contain" />
+              <MarkerIcon style={{ width: 40, height: 40 }} />
             </Marker>
           )}
         </MapView>

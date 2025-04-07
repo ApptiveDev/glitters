@@ -20,5 +20,5 @@ module.exports = {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
-  "ignorePatterns": ["babel.config.js", ".eslintrc.js", "app.config.js"],
+  "ignorePatterns": ["babel.config.js", ".eslintrc.js", "app.config.js", "metro.config.js", "prettier.config.js", "tsconfig.json"],
 };

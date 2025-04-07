@@ -1,12 +1,12 @@
+import MarkerIcon from '@assets/icons/marker.svg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useRef } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
-import markerIcon from '@/assets/images/marker.png';
 import Loading from '@/components/common/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
@@ -33,6 +33,8 @@ const MapSearch = () => {
     return <Loading />;
   }
 
+  console.log(typeof MarkerIcon);
+
   return (
     <View style={styles.container}>
       <MapView
@@ -55,7 +57,7 @@ const MapSearch = () => {
                 longitude: marker.longitude,
               }}
             >
-              <Image source={markerIcon} style={{ width: 40, height: 40 }} resizeMode="contain" />
+              <MarkerIcon style={{ width: 40, height: 40 }} />
             </Marker>
           ))}
       </MapView>
