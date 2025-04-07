@@ -1,140 +1,85 @@
+import MarkerIcon from '@assets/icons/marker.svg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import Mapbox from '@rnmapbox/maps';
-import Constants from 'expo-constants';
-import * as Location from 'expo-location';
-import * as SplashScreen from 'expo-splash-screen';
-import { Feature, GeoJsonProperties, Geometry, Point } from 'geojson';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
+import React, { useRef } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import pinIcon from '@/assets/images/pin.png';
-import mock from '@/utils/markers';
+import { getMarkers } from '@/api/markers';
+import Loading from '@/components/common/Loading';
+import { useCurrentLocation } from '@/hooks/useCurrentLocation';
+import colors from '@/types/colors';
+import { MarkerType } from '@/types/maps';
+import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
-import mapStyles, { mapPinLayer } from './mapStyles';
+import styles from './styles';
 
-const defaultCamera = {
-  centerCoordinate: [129.082794, 35.231154],
-  zoomLevel: 17.4,
-};
+const MapSearch = () => {
+  const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
 
-const token = Constants.expoConfig?.extra?.mapboxAccessToken;
-Mapbox.setAccessToken(token);
-
-const Example = () => {
-  const cameraRef = React.useRef<Mapbox.Camera>(null);
-  const [zoom, setZoom] = useState<number>(defaultCamera.zoomLevel);
-  const [location, setLocation] = useState<Location.LocationObject>();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [disableMode, setDisableMode] = useState(false);
-  const [features, setFeatures] = useState<Feature<Point, GeoJsonProperties>[]>(mock);
 
-  useEffect(() => {
-    (async () => {
-      await SplashScreen.hideAsync();
+  const { data: markers, isLoading } = useQuery({
+    queryKey: ['markers'],
+    queryFn: getMarkers,
+  });
 
-      const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status === 'granted') {
-        const currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation(currentLocation);
-      }
-    })();
-  }, [location]);
-
-  const handlePress = () => {
-    bottomSheetRef.current?.expand();
-    setDisableMode(true);
+  const handleButtonPress = () => {
+    router.push('/maps/create');
   };
 
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      setDisableMode(false);
-    }
-  }, []);
+  if (!location || isLoading) {
+    return <Loading />;
+  }
 
-  const handleZoomIn = () => {
-    if (zoom >= 18) {
-      return;
-    }
-    setZoom((prevZoom) => prevZoom + 1);
-    cameraRef.current?.setCamera({ zoomLevel: zoom });
-  };
-
-  const handleZoomOut = () => {
-    if (zoom <= 14) {
-      return;
-    }
-    setZoom((prevZoom) => prevZoom - 1);
-    cameraRef.current?.setCamera({ zoomLevel: zoom });
-  };
-
-  const handleMapPress = (feature: Feature<Geometry, GeoJsonProperties>) => {
-    if (feature.geometry.type === 'Point') {
-      setFeatures((prev) => {
-        const newFeatures = [...prev];
-        newFeatures.push(feature as Feature<Point, GeoJsonProperties>);
-        console.log('마커 클릭 좌표:', features);
-        if (feature.geometry.type === 'Point') {
-          console.log('마커 클릭 좌표:', feature.geometry.coordinates);
-        }
-        return newFeatures;
-      });
-    }
-  };
+  console.log(typeof MarkerIcon);
 
   return (
-    <View style={mapStyles.container}>
-      <Mapbox.MapView style={{ flex: 1 }} logoEnabled={false} attributionEnabled={false} onPress={handleMapPress}>
-        <Mapbox.UserLocation visible />
-        <Mapbox.Camera defaultSettings={defaultCamera} ref={cameraRef} zoomLevel={zoom} />
-        <Mapbox.Images images={{ exampleIcon: pinIcon }} />
-        <Mapbox.ShapeSource id="mapPinsSource" shape={{ type: 'FeatureCollection', features }} onPress={handlePress}>
-          <Mapbox.SymbolLayer id="mapPinsLayer" style={mapPinLayer} />
-        </Mapbox.ShapeSource>
-      </Mapbox.MapView>
-      <View style={{ position: 'absolute', right: 20, bottom: 100 }}>
-        <TouchableOpacity
-          onPress={handleZoomIn}
-          style={{
-            backgroundColor: '#fff',
-            padding: 10,
-            marginBottom: 8,
-            borderRadius: 8,
-            elevation: 3,
-          }}
-        >
-          <Text style={{ fontSize: 20 }}>＋</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        initialRegion={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 0.003,
+          longitudeDelta: 0.003,
+        }}
+        showsUserLocation
+      >
+        {markers &&
+          markers.map((marker: MarkerType) => (
+            <Marker
+              key={marker.id}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+            >
+              <MarkerIcon style={{ width: 40, height: 40 }} />
+            </Marker>
+          ))}
+      </MapView>
 
-        <TouchableOpacity
-          onPress={handleZoomOut}
-          style={{
-            backgroundColor: '#fff',
-            padding: 10,
-            borderRadius: 8,
-            elevation: 3,
-          }}
-        >
-          <Text style={{ fontSize: 20 }}>－</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={mapStyles.button} onPress={handlePress} disabled={disableMode}>
-        <Text style={mapStyles.buttonText}>등록하기</Text>
-      </TouchableOpacity>
       <BottomSheet
         ref={bottomSheetRef}
-        onChange={handleSheetChanges}
         snapPoints={['25%', '50%']}
-        backgroundStyle={{ backgroundColor: '#fff' }}
         index={-1}
+        backgroundStyle={{ backgroundColor: `${colors.background}` }}
       >
-        <BottomSheetView style={mapStyles.contentContainer}>
-          <Text>Awesome 🎉</Text>
+        <BottomSheetView style={styles.contentContainer}>
+          <Text style={styles.bottomSheetMainText}>여기에 포스트 내용 들어감</Text>
+          <Text style={styles.bottomSheetSubText}>포스트 여기다가 써야지</Text>
         </BottomSheetView>
       </BottomSheet>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+          <Text style={styles.buttonText}>기록하기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-export default Example;
+export default MapSearch;

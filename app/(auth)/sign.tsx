@@ -1,24 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 
-import { getSchoolList, SchoolListResponse } from '@/api/login';
+import { getSchoolList } from '@/api/sign';
 import DropdownComponent from '@/components/common/Dropdown';
 import CommonInput from '@/components/common/Input';
+import colors from '@/types/colors';
+import { SchoolListResponse } from '@/types/sign';
 
-const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 100,
-    gap: 20,
-  },
-});
+import styles from './styles';
 
 export const Sign = () => {
   const [domain, setDomain] = useState<string | null>(null);
   const [value, setValue] = useState<string>('');
   const [valid, setValid] = useState<boolean>(false);
+  const { width } = Dimensions.get('window');
 
   const { data } = useQuery<SchoolListResponse>({
     queryKey: ['school_list'],
@@ -30,21 +26,33 @@ export const Sign = () => {
     const list = data?.institutions;
     return list?.map((item) => ({
       label: item.name,
-      value: item.email_domain,
+      value: item.emailDomain,
     }));
   }, [data]);
 
   const onChangeText = (text: string) => {
     setValue(text);
-    setValid(text.endsWith(domain || ''));
+    if (text.length > 0) {
+      setValid(true);
+    }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#404C7A' }}>
+    <View style={{ flex: 1, backgroundColor: `${colors.background}` }}>
       <View style={styles.view}>
         <DropdownComponent data={formattedList || []} value={domain} setValue={setDomain} />
         {domain && (
-          <CommonInput width={346} defaultValue={domain} isValid={valid} value={value} onChangeText={onChangeText} />
+          <View style={styles.inputContainer}>
+            <CommonInput
+              style={{ width: width / 2 - 28 }}
+              placeholder="이메일을 입력하세요"
+              isValid={valid}
+              defaultValue=""
+              value={value}
+              onChangeText={onChangeText}
+            />
+            <CommonInput style={{ width: width / 2 - 28 }} defaultValue={domain} editable={false} />
+          </View>
         )}
       </View>
     </View>
