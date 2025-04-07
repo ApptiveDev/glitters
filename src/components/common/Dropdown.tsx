@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
+import colors from '@/types/colors';
+
 interface DropdownComponentProps {
   data: { label: string; value: string }[];
   value: string | null;
@@ -22,23 +24,23 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     height: 50,
-    backgroundColor: '#515F95',
+    backgroundColor: `${colors.primary}`,
     borderRadius: 12,
     borderColor: '#FBFBFB',
     borderWidth: 1,
     padding: 16,
-    color: '#FFF',
+    color: `${colors.absolute.white}`,
   },
   icon: {
     marginRight: 5,
   },
   placeholderStyle: {
     fontSize: 16,
-    color: '#FFF',
+    color: `${colors.absolute.white}`,
   },
   selectedTextStyle: {
     fontSize: 16,
-    color: '#FFF',
+    color: `${colors.absolute.white}`,
   },
   iconStyle: {
     width: 20,

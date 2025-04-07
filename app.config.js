@@ -7,7 +7,6 @@ export default {
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'myapp',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
@@ -42,7 +41,7 @@ export default {
       typedRoutes: true,
     },
     extra: {
-      mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN,
+      googleApiKey: process.env.GOOGLE_API_KEY,
     },
   },
 };

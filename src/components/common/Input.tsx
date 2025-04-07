@@ -2,8 +2,9 @@
 import React from 'react';
 import { DimensionValue, StyleSheet, Text, TextInput, TextInputProps, TextStyle, View } from 'react-native';
 
+import colors from '@/types/colors';
+
 interface CommonInputProps extends TextInputProps {
-  width?: DimensionValue;
   height?: DimensionValue;
   disable?: boolean;
   fontSize?: number;
@@ -14,20 +15,18 @@ interface CommonInputProps extends TextInputProps {
   isError?: boolean;
   isGuide?: boolean;
   guideText?: string;
+  editable?: boolean;
   onChangeText?: (text: string) => void;
 }
 
 const styles = StyleSheet.create({
   input: {
-    height: 40,
     borderBottomWidth: 1,
-    marginBottom: 12,
     paddingLeft: 8,
     borderRadius: 4,
-    boxSizing: 'border-box',
   },
-  errerText: {
-    color: '#FFA0A0',
+  errorText: {
+    color: colors.error,
     paddingLeft: 8,
     fontSize: 12,
   },
@@ -36,7 +35,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   guideText: {
-    color: '#FFF7C1',
+    color: colors.guide,
     fontSize: 12,
     paddingLeft: 8,
   },
@@ -45,10 +44,9 @@ const styles = StyleSheet.create({
 const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
   (
     {
-      width = '100%',
-      height = 40,
+      height = 48,
       placeholder = '',
-      defaultValue = '기본값',
+      defaultValue = '',
       fontSize = 16,
       padding = 12,
       backgroundColor = 'transparent',
@@ -59,34 +57,34 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
       isError = false,
       isGuide = false,
       guideText = '',
+      editable = true,
       style,
     },
     ref,
   ) => {
     const dynamicStyles: TextStyle = {
-      width,
-      backgroundColor,
-      color: isValid ? '#FFF' : '#8793C2',
-      borderColor: disable ? '#FFF' : '#8793C2',
       height,
       fontSize,
-      padding,
+      backgroundColor,
+      color: isValid ? '#FFF' : colors.gray.main,
+      borderColor: disable ? '#FFF' : colors.gray.main,
+      paddingHorizontal: padding,
+      paddingVertical: 10,
+      textAlignVertical: 'center',
+      borderBottomWidth: 1,
     };
 
     return (
       <View style={styles.component}>
         <TextInput
+          ref={ref}
           style={[styles.input, dynamicStyles, style]}
           placeholder={placeholder}
           defaultValue={defaultValue}
           onChangeText={onChangeText}
-          ref={ref}
+          editable={editable}
         />
-        {isError && (
-          <Text style={styles.errerText} disabled={!isError}>
-            {errorMessage}
-          </Text>
-        )}
+        {isError && <Text style={styles.errorText}>{errorMessage}</Text>}
         {isGuide && <Text style={styles.guideText}>{guideText}</Text>}
       </View>
     );
