@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 import { getSchoolList } from '@/api/sign';
 import DropdownComponent from '@/components/common/Dropdown';
@@ -8,14 +8,7 @@ import CommonInput from '@/components/common/Input';
 import colors from '@/types/colors';
 import { SchoolListResponse } from '@/types/sign';
 
-const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 100,
-    gap: 20,
-  },
-});
+import styles from './styles';
 
 export const Sign = () => {
   const [domain, setDomain] = useState<string | null>(null);
