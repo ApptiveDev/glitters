@@ -1,17 +1,19 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { getSchoolList } from '@/api/sign';
+import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/sign';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
 import CommonInput from '@/components/common/Input';
+import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import colors from '@/types/colors';
-import { checkAuthCode, SchoolListResponse, verifyEmail } from '@/types/sign';
+import { SchoolListResponse } from '@/types/sign';
 
 import styles from './styles';
 
@@ -39,6 +41,8 @@ export const Sign = () => {
     authCodeFormatValid: false,
     authCodeVerified: false,
   });
+
+  const { user, updateUser } = useUser();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -155,6 +159,18 @@ export const Sign = () => {
         authCodeFormatValid: false,
       }));
     }
+  };
+
+  useEffect(() => {
+    if (user.email) {
+      router.push('./sign-info');
+    }
+  }, [user.email]);
+
+  const goToNextScreen = () => {
+    updateUser({
+      email: `${localPart}${domain}`,
+    });
   };
 
   return (
@@ -290,7 +306,7 @@ export const Sign = () => {
           {fieldValidation.authCodeVerified && (
             <CommonButton
               title="정보 입력하기"
-              onPress={() => {}}
+              onPress={goToNextScreen}
               style={{
                 width: '100%',
                 height: 48,
