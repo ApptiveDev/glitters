@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     color: colors.error,
     paddingLeft: 8,
     fontSize: 12,
+    marginTop: 8,
   },
   component: {
     justifyContent: 'center',
