@@ -1,4 +1,3 @@
-import MarkerIcon from '@assets/icons/marker.svg';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
@@ -7,6 +6,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
+import MarkerIcon from '@/assets/icons/marker.svg';
 import Loading from '@/components/common/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
