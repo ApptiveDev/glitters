@@ -11,6 +11,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
+  heading: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  element: {
+    flex: 1,
+    width: '100%',
+    gap: 12,
+  },
 });
 
 export default styles;

@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
   },
   bottomList: {
     backgroundColor: 'white',
-    paddingVertical: 16,
+    paddingVertical: 52,
+    paddingHorizontal: 44,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     maxHeight: 400,
