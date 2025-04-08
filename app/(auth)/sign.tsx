@@ -9,7 +9,7 @@ import { getSchoolList } from '@/api/sign';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
 import CommonInput from '@/components/common/Input';
-import useCountdownTimer from '@/hooks/useCountDownTimer';
+import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import colors from '@/types/colors';
 import { checkAuthCode, SchoolListResponse, verifyEmail } from '@/types/sign';
 
