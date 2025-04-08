@@ -3,6 +3,20 @@ import { SchoolListResponse } from '@/types/sign';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
   try {
+    if (__DEV__) {
+      return {
+        institutions: [
+          {
+            id: 1,
+            name: '부산대학교',
+            emailDomain: '@pusan.ac.kr',
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      };
+    }
     const response = await apiInstance.get('/institutions');
     return response.data;
   } catch (error) {

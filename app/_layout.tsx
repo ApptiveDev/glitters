@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 export const RootLayout = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: `${colors.background}` }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: `${colors.background}`, width: '100%' }}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <BottomSheetModalProvider>
             <UserProvider>

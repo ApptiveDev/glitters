@@ -31,6 +31,9 @@ const colors = {
   },
   error: '#FFA0A0',
   guide: '#FFF7C1',
+  text: {
+    white: '#FBFBFB',
+  },
 };
 
 export default colors;
