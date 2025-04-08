@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/sign';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
+import Heading from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
@@ -202,9 +203,11 @@ export const Sign = () => {
             justifyContent: 'flex-start',
             alignItems: 'center',
             paddingHorizontal: 28,
+            paddingTop: 48,
           }}
         >
-          <View style={{ flex: 1, width: '100%', gap: 8 }}>
+          <View style={styles.element}>
+            {!domain && <Heading title="학교 선택하기" />}
             <CustomDropdown
               data={formattedList || []}
               value={domain}
@@ -214,26 +217,30 @@ export const Sign = () => {
           </View>
 
           {domain && (
-            <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
-              <CommonInput
-                style={{ flex: 1, width: width / 2 - 28 }}
-                isValid={fieldValidation.emailFormatValid}
-                defaultValue=""
-                value={localPart}
-                onChangeText={onEmailChangeText}
-                editable={!fieldValidation.emailSent}
-              />
-              <CommonInput
-                style={{ flex: 1, width: width / 2 - 28 }}
-                defaultValue={domain}
-                isValid={fieldValidation.emailFormatValid}
-                editable={false}
-              />
+            <View style={styles.element}>
+              <Heading title="학교 이메일 입력하기" />
+              <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
+                <CommonInput
+                  style={{ flex: 1, width: width / 2 - 28 }}
+                  isValid={fieldValidation.emailFormatValid}
+                  defaultValue=""
+                  value={localPart}
+                  onChangeText={onEmailChangeText}
+                  editable={!fieldValidation.emailSent}
+                />
+                <CommonInput
+                  style={{ flex: 1, width: width / 2 - 28 }}
+                  defaultValue={domain}
+                  isValid={fieldValidation.emailFormatValid}
+                  editable={false}
+                />
+              </View>
             </View>
           )}
 
           {fieldValidation.emailSent ? (
-            <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8 }}>
+            <View style={styles.heading}>
+              <Heading title="인증번호 입력하기" />
               <CommonInput
                 style={{ width: width - 56 }}
                 defaultValue=""
