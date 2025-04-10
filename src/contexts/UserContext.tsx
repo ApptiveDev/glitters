@@ -1,27 +1,36 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  birth: string;
-  termsAccepted: boolean;
-  joinedAt: string;
-  reportedCount: number;
-  isDeactivated: boolean;
-}
+import type { User } from '@/types/auth';
+
+const initialUserState: User = {
+  id: 0,
+  name: '',
+  email: '',
+  password: '',
+  birth: '',
+  termsAccepted: false,
+  joinedAt: '',
+  reportedCount: 0,
+  isDeactivated: false,
+};
 
 interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: User;
+  setUser: (user: User) => void;
+  updateUser: (fields: Partial<User>) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const value = useMemo(() => ({ user, setUser }), [user]);
+  const [user, setUser] = useState<User>(initialUserState);
+
+  const updateUser = (fields: Partial<User>) => {
+    setUser((prev) => ({ ...prev, ...fields }));
+  };
+
+  const value = useMemo(() => ({ user, setUser, updateUser }), [user]);
+
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 

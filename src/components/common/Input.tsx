@@ -1,7 +1,17 @@
 /* eslint-disable react/require-default-props */
 import React from 'react';
-import { DimensionValue, StyleSheet, Text, TextInput, TextInputProps, TextStyle, View } from 'react-native';
+import {
+  ActivityIndicator,
+  DimensionValue,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  TextStyle,
+  View,
+} from 'react-native';
 
+import CheckIcon from '@/assets/icons/check.svg';
 import colors from '@/types/colors';
 
 interface CommonInputProps extends TextInputProps {
@@ -16,6 +26,8 @@ interface CommonInputProps extends TextInputProps {
   isGuide?: boolean;
   guideText?: string;
   editable?: boolean;
+  checked?: boolean;
+  loading?: boolean;
   onChangeText?: (text: string) => void;
 }
 
@@ -29,6 +41,7 @@ const styles = StyleSheet.create({
     color: colors.error,
     paddingLeft: 8,
     fontSize: 12,
+    marginTop: 8,
   },
   component: {
     justifyContent: 'center',
@@ -37,7 +50,14 @@ const styles = StyleSheet.create({
   guideText: {
     color: colors.guide,
     fontSize: 12,
-    paddingLeft: 8,
+    position: 'absolute',
+    bottom: 14,
+    right: 0,
+  },
+  underline: {
+    height: 1,
+    alignSelf: 'stretch',
+    marginTop: -1,
   },
 });
 
@@ -58,6 +78,8 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
       isGuide = false,
       guideText = '',
       editable = true,
+      checked = false,
+      loading = false,
       style,
     },
     ref,
@@ -65,14 +87,14 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
     const dynamicStyles: TextStyle = {
       height,
       fontSize,
-      backgroundColor,
-      color: isValid ? '#FFF' : colors.gray.main,
-      borderColor: disable ? '#FFF' : colors.gray.main,
+      backgroundColor: disable ? colors.gray.light : backgroundColor,
+      color: isValid ? colors.absolute.white : colors.gray.main,
       paddingHorizontal: padding,
       paddingVertical: 10,
       textAlignVertical: 'center',
-      borderBottomWidth: 1,
     };
+
+    const lineColor = isValid ? colors.absolute.white : colors.gray.main;
 
     return (
       <View style={styles.component}>
@@ -82,10 +104,35 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
           placeholder={placeholder}
           defaultValue={defaultValue}
           onChangeText={onChangeText}
+          placeholderTextColor={colors.primary.main}
           editable={editable}
         />
+        {isGuide && !loading && !checked && <Text style={styles.guideText}>{guideText}</Text>}
+        {loading && (
+          <ActivityIndicator
+            size="small"
+            color={colors.yellow.dark}
+            style={{
+              position: 'absolute',
+              right: 0,
+              width: 16,
+              height: 16,
+            }}
+          />
+        )}
+        <CheckIcon
+          width={16}
+          height={16}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 12,
+            opacity: checked && !loading ? 1 : 0,
+          }}
+        />
+
+        <View style={[styles.underline, { backgroundColor: lineColor }]} />
         {isError && <Text style={styles.errorText}>{errorMessage}</Text>}
-        {isGuide && <Text style={styles.guideText}>{guideText}</Text>}
       </View>
     );
   },

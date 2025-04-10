@@ -1,11 +1,15 @@
 import { Slot } from 'expo-router';
-import { View } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
+
+import colors from '@/types/colors';
 
 export const AuthLayout = () => {
   return (
-    <View style={{ flex: 1, alignItems: 'center', padding: 28, gap: 20 }}>
-      <Slot />
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: `${colors.background}`, width: '100%' }}>
+      <View style={{ flex: 1, alignItems: 'center', gap: 20 }}>
+        <Slot />
+      </View>
+    </SafeAreaView>
   );
 };
 
