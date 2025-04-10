@@ -1,5 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
+
+import { getToken } from '@/utils/authStorage';
 
 const apiInstance: AxiosInstance = axios.create({
   baseURL: `https://banjjak.me:8445/api/`,
@@ -18,7 +19,7 @@ apiInstance.interceptors.request.use(
       token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRXhhbXBsZSIsImVtYWlsIjoiY2xhNnNoYWRlQGdtYWlsLmNvbSIsImlkIjoyLCJpYXQiOjE3NDM2NTQzODMsImV4cCI6MjA1OTAxNDM4M30.ccmESMMwwRHbrUOCUeN9uUZeNIT7X5CHnA4nUv02NNw';
     } else {
-      token = await AsyncStorage.getItem('Authorization');
+      token = getToken();
     }
     if (token) {
       newConfig.headers.Authorization = `Bearer ${token}`;

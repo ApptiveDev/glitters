@@ -6,7 +6,7 @@ import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, Text, View } from
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/sign';
+import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
 import { Heading } from '@/components/common/Heading';

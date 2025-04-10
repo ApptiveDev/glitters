@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { UserRegistrationRequest } from '@/types/user';
+import { UserLoginRequest, UserRegistrationRequest } from '@/types/auth';
 import { SchoolListResponse } from '@/types/utils';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
@@ -81,5 +81,19 @@ export const registerUser = async (user: UserRegistrationRequest) => {
   } catch (error) {
     console.error('Error registering user:', error);
     throw new Error('Failed to register user');
+  }
+};
+
+export const loginUser = async (userLogin: UserLoginRequest) => {
+  const { email, password } = userLogin;
+  try {
+    const response = await apiInstance.post('/login', {
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error logging in user:', error);
+    throw new Error('Failed to login user');
   }
 };
