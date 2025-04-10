@@ -2,15 +2,15 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Dimensions, Text, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
+import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
+import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
@@ -48,7 +48,6 @@ export const Sign = () => {
 
   const isKeyboardVisible = useKeyboardVisible();
 
-  const insets = useSafeAreaInsets();
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
 
   const useVerifyEmailMutation = () => {
@@ -167,127 +166,90 @@ export const Sign = () => {
         flex: 1,
       }}
     >
-      <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'space-between',
-          alignItems: 'center',
+      <KeyboardScrollContainer
+        viewStyle={{
+          gap: 28,
         }}
-        keyboardShouldPersistTaps="handled"
-        extraScrollHeight={20}
-        enableOnAndroid
-        enableResetScrollToCoords={false}
-        scrollEnabled
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
       >
-        <View
-          style={{
-            width: '100%',
-            gap: 28,
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: 28,
-            paddingTop: 48,
-          }}
-        >
+        <View style={styles.element}>
+          {!domain && <Heading title="학교 선택하기" />}
+          <CustomDropdown
+            data={formattedList || []}
+            value={domain}
+            setValue={setDomain}
+            style={{ width: width - 56 }}
+          />
+        </View>
+
+        {domain && (
           <View style={styles.element}>
-            {!domain && <Heading title="학교 선택하기" />}
-            <CustomDropdown
-              data={formattedList || []}
-              value={domain}
-              setValue={setDomain}
-              style={{ width: width - 56 }}
-            />
-          </View>
-
-          {domain && (
-            <View style={styles.element}>
-              <Heading title="학교 이메일 입력하기" />
-              <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
-                <CommonInput
-                  style={{ flex: 1, width: width / 2 - 28 }}
-                  isValid={fieldValidation.emailFormatValid}
-                  defaultValue=""
-                  value={localPart}
-                  onChangeText={onEmailChangeText}
-                  editable={!fieldValidation.emailSent}
-                />
-                <CommonInput
-                  style={{ flex: 1, width: width / 2 - 28 }}
-                  defaultValue={domain}
-                  isValid={fieldValidation.emailFormatValid}
-                  editable={false}
-                />
-              </View>
-            </View>
-          )}
-
-          {fieldValidation.emailSent ? (
-            <View style={styles.heading}>
-              <Heading title="인증번호 입력하기" />
+            <Heading title="학교 이메일 입력하기" />
+            <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
               <CommonInput
-                style={{ width: width - 56 }}
+                style={{ flex: 1, width: width / 2 - 28 }}
+                isValid={fieldValidation.emailFormatValid}
                 defaultValue=""
-                value={authCode}
-                onChangeText={onAuthCodeChangeText}
-                placeholder="인증번호를 입력하세요."
-                loading={inputStatus.loading}
-                checked={inputStatus.checked}
-                guideText={`${formatted}분 남음`}
-                isGuide
-                editable={!fieldValidation.authCodeVerified && isRunning}
+                value={localPart}
+                onChangeText={onEmailChangeText}
+                editable={!fieldValidation.emailSent}
               />
-              {!fieldValidation.authCodeVerified && (
-                <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
-                  <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
-                  <Text
-                    style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
-                    onPress={buttonPress}
-                  >
-                    재전송하기
-                  </Text>
-                </Text>
-              )}
+              <CommonInput
+                style={{ flex: 1, width: width / 2 - 28 }}
+                defaultValue={domain}
+                isValid={fieldValidation.emailFormatValid}
+                editable={false}
+              />
             </View>
-          ) : (
-            <View style={{ flex: 1, width: '100%', gap: 8 }} />
-          )}
-        </View>
-      </KeyboardAwareScrollView>
+          </View>
+        )}
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          bottom: 0,
-        }}
-      >
-        <View
-          style={{
-            paddingBottom: insets.bottom + 20,
-            paddingHorizontal: isKeyboardVisible ? 0 : 28,
-          }}
-        >
-          {fieldValidation.emailFormatValid && !fieldValidation.emailSent ? (
-            <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
-          ) : (
-            <View
-              style={{
-                height: 48,
-                width: '100%',
-              }}
+        {fieldValidation.emailSent ? (
+          <View style={styles.heading}>
+            <Heading title="인증번호 입력하기" />
+            <CommonInput
+              style={{ width: width - 56 }}
+              defaultValue=""
+              value={authCode}
+              onChangeText={onAuthCodeChangeText}
+              placeholder="인증번호를 입력하세요."
+              loading={inputStatus.loading}
+              checked={inputStatus.checked}
+              guideText={`${formatted}분 남음`}
+              isGuide
+              editable={!fieldValidation.authCodeVerified && isRunning}
             />
-          )}
-          {fieldValidation.authCodeVerified && (
-            <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
-          )}
-        </View>
-      </KeyboardAvoidingView>
+            {!fieldValidation.authCodeVerified && (
+              <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
+                <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
+                <Text
+                  style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
+                  onPress={buttonPress}
+                >
+                  재전송하기
+                </Text>
+              </Text>
+            )}
+          </View>
+        ) : (
+          <View style={{ flex: 1, width: '100%', gap: 8 }} />
+        )}
+      </KeyboardScrollContainer>
+
+      <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
+        {fieldValidation.emailFormatValid && !fieldValidation.emailSent ? (
+          <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
+        ) : (
+          <View
+            style={{
+              height: 48,
+              width: '100%',
+            }}
+          />
+        )}
+        {fieldValidation.authCodeVerified && (
+          <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
+        )}
+      </BottomButtonContainer>
     </View>
   );
 };

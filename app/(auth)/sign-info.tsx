@@ -1,16 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useState } from 'react';
+import { Dimensions, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
+import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 
 import styles from './styles';
 
@@ -29,7 +30,7 @@ interface UserInfoField {
 }
 
 export const SignInfo = () => {
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
   const initialField = { value: '', isValid: false, isTouched: false };
   const [userInfoField, setUserInfoField] = useState<UserInfoField>({
     name: initialField,
@@ -39,7 +40,7 @@ export const SignInfo = () => {
     agreedToTermsOfService: false,
   });
   const { width } = Dimensions.get('window');
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const isKeyboardVisible = useKeyboardVisible();
   const insets = useSafeAreaInsets();
 
   const usePostMutation = () => {
@@ -64,20 +65,6 @@ export const SignInfo = () => {
       },
     }));
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
 
   const onUserNameChangeText = (text: string) => {
     updateField('name', text, (val) => val.length >= 2 && val.length <= 10);
@@ -106,7 +93,6 @@ export const SignInfo = () => {
         termsAccepted: userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService,
       });
       setUser(response.member);
-      console.log('회원가입 성공', user);
     } catch (error) {
       console.error('Error creating user:', error);
     }
@@ -118,98 +104,76 @@ export const SignInfo = () => {
         flex: 1,
       }}
     >
-      <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'space-between',
-          alignItems: 'center',
+      <KeyboardScrollContainer
+        viewStyle={{
+          gap: 28,
         }}
-        keyboardShouldPersistTaps="handled"
-        extraScrollHeight={20}
-        enableOnAndroid
-        enableResetScrollToCoords={false}
-        scrollEnabled
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
       >
-        <View
-          style={{
-            width: '100%',
-            gap: 28,
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: 28,
-            paddingTop: 48,
-          }}
-        >
-          <View style={styles.heading}>
-            <Heading title="이름 입력하기" />
-            <CommonInput
-              style={{ width: width - 56 }}
-              defaultValue=""
-              value={userInfoField.name.value}
-              onChangeText={onUserNameChangeText}
-              placeholder="이름을 입력하세요."
-              isError={!userInfoField.name.isValid && userInfoField.name.isTouched}
-              errorMessage="이름은 2자 이상 10자 이하로 입력해주세요."
-            />
-          </View>
-          <View style={styles.heading}>
-            <Heading title="생년월일 입력하기(8자리)" />
-            <CommonInput
-              style={{ width: width - 56 }}
-              defaultValue=""
-              value={userInfoField.birth.value}
-              onChangeText={onUserBirthChangeText}
-              placeholder="생년월일을 입력하세요."
-              isError={!userInfoField.birth.isValid && userInfoField.birth.isTouched}
-              errorMessage="생년월일은 8자리 숫자로 입력해주세요."
-            />
-          </View>
-          <View style={styles.heading}>
-            <Heading title="성별 선택하기" />
-            <GenderSelector
-              selected={userInfoField.gender.value as '남성' | '여성' | ''}
-              onSelect={(val) => updateField('gender', val, (value) => value === '남성' || value === '여성')}
-              isError={!userInfoField.gender.value && userInfoField.gender.isTouched}
-              errorMessage="성별을 선택해주세요."
-            />
-          </View>
-          {userInfoField.name.isValid && userInfoField.birth.isValid && userInfoField.gender.isValid && (
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                gap: 12,
-              }}
-            >
-              <TermsItem
-                isChecked={userInfoField.agreedToPrivacyPolicy}
-                onPress={() =>
-                  setUserInfoField((prev) => ({
-                    ...prev,
-                    agreedToPrivacyPolicy: !prev.agreedToPrivacyPolicy,
-                  }))
-                }
-                title="개인정보 처리방침"
-              />
-              <TermsItem
-                isChecked={userInfoField.agreedToTermsOfService}
-                onPress={() =>
-                  setUserInfoField((prev) => ({
-                    ...prev,
-                    agreedToTermsOfService: !prev.agreedToTermsOfService,
-                  }))
-                }
-                title="서비스 이용약관"
-              />
-            </View>
-          )}
+        <View style={styles.heading}>
+          <Heading title="이름 입력하기" />
+          <CommonInput
+            style={{ width: width - 56 }}
+            defaultValue=""
+            value={userInfoField.name.value}
+            onChangeText={onUserNameChangeText}
+            placeholder="이름을 입력하세요."
+            isError={!userInfoField.name.isValid && userInfoField.name.isTouched}
+            errorMessage="이름은 2자 이상 10자 이하로 입력해주세요."
+          />
         </View>
-      </KeyboardAwareScrollView>
+        <View style={styles.heading}>
+          <Heading title="생년월일 입력하기(8자리)" />
+          <CommonInput
+            style={{ width: width - 56 }}
+            defaultValue=""
+            value={userInfoField.birth.value}
+            onChangeText={onUserBirthChangeText}
+            placeholder="생년월일을 입력하세요."
+            isError={!userInfoField.birth.isValid && userInfoField.birth.isTouched}
+            errorMessage="생년월일은 8자리 숫자로 입력해주세요."
+          />
+        </View>
+        <View style={styles.heading}>
+          <Heading title="성별 선택하기" />
+          <GenderSelector
+            selected={userInfoField.gender.value as '남성' | '여성' | ''}
+            onSelect={(val) => updateField('gender', val, (value) => value === '남성' || value === '여성')}
+            isError={!userInfoField.gender.value && userInfoField.gender.isTouched}
+            errorMessage="성별을 선택해주세요."
+          />
+        </View>
+        {userInfoField.name.isValid && userInfoField.birth.isValid && userInfoField.gender.isValid && (
+          <View
+            style={{
+              width: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: 12,
+            }}
+          >
+            <TermsItem
+              isChecked={userInfoField.agreedToPrivacyPolicy}
+              onPress={() =>
+                setUserInfoField((prev) => ({
+                  ...prev,
+                  agreedToPrivacyPolicy: !prev.agreedToPrivacyPolicy,
+                }))
+              }
+              title="개인정보 처리방침"
+            />
+            <TermsItem
+              isChecked={userInfoField.agreedToTermsOfService}
+              onPress={() =>
+                setUserInfoField((prev) => ({
+                  ...prev,
+                  agreedToTermsOfService: !prev.agreedToTermsOfService,
+                }))
+              }
+              title="서비스 이용약관"
+            />
+          </View>
+        )}
+      </KeyboardScrollContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
