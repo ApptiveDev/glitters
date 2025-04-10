@@ -1,5 +1,6 @@
 import apiInstance from '@/api/apiInstance';
-import { SchoolListResponse } from '@/types/sign';
+import { UserRegistrationRequest } from '@/types/user';
+import { SchoolListResponse } from '@/types/utils';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
   try {
@@ -63,5 +64,22 @@ export const checkAuthCode = async (email: string, code: string) => {
   } catch (error) {
     console.error('Error verifying auth code:', error);
     throw new Error('Failed to verify auth code');
+  }
+};
+
+export const registerUser = async (user: UserRegistrationRequest) => {
+  const { email, password, name, birth, termsAccepted } = user;
+  try {
+    const response = await apiInstance.post('/register', {
+      email,
+      password,
+      name,
+      birth,
+      termsAccepted,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw new Error('Failed to register user');
   }
 };

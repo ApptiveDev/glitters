@@ -9,12 +9,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/sign';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
-import Heading from '@/components/common/Heading';
+import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import colors from '@/types/colors';
-import { SchoolListResponse } from '@/types/sign';
+import { SchoolListResponse } from '@/types/utils';
 
 import styles from './styles';
 

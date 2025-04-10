@@ -1,27 +1,31 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import type { SignUpUser } from '@/types/user';
+import type { User } from '@/types/user';
 
-const initialUserState: SignUpUser = {
+const initialUserState: User = {
+  id: 0,
+  name: '',
   email: '',
   password: '',
-  name: '',
   birth: '',
   termsAccepted: false,
+  joinedAt: '',
+  reportedCount: 0,
+  isDeactivated: false,
 };
 
 interface UserContextType {
-  user: SignUpUser;
-  setUser: (user: SignUpUser) => void;
-  updateUser: (fields: Partial<SignUpUser>) => void;
+  user: User;
+  setUser: (user: User) => void;
+  updateUser: (fields: Partial<User>) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<SignUpUser>(initialUserState);
+  const [user, setUser] = useState<User>(initialUserState);
 
-  const updateUser = (fields: Partial<SignUpUser>) => {
+  const updateUser = (fields: Partial<User>) => {
     setUser((prev) => ({ ...prev, ...fields }));
   };
 

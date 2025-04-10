@@ -10,7 +10,7 @@ export interface User {
   isDeactivated: boolean;
 }
 
-export interface SignUpUser {
+export interface UserRegistrationRequest {
   email?: string;
   password?: string;
   name?: string;
@@ -18,7 +18,7 @@ export interface SignUpUser {
   termsAccepted?: boolean;
 }
 
-export interface SignUpUserResponse {
-  user: User;
+export interface UserRegistrationResponse {
+  member: User;
   token: string;
 }
