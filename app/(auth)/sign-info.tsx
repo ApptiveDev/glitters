@@ -1,13 +1,15 @@
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { registerUser } from '@/api/sign';
 import { CommonButton } from '@/components/common/Button';
-import Heading from '@/components/common/Heading';
+import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import GenderSelector from '@/components/GenderSelector';
-import TermsItem from '@/components/TermsItem';
+import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 
@@ -28,7 +30,7 @@ interface UserInfoField {
 }
 
 export const SignInfo = () => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const initialField = { value: '', isValid: false, isTouched: false };
   const [userInfoField, setUserInfoField] = useState<UserInfoField>({
     name: initialField,
@@ -41,7 +43,13 @@ export const SignInfo = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
-  console.log('user', user);
+  const usePostMutation = () => {
+    return useMutation({
+      mutationFn: registerUser,
+    });
+  };
+
+  const { mutateAsync } = usePostMutation();
 
   const updateField = (
     key: keyof Pick<UserInfoField, 'name' | 'birth' | 'gender'>,
@@ -77,10 +85,32 @@ export const SignInfo = () => {
   };
 
   const onUserBirthChangeText = (text: string) => {
-    updateField('birth', text, (val) => {
-      const regex = /^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
-      return regex.test(val);
-    });
+    const raw = text.replace(/[^0-9]/g, '');
+
+    const regex = /^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
+
+    if (raw.length === 8 && regex.test(raw)) {
+      const formatted = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+      updateField('birth', formatted, () => true);
+    } else {
+      updateField('birth', text, () => false);
+    }
+  };
+
+  const handleButtonPress = async () => {
+    try {
+      const response = await mutateAsync({
+        name: userInfoField.name.value,
+        email: 'ming0820@pusan.ac.kr',
+        password: 'gDWQ^5kvLrC85w(',
+        birth: new Date(userInfoField.birth.value).toISOString(),
+        termsAccepted: userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService,
+      });
+      setUser(response.member);
+      console.log('회원가입 성공', user);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
   };
 
   return (
@@ -199,7 +229,7 @@ export const SignInfo = () => {
           {userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService && (
             <CommonButton
               title="회원가입 완료하기"
-              onPress={() => {}}
+              onPress={handleButtonPress}
               style={{
                 width: '100%',
                 height: 48,
