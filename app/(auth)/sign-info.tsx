@@ -11,7 +11,6 @@ import CommonInput from '@/components/common/Input';
 import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
-import colors from '@/types/colors';
 
 import styles from './styles';
 
@@ -227,21 +226,7 @@ export const SignInfo = () => {
           }}
         >
           {userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService && (
-            <CommonButton
-              title="회원가입 완료하기"
-              onPress={handleButtonPress}
-              style={{
-                width: '100%',
-                height: 48,
-                backgroundColor: colors.yellow.dark,
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                color: colors.absolute.white,
-                padding: 0,
-                borderRadius: isKeyboardVisible ? 0 : 12,
-              }}
-            />
+            <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
           )}
         </View>
       </KeyboardAvoidingView>

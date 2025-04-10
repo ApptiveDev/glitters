@@ -1,30 +1,53 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+
+import colors from '@/types/colors';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  disabled?: boolean;
-  disableStyle?: object;
   style?: object;
-  fontSize?: number;
+  variant?: 'primary' | 'disable';
+  isKeyboardVisible?: boolean;
 }
 
-export const CommonButton = ({
-  title,
-  onPress,
-  disabled = false,
-  style = {},
-  disableStyle = {},
-  fontSize = 16,
-}: ButtonProps) => {
-  const dynamicStyles = StyleSheet.create({
-    buttonText: {
-      fontSize,
-    },
-  });
+const baseStyle: ViewStyle = {
+  width: '100%',
+  height: 48,
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const buttonStyles = StyleSheet.create({
+  primary: {
+    ...baseStyle,
+    backgroundColor: colors.yellow.dark,
+  },
+  disable: {
+    ...baseStyle,
+    backgroundColor: colors.gray.light,
+  },
+});
+
+const testStyles = StyleSheet.create({
+  primary: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.background,
+  },
+  disable: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.absolute.black,
+  },
+});
+
+export const CommonButton = ({ title, onPress, style = {}, variant = 'primary', isKeyboardVisible }: ButtonProps) => {
   return (
-    <TouchableOpacity style={[style, disabled && disableStyle]} onPress={onPress} disabled={disabled}>
-      <Text style={dynamicStyles.buttonText}>{title}</Text>
+    <TouchableOpacity
+      style={[buttonStyles[variant], isKeyboardVisible ? { borderRadius: 0 } : { borderRadius: 12 }, style]}
+      onPress={onPress}
+    >
+      <Text style={testStyles[variant]}>{title}</Text>
     </TouchableOpacity>
   );
 };
