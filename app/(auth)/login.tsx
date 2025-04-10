@@ -6,7 +6,6 @@ import { loginUser } from '@/api/auth';
 import { CommonButton } from '@/components/common/Button';
 import CommonInput from '@/components/common/Input';
 import { useUser } from '@/contexts/UserContext';
-import colors from '@/types/colors';
 import { storeToken } from '@/utils/authStorage';
 
 interface InputField {
@@ -94,22 +93,7 @@ export const Login = () => {
         onChangeText={onPasswordChangeText}
         value={loginField.password.value}
       />
-      <CommonButton
-        title="로그인하기"
-        style={{
-          width: '100%',
-          height: 48,
-          backgroundColor: colors.yellow.dark,
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 12,
-          color: colors.absolute.white,
-          marginTop: 20,
-          padding: 0,
-          borderRadius: 12,
-        }}
-        onPress={handleLogin}
-      />
+      <CommonButton title="로그인하기" onPress={handleLogin} />
     </View>
   );
 };

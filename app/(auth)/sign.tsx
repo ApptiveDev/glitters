@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
-import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -13,6 +13,7 @@ import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { SchoolListResponse } from '@/types/utils';
 
@@ -45,7 +46,7 @@ export const Sign = () => {
 
   const { user, updateUser } = useUser();
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const isKeyboardVisible = useKeyboardVisible();
 
   const insets = useSafeAreaInsets();
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
@@ -61,20 +62,6 @@ export const Sign = () => {
       mutationFn: ({ email, code }: { email: string; code: string }) => checkAuthCode(email, code),
     });
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
 
   const { data } = useQuery<SchoolListResponse>({
     queryKey: ['school_list'],
@@ -287,21 +274,7 @@ export const Sign = () => {
           }}
         >
           {fieldValidation.emailFormatValid && !fieldValidation.emailSent ? (
-            <CommonButton
-              title="인증번호 받기"
-              onPress={buttonPress}
-              style={{
-                width: '100%',
-                height: 48,
-                backgroundColor: colors.yellow.dark,
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                color: colors.absolute.white,
-                padding: 0,
-                borderRadius: isKeyboardVisible ? 0 : 12,
-              }}
-            />
+            <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
           ) : (
             <View
               style={{
@@ -311,21 +284,7 @@ export const Sign = () => {
             />
           )}
           {fieldValidation.authCodeVerified && (
-            <CommonButton
-              title="정보 입력하기"
-              onPress={goToNextScreen}
-              style={{
-                width: '100%',
-                height: 48,
-                backgroundColor: colors.yellow.dark,
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                color: colors.absolute.white,
-                padding: 0,
-                borderRadius: isKeyboardVisible ? 0 : 12,
-              }}
-            />
+            <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
           )}
         </View>
       </KeyboardAvoidingView>
