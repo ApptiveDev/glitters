@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
+    paddingBottom: 12,
   },
   heading: {
     flex: 1,
@@ -21,6 +22,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     gap: 12,
+    paddingBottom: 12,
   },
 });
 

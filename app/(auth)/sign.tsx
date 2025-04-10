@@ -16,6 +16,7 @@ import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { InputField, SchoolListResponse } from '@/types/utils';
+import { sleep } from '@/utils/sleep';
 
 import styles from './styles';
 
@@ -27,7 +28,8 @@ interface InputStatus {
 interface AuthField {
   email: InputField & { isVerified: boolean };
   authCode: InputField & { isVerified: boolean };
-  password: InputField;
+  password: InputField & { isVerified: boolean };
+  recheck: string;
 }
 
 export const Sign = () => {
@@ -40,10 +42,9 @@ export const Sign = () => {
   const [authField, setAuthField] = useState<AuthField>({
     email: initialField as InputField & { isVerified: false },
     authCode: initialField as InputField & { isVerified: false },
-    password: initialField,
+    password: initialField as InputField & { isVerified: false },
+    recheck: '',
   });
-
-  console.log('input Status', inputStatus);
 
   const { user, updateUser } = useUser();
 
@@ -125,6 +126,7 @@ export const Sign = () => {
       try {
         setInputStatus({ loading: true, checked: false });
         await checkAuthCodeMutate({ email, code });
+        await sleep(500);
         setInputStatus({ loading: false, checked: true });
         setAuthField((prev) => ({
           ...prev,
@@ -169,17 +171,51 @@ export const Sign = () => {
     }
   };
 
-  useEffect(() => {
-    if (user.email) {
-      router.push('./sign-info');
+  const onChangePasswordText = (text: string) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=[{\]};:'",.<>/?\\|`~]).{10,25}$/;
+    const isValid = regex.test(text);
+    setAuthField((prev) => ({
+      ...prev,
+      password: {
+        value: text,
+        isTouched: true,
+        isValid,
+        isVerified: prev.password.isVerified,
+      },
+    }));
+  };
+
+  const onRecheckPasswordText = (text: string) => {
+    const isPasswordValid = authField.password.value === text;
+
+    setAuthField((prev) => ({
+      ...prev,
+      recheck: text,
+    }));
+
+    if (isPasswordValid) {
+      setAuthField((prev) => ({
+        ...prev,
+        password: {
+          ...prev.password,
+          isVerified: true,
+        },
+      }));
     }
-  }, [user.email]);
+  };
 
   const goToNextScreen = () => {
     updateUser({
       email: `${localPart}${domain}`,
+      password: authField.password.value,
     });
   };
+
+  useEffect(() => {
+    if (user.email && user.password) {
+      router.replace('/sign-info');
+    }
+  }, [user.email, user.password]);
 
   return (
     <View
@@ -189,18 +225,20 @@ export const Sign = () => {
     >
       <KeyboardScrollContainer
         viewStyle={{
-          gap: 28,
+          gap: 16,
         }}
       >
-        <View style={styles.element}>
-          {!domain && <Heading title="학교 선택하기" />}
-          <CustomDropdown
-            data={formattedList || []}
-            value={domain}
-            setValue={setDomain}
-            style={{ width: width - 56 }}
-          />
-        </View>
+        {!domain && (
+          <View style={styles.element}>
+            <Heading title="학교 선택하기" />
+            <CustomDropdown
+              data={formattedList || []}
+              value={domain}
+              setValue={setDomain}
+              style={{ width: width - 56 }}
+            />
+          </View>
+        )}
 
         {domain && (
           <View style={styles.element}>
@@ -224,7 +262,7 @@ export const Sign = () => {
           </View>
         )}
 
-        {authField.email.isVerified ? (
+        {authField.email.isVerified && !authField.authCode.isVerified && (
           <View style={styles.heading}>
             <Heading title="인증번호 입력하기" />
             <CommonInput
@@ -239,49 +277,57 @@ export const Sign = () => {
               isGuide
               editable={!authField.authCode.isVerified && isRunning}
             />
-            {!authField.authCode.isVerified && (
-              <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
-                <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
-                <Text
-                  style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
-                  onPress={buttonPress}
-                >
-                  재전송하기
-                </Text>
+            <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
+              <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
+              <Text
+                style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
+                onPress={buttonPress}
+              >
+                재전송하기
               </Text>
-            )}
+            </Text>
           </View>
-        ) : (
-          <View style={{ flex: 1, width: '100%', gap: 8 }} />
         )}
         {authField.authCode.isVerified && (
-          <View style={styles.heading}>
-            <Heading title="비밀번호 입력하기" />
-            <CommonInput
-              style={{ width: width - 56 }}
-              defaultValue=""
-              value={authField.password.value}
-              onChangeText={(text) => updateField('password', text, (val) => val.length >= 8)}
-              placeholder="비밀번호를 입력하세요."
-              isError={!authField.password.isValid && authField.password.isTouched}
-              errorMessage="비밀번호는 8자 이상으로 입력해주세요."
-            />
-          </View>
+          <>
+            <View style={styles.heading}>
+              <Heading title="비밀번호 입력하기" />
+              <CommonInput
+                style={{ width: width - 56 }}
+                secureTextEntry
+                defaultValue=""
+                value={authField.password.value}
+                onChangeText={onChangePasswordText}
+                placeholder="이용할 비밀번호를 입력하세요."
+                isError={!authField.password.isValid && authField.password.isTouched}
+                errorMessage="10자 이상 25자 이내의 영문, 숫자, 특수문자를 조합해주세요."
+              />
+            </View>
+
+            {authField.password.isValid && (
+              <View style={styles.heading}>
+                <Heading title="비밀번호 확인하기" />
+                <CommonInput
+                  style={{ width: width - 56 }}
+                  secureTextEntry
+                  defaultValue=""
+                  value={authField.recheck}
+                  onChangeText={onRecheckPasswordText}
+                  placeholder="비밀번호를 다시 한 번 입력해주세요."
+                  isError={authField.password.value !== authField.recheck}
+                  errorMessage="비밀번호가 일치하지 않습니다."
+                />
+              </View>
+            )}
+          </>
         )}
       </KeyboardScrollContainer>
 
       <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
-        {authField.email.isValid && !authField.email.isVerified ? (
+        {authField.email.isValid && !authField.email.isVerified && (
           <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
-        ) : (
-          <View
-            style={{
-              height: 48,
-              width: '100%',
-            }}
-          />
         )}
-        {authField.authCode.isVerified && (
+        {authField.password.isVerified && (
           <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
         )}
       </BottomButtonContainer>
