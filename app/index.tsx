@@ -17,7 +17,7 @@ export const Index = () => {
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
       await SplashScreen.hideAsync();
-      router.replace('/sign-info');
+      router.replace('/login');
     }
   }, [isReady, router]);
 
