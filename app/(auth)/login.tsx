@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, KeyboardAvoidingViewComponent } from 'react-native';
 
 import { loginUser } from '@/api/auth';
 import { CommonButton } from '@/components/common/Button';
 import CommonInput from '@/components/common/Input';
+import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { useUser } from '@/contexts/UserContext';
 import { storeToken } from '@/utils/authStorage';
 
@@ -68,33 +69,30 @@ export const Login = () => {
     }
   };
   return (
-    <View
-      style={{
-        flex: 1,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <CommonInput
-        placeholder="Email"
-        style={{
-          width: width - 28,
-        }}
-        onChangeText={onEmailChangeText}
-        value={loginField.email.value}
-      />
-      <CommonInput
-        placeholder="Password"
-        secureTextEntry
-        style={{
-          width: width - 28,
-        }}
-        onChangeText={onPasswordChangeText}
-        value={loginField.password.value}
-      />
-      <CommonButton title="로그인하기" onPress={handleLogin} />
-    </View>
+    <>
+      <KeyboardScrollContainer>
+        <CommonInput
+          placeholder="Email"
+          style={{
+            width: width - 28,
+          }}
+          onChangeText={onEmailChangeText}
+          value={loginField.email.value}
+        />
+        <CommonInput
+          placeholder="Password"
+          secureTextEntry
+          style={{
+            width: width - 28,
+          }}
+          onChangeText={onPasswordChangeText}
+          value={loginField.password.value}
+        />
+      </KeyboardScrollContainer>
+      <KeyboardAvoidingViewComponent>
+        <CommonButton title="로그인하기" onPress={handleLogin} />
+      </KeyboardAvoidingViewComponent>
+    </>
   );
 };
 export default Login;
