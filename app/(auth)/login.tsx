@@ -1,12 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingViewComponent } from 'react-native';
+import { Dimensions } from 'react-native';
 
 import { loginUser } from '@/api/auth';
+import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import CommonInput from '@/components/common/Input';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { useUser } from '@/contexts/UserContext';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { storeToken } from '@/utils/authStorage';
 
 interface InputField {
@@ -27,6 +29,8 @@ export const Login = () => {
     email: { value: '', isValid: false, isTouched: false },
     password: { value: '', isValid: false, isTouched: false },
   });
+
+  const isKeyboardVisible = useKeyboardVisible();
 
   const usePostMutation = () => {
     return useMutation({
@@ -89,9 +93,9 @@ export const Login = () => {
           value={loginField.password.value}
         />
       </KeyboardScrollContainer>
-      <KeyboardAvoidingViewComponent>
-        <CommonButton title="로그인하기" onPress={handleLogin} />
-      </KeyboardAvoidingViewComponent>
+      <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
+        <CommonButton title="로그인하기" onPress={handleLogin} isKeyboardVisible={isKeyboardVisible} />
+      </BottomButtonContainer>
     </>
   );
 };

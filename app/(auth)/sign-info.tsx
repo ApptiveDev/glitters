@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Dimensions, View } from 'react-native';
 
 import { registerUser } from '@/api/auth';
+import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
@@ -36,7 +36,6 @@ export const SignInfo = () => {
   });
   const { width } = Dimensions.get('window');
   const isKeyboardVisible = useKeyboardVisible();
-  const insets = useSafeAreaInsets();
 
   const usePostMutation = () => {
     return useMutation({
@@ -169,26 +168,11 @@ export const SignInfo = () => {
           </View>
         )}
       </KeyboardScrollContainer>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          bottom: 0,
-        }}
-      >
-        <View
-          style={{
-            paddingBottom: insets.bottom + 20,
-            paddingHorizontal: isKeyboardVisible ? 0 : 28,
-          }}
-        >
-          {userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService && (
-            <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
-          )}
-        </View>
-      </KeyboardAvoidingView>
+      <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
+        {userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService && (
+          <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
+        )}
+      </BottomButtonContainer>
     </View>
   );
 };

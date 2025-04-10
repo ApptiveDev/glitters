@@ -18,9 +18,15 @@ apiInstance.interceptors.request.use(
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
-
     return config;
   },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+apiInstance.interceptors.response.use(
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       router.replace('/login');
