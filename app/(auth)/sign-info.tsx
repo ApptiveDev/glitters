@@ -4,7 +4,7 @@ import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, View } from 'reac
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { registerUser } from '@/api/sign';
+import { registerUser } from '@/api/auth';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
