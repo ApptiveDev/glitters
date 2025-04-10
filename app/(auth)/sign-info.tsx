@@ -12,14 +12,9 @@ import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
+import { InputField } from '@/types/utils';
 
 import styles from './styles';
-
-interface InputField {
-  value: string;
-  isValid: boolean;
-  isTouched: boolean;
-}
 
 interface UserInfoField {
   name: InputField;
@@ -89,7 +84,7 @@ export const SignInfo = () => {
         name: userInfoField.name.value,
         email: 'ming0820@pusan.ac.kr',
         password: 'gDWQ^5kvLrC85w(',
-        birth: new Date(userInfoField.birth.value).toISOString(),
+        birth: userInfoField.birth.value,
         termsAccepted: userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService,
       });
       setUser(response.member);

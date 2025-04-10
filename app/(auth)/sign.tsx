@@ -15,7 +15,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
-import { SchoolListResponse } from '@/types/utils';
+import { InputField, SchoolListResponse } from '@/types/utils';
 
 import styles from './styles';
 
@@ -24,11 +24,10 @@ interface InputStatus {
   checked: boolean;
 }
 
-interface FieldValidation {
-  emailFormatValid: boolean;
-  emailSent: boolean;
-  authCodeFormatValid: boolean;
-  authCodeVerified: boolean;
+interface AuthField {
+  email: InputField & { isVerified: boolean };
+  authCode: InputField & { isVerified: boolean };
+  password: InputField;
 }
 
 export const Sign = () => {
@@ -36,19 +35,36 @@ export const Sign = () => {
   const [localPart, setLocalPart] = useState<string>('');
   const { width } = Dimensions.get('window');
   const [authCode, setAuthCode] = useState<string>('');
+  const initialField = { value: '', isValid: false, isTouched: false };
   const [inputStatus, setInputStatus] = useState<InputStatus>({ loading: false, checked: false });
-  const [fieldValidation, setFieldValidation] = useState<FieldValidation>({
-    emailFormatValid: false,
-    emailSent: false,
-    authCodeFormatValid: false,
-    authCodeVerified: false,
+  const [authField, setAuthField] = useState<AuthField>({
+    email: initialField as InputField & { isVerified: false },
+    authCode: initialField as InputField & { isVerified: false },
+    password: initialField,
   });
+
+  console.log('input Status', inputStatus);
 
   const { user, updateUser } = useUser();
 
   const isKeyboardVisible = useKeyboardVisible();
 
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
+
+  const updateField = (
+    key: keyof Pick<AuthField, 'email' | 'password' | 'authCode'>,
+    value: string,
+    validateFn: (val: string) => boolean,
+  ) => {
+    setAuthField((prev) => ({
+      ...prev,
+      [key]: {
+        value,
+        isTouched: true,
+        isValid: validateFn(value),
+      },
+    }));
+  };
 
   const useVerifyEmailMutation = () => {
     return useMutation({
@@ -80,11 +96,11 @@ export const Sign = () => {
   }, [data]);
 
   const onEmailChangeText = (text: string) => {
-    const isValidFormat = /^[a-zA-Z0-9._%+-]+$/.test(text);
-    if (isValidFormat) {
-      setLocalPart(text);
-      setFieldValidation({ ...fieldValidation, emailFormatValid: true });
-    }
+    setLocalPart(text);
+    updateField('email', text, (val) => {
+      const isValidFormat = /^[a-zA-Z0-9._%+-]+$/.test(val);
+      return val.length >= 2 && val.length < 32 && isValidFormat;
+    });
   };
 
   const buttonPress = async () => {
@@ -92,10 +108,15 @@ export const Sign = () => {
     start();
     try {
       await verifyEmailMutate(`${localPart}${domain}`);
-      setFieldValidation({ ...fieldValidation, emailSent: true });
+      setAuthField((prev) => ({
+        ...prev,
+        email: {
+          ...prev.email,
+          isVerified: true,
+        },
+      }));
     } catch (error) {
       console.error('Error verifying email:', error);
-      setFieldValidation({ ...fieldValidation, emailSent: false });
     }
   };
 
@@ -105,16 +126,22 @@ export const Sign = () => {
         setInputStatus({ loading: true, checked: false });
         await checkAuthCodeMutate({ email, code });
         setInputStatus({ loading: false, checked: true });
-        setFieldValidation((prev) => ({
+        setAuthField((prev) => ({
           ...prev,
-          authCodeVerified: true,
+          authCode: {
+            ...prev.authCode,
+            isVerified: true,
+          },
         }));
       } catch (error) {
-        console.error('Error verifying auth code:', error);
+        console.error('인증 코드 오류:', error);
         setInputStatus({ loading: false, checked: false });
-        setFieldValidation((prev) => ({
+        setAuthField((prev) => ({
           ...prev,
-          authCodeVerified: false,
+          authCode: {
+            ...prev.authCode,
+            isVerified: false,
+          },
         }));
       }
     }, 500);
@@ -131,20 +158,14 @@ export const Sign = () => {
     if (isValidFormat) {
       setAuthCode(text);
 
-      if (text.length === 6 && fieldValidation.emailSent) {
+      if (text.length === 6 && authField.email.isValid) {
         const email = `${localPart}${domain}`;
-        setFieldValidation((prev) => ({
-          ...prev,
-          authCodeFormatValid: true,
-        }));
+        updateField('authCode', text, () => true);
         debouncedCheck(email, text);
       }
     } else {
       setInputStatus({ loading: false, checked: false });
-      setFieldValidation((prev) => ({
-        ...prev,
-        authCodeFormatValid: false,
-      }));
+      updateField('authCode', text, () => false);
     }
   };
 
@@ -187,23 +208,23 @@ export const Sign = () => {
             <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
               <CommonInput
                 style={{ flex: 1, width: width / 2 - 28 }}
-                isValid={fieldValidation.emailFormatValid}
+                isValid={authField.email.isValid}
                 defaultValue=""
                 value={localPart}
                 onChangeText={onEmailChangeText}
-                editable={!fieldValidation.emailSent}
+                editable={!authField.authCode.isTouched}
               />
               <CommonInput
                 style={{ flex: 1, width: width / 2 - 28 }}
                 defaultValue={domain}
-                isValid={fieldValidation.emailFormatValid}
+                isValid={authField.email.isValid}
                 editable={false}
               />
             </View>
           </View>
         )}
 
-        {fieldValidation.emailSent ? (
+        {authField.email.isVerified ? (
           <View style={styles.heading}>
             <Heading title="인증번호 입력하기" />
             <CommonInput
@@ -216,9 +237,9 @@ export const Sign = () => {
               checked={inputStatus.checked}
               guideText={`${formatted}분 남음`}
               isGuide
-              editable={!fieldValidation.authCodeVerified && isRunning}
+              editable={!authField.authCode.isVerified && isRunning}
             />
-            {!fieldValidation.authCodeVerified && (
+            {!authField.authCode.isVerified && (
               <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
                 <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
                 <Text
@@ -233,10 +254,24 @@ export const Sign = () => {
         ) : (
           <View style={{ flex: 1, width: '100%', gap: 8 }} />
         )}
+        {authField.authCode.isVerified && (
+          <View style={styles.heading}>
+            <Heading title="비밀번호 입력하기" />
+            <CommonInput
+              style={{ width: width - 56 }}
+              defaultValue=""
+              value={authField.password.value}
+              onChangeText={(text) => updateField('password', text, (val) => val.length >= 8)}
+              placeholder="비밀번호를 입력하세요."
+              isError={!authField.password.isValid && authField.password.isTouched}
+              errorMessage="비밀번호는 8자 이상으로 입력해주세요."
+            />
+          </View>
+        )}
       </KeyboardScrollContainer>
 
       <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
-        {fieldValidation.emailFormatValid && !fieldValidation.emailSent ? (
+        {authField.email.isValid && !authField.email.isVerified ? (
           <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
         ) : (
           <View
@@ -246,7 +281,7 @@ export const Sign = () => {
             }}
           />
         )}
-        {fieldValidation.authCodeVerified && (
+        {authField.authCode.isVerified && (
           <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
         )}
       </BottomButtonContainer>

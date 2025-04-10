@@ -10,3 +10,9 @@ export interface SchoolListType {
 export interface SchoolListResponse {
   institutions: SchoolListType[];
 }
+
+export interface InputField {
+  value: string;
+  isValid: boolean;
+  isTouched: boolean;
+}
