@@ -23,7 +23,6 @@ export const Index = () => {
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
       const token = await getToken();
-      console.log(token);
       if (token) {
         router.replace('/maps');
       } else {

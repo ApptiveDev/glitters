@@ -37,6 +37,7 @@ export const Login = () => {
       });
       setUser(response.member);
       storeToken(response.token);
+      router.replace('/maps');
     } catch (error) {
       console.error('Error logging in:', error);
     }

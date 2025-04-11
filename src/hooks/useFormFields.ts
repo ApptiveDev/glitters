@@ -10,7 +10,12 @@ interface FormFields {
   email: FieldState;
   authCode: FieldState;
   password: FieldState;
+  name: FieldState;
+  birth: FieldState;
+  gender: FieldState;
   recheck: string;
+  agreedToPrivacyPolicy: boolean;
+  agreedToTermsOfService: boolean;
 }
 
 const initialField: FieldState = {
@@ -25,11 +30,16 @@ export const useFormFields = () => {
     email: { ...initialField },
     authCode: { ...initialField },
     password: { ...initialField },
+    name: { ...initialField },
+    birth: { ...initialField },
+    gender: { ...initialField },
     recheck: '',
+    agreedToPrivacyPolicy: false,
+    agreedToTermsOfService: false,
   });
 
   const setFieldValue = (
-    key: keyof Pick<FormFields, 'email' | 'password' | 'authCode'>,
+    key: keyof Pick<FormFields, 'email' | 'password' | 'authCode' | 'name' | 'birth' | 'gender'>,
     value: string,
     validateFn: (val: string) => boolean,
   ) => {
@@ -61,12 +71,28 @@ export const useFormFields = () => {
     }));
   };
 
+  const setAgreedToPrivacyPolicy = (value: boolean) => {
+    setFormFields((prev) => ({
+      ...prev,
+      agreedToPrivacyPolicy: value,
+    }));
+  };
+
+  const setAgreedToTermsOfService = (value: boolean) => {
+    setFormFields((prev) => ({
+      ...prev,
+      agreedToTermsOfService: value,
+    }));
+  };
+
   return {
     formFields,
     setFieldValue,
     setFieldVerified,
     setRecheckPassword,
     setFormFields,
+    setAgreedToPrivacyPolicy,
+    setAgreedToTermsOfService,
   };
 };
 

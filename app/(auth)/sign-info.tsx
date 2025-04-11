@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { router } from 'expo-router';
 import { Dimensions, View } from 'react-native';
 
 import { registerUser } from '@/api/auth';
@@ -11,29 +11,15 @@ import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollConta
 import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
+import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
-import { InputField } from '@/types/utils';
+import { storeToken } from '@/utils/authStorage';
 
 import styles from './styles';
 
-interface UserInfoField {
-  name: InputField;
-  birth: InputField;
-  gender: InputField;
-  agreedToPrivacyPolicy: boolean;
-  agreedToTermsOfService: boolean;
-}
-
 export const SignInfo = () => {
-  const { setUser } = useUser();
-  const initialField = { value: '', isValid: false, isTouched: false };
-  const [userInfoField, setUserInfoField] = useState<UserInfoField>({
-    name: initialField,
-    birth: initialField,
-    gender: initialField,
-    agreedToPrivacyPolicy: false,
-    agreedToTermsOfService: false,
-  });
+  const { user, setUser } = useUser();
+  const { formFields, setFieldValue, setAgreedToPrivacyPolicy, setAgreedToTermsOfService } = useFormFields();
   const { width } = Dimensions.get('window');
   const isKeyboardVisible = useKeyboardVisible();
 
@@ -45,48 +31,34 @@ export const SignInfo = () => {
 
   const { mutateAsync } = usePostMutation();
 
-  const updateField = (
-    key: keyof Pick<UserInfoField, 'name' | 'birth' | 'gender'>,
-    value: string,
-    validateFn: (val: string) => boolean,
-  ) => {
-    setUserInfoField((prev) => ({
-      ...prev,
-      [key]: {
-        value,
-        isTouched: true,
-        isValid: validateFn(value),
-      },
-    }));
-  };
-
   const onUserNameChangeText = (text: string) => {
-    updateField('name', text, (val) => val.length >= 2 && val.length <= 10);
+    setFieldValue('name', text, (val) => val.length >= 2 && val.length <= 10);
   };
 
   const onUserBirthChangeText = (text: string) => {
     const raw = text.replace(/[^0-9]/g, '');
-
     const regex = /^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
 
     if (raw.length === 8 && regex.test(raw)) {
       const formatted = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
-      updateField('birth', formatted, () => true);
+      setFieldValue('birth', formatted, () => true);
     } else {
-      updateField('birth', text, () => false);
+      setFieldValue('birth', text, () => false);
     }
   };
 
   const handleButtonPress = async () => {
     try {
       const response = await mutateAsync({
-        name: userInfoField.name.value,
-        email: 'ming0820@pusan.ac.kr',
-        password: 'gDWQ^5kvLrC85w(',
-        birth: userInfoField.birth.value,
-        termsAccepted: userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService,
+        name: formFields.name.value,
+        email: user.email,
+        password: user.password,
+        birth: formFields.birth.value,
+        termsAccepted: formFields.agreedToPrivacyPolicy && formFields.agreedToTermsOfService,
       });
       setUser(response.member);
+      storeToken(response.token);
+      router.replace('/maps');
     } catch (error) {
       console.error('Error creating user:', error);
     }
@@ -108,10 +80,10 @@ export const SignInfo = () => {
           <CommonInput
             style={{ width: width - 56 }}
             defaultValue=""
-            value={userInfoField.name.value}
+            value={formFields.name.value}
             onChangeText={onUserNameChangeText}
             placeholder="이름을 입력하세요."
-            isError={!userInfoField.name.isValid && userInfoField.name.isTouched}
+            isError={!formFields.name.isValid && formFields.name.isTouched}
             errorMessage="이름은 2자 이상 10자 이하로 입력해주세요."
           />
         </View>
@@ -120,23 +92,23 @@ export const SignInfo = () => {
           <CommonInput
             style={{ width: width - 56 }}
             defaultValue=""
-            value={userInfoField.birth.value}
+            value={formFields.birth.value}
             onChangeText={onUserBirthChangeText}
             placeholder="생년월일을 입력하세요."
-            isError={!userInfoField.birth.isValid && userInfoField.birth.isTouched}
+            isError={!formFields.birth.isValid && formFields.birth.isTouched}
             errorMessage="생년월일은 8자리 숫자로 입력해주세요."
           />
         </View>
         <View style={styles.heading}>
           <Heading title="성별 선택하기" />
           <GenderSelector
-            selected={userInfoField.gender.value as '남성' | '여성' | ''}
-            onSelect={(val) => updateField('gender', val, (value) => value === '남성' || value === '여성')}
-            isError={!userInfoField.gender.value && userInfoField.gender.isTouched}
+            selected={formFields.gender.value as '남성' | '여성' | ''}
+            onSelect={(val) => setFieldValue('gender', val, (value) => value === '남성' || value === '여성')}
+            isError={!formFields.gender.value && formFields.gender.isTouched}
             errorMessage="성별을 선택해주세요."
           />
         </View>
-        {userInfoField.name.isValid && userInfoField.birth.isValid && userInfoField.gender.isValid && (
+        {formFields.name.isValid && formFields.birth.isValid && formFields.gender.isValid && (
           <View
             style={{
               width: '100%',
@@ -146,30 +118,20 @@ export const SignInfo = () => {
             }}
           >
             <TermsItem
-              isChecked={userInfoField.agreedToPrivacyPolicy}
-              onPress={() =>
-                setUserInfoField((prev) => ({
-                  ...prev,
-                  agreedToPrivacyPolicy: !prev.agreedToPrivacyPolicy,
-                }))
-              }
+              isChecked={formFields.agreedToPrivacyPolicy}
+              onPress={() => setAgreedToPrivacyPolicy(!formFields.agreedToPrivacyPolicy)}
               title="개인정보 처리방침"
             />
             <TermsItem
-              isChecked={userInfoField.agreedToTermsOfService}
-              onPress={() =>
-                setUserInfoField((prev) => ({
-                  ...prev,
-                  agreedToTermsOfService: !prev.agreedToTermsOfService,
-                }))
-              }
+              isChecked={formFields.agreedToTermsOfService}
+              onPress={() => setAgreedToTermsOfService(!formFields.agreedToTermsOfService)}
               title="서비스 이용약관"
             />
           </View>
         )}
       </KeyboardScrollContainer>
       <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
-        {userInfoField.agreedToPrivacyPolicy && userInfoField.agreedToTermsOfService && (
+        {formFields.agreedToPrivacyPolicy && formFields.agreedToTermsOfService && (
           <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
         )}
       </BottomButtonContainer>

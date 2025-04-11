@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
@@ -13,9 +13,10 @@ import CommonInput from '@/components/common/Input';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
+import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
-import { InputField, SchoolListResponse } from '@/types/utils';
+import { SchoolListResponse } from '@/types/utils';
 import { sleep } from '@/utils/sleep';
 
 import styles from './styles';
@@ -25,47 +26,20 @@ interface InputStatus {
   checked: boolean;
 }
 
-interface AuthField {
-  email: InputField & { isVerified: boolean };
-  authCode: InputField & { isVerified: boolean };
-  password: InputField & { isVerified: boolean };
-  recheck: string;
-}
-
 export const Sign = () => {
   const [domain, setDomain] = useState<string | null>(null);
   const [localPart, setLocalPart] = useState<string>('');
   const { width } = Dimensions.get('window');
   const [authCode, setAuthCode] = useState<string>('');
-  const initialField = { value: '', isValid: false, isTouched: false };
   const [inputStatus, setInputStatus] = useState<InputStatus>({ loading: false, checked: false });
-  const [authField, setAuthField] = useState<AuthField>({
-    email: initialField as InputField & { isVerified: false },
-    authCode: initialField as InputField & { isVerified: false },
-    password: initialField as InputField & { isVerified: false },
-    recheck: '',
-  });
+
+  const { formFields, setFieldValue, setFieldVerified, setRecheckPassword } = useFormFields();
 
   const { user, updateUser } = useUser();
 
   const isKeyboardVisible = useKeyboardVisible();
 
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
-
-  const updateField = (
-    key: keyof Pick<AuthField, 'email' | 'password' | 'authCode'>,
-    value: string,
-    validateFn: (val: string) => boolean,
-  ) => {
-    setAuthField((prev) => ({
-      ...prev,
-      [key]: {
-        value,
-        isTouched: true,
-        isValid: validateFn(value),
-      },
-    }));
-  };
 
   const useVerifyEmailMutation = () => {
     return useMutation({
@@ -98,7 +72,7 @@ export const Sign = () => {
 
   const onEmailChangeText = (text: string) => {
     setLocalPart(text);
-    updateField('email', text, (val) => {
+    setFieldValue('email', text, (val) => {
       const isValidFormat = /^[a-zA-Z0-9._%+-]+$/.test(val);
       return val.length >= 2 && val.length < 32 && isValidFormat;
     });
@@ -109,105 +83,70 @@ export const Sign = () => {
     start();
     try {
       await verifyEmailMutate(`${localPart}${domain}`);
-      setAuthField((prev) => ({
-        ...prev,
-        email: {
-          ...prev.email,
-          isVerified: true,
-        },
-      }));
+      setFieldVerified('email', true);
     } catch (error) {
       console.error('Error verifying email:', error);
     }
   };
 
-  const debouncedCheck = useMemo(() => {
-    return debounce(async (email: string, code: string) => {
+  const debouncedCheckRef = useRef(
+    debounce(async (email: string, code: string) => {
       try {
         setInputStatus({ loading: true, checked: false });
         await checkAuthCodeMutate({ email, code });
         await sleep(500);
         setInputStatus({ loading: false, checked: true });
-        setAuthField((prev) => ({
-          ...prev,
-          authCode: {
-            ...prev.authCode,
-            isVerified: true,
-          },
-        }));
-      } catch (error) {
-        console.error('인증 코드 오류:', error);
+        setFieldVerified('authCode', true);
+      } catch {
         setInputStatus({ loading: false, checked: false });
-        setAuthField((prev) => ({
-          ...prev,
-          authCode: {
-            ...prev.authCode,
-            isVerified: false,
-          },
-        }));
+        setFieldVerified('authCode', false);
       }
-    }, 500);
-  }, [checkAuthCodeMutate]);
+    }, 500),
+  );
 
   useEffect(() => {
+    const debouncedCheck = debouncedCheckRef.current;
     return () => {
       debouncedCheck.cancel();
     };
-  }, [debouncedCheck]);
+  }, []);
 
   const onAuthCodeChangeText = (text: string) => {
     const isValidFormat = /^[0-9]*$/.test(text);
     if (isValidFormat) {
       setAuthCode(text);
-
-      if (text.length === 6 && authField.email.isValid) {
+      if (text.length === 6) {
         const email = `${localPart}${domain}`;
-        updateField('authCode', text, () => true);
-        debouncedCheck(email, text);
+        setFieldValue('authCode', text, () => true);
+        debouncedCheckRef.current(email, text);
       }
     } else {
       setInputStatus({ loading: false, checked: false });
-      updateField('authCode', text, () => false);
+      setFieldValue('authCode', text, () => false);
     }
   };
 
   const onChangePasswordText = (text: string) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=[{\]};:'",.<>/?\\|`~]).{10,25}$/;
-    const isValid = regex.test(text);
-    setAuthField((prev) => ({
-      ...prev,
-      password: {
-        value: text,
-        isTouched: true,
-        isValid,
-        isVerified: prev.password.isVerified,
-      },
-    }));
+    const isValid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=[{\]};:'",.<>/?\\|`~]).{10,25}$/.test(text);
+    setFieldValue('password', text, (val) => {
+      return val.length >= 10 && val.length <= 25 && isValid;
+    });
   };
 
   const onRecheckPasswordText = (text: string) => {
-    const isPasswordValid = authField.password.value === text;
+    const isPasswordValid = formFields.password.value === text;
 
-    setAuthField((prev) => ({
-      ...prev,
-      recheck: text,
-    }));
+    setRecheckPassword(text);
 
     if (isPasswordValid) {
-      setAuthField((prev) => ({
-        ...prev,
-        password: {
-          ...prev.password,
-          isVerified: true,
-        },
-      }));
+      setFieldVerified('password', true);
     }
   };
 
   const goToNextScreen = () => {
     updateUser({
       email: `${localPart}${domain}`,
-      password: authField.password.value,
+      password: formFields.password.value,
     });
   };
 
@@ -246,23 +185,23 @@ export const Sign = () => {
             <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
               <CommonInput
                 style={{ flex: 1, width: width / 2 - 28 }}
-                isValid={authField.email.isValid}
+                isValid={formFields.email.isValid}
                 defaultValue=""
                 value={localPart}
                 onChangeText={onEmailChangeText}
-                editable={!authField.authCode.isTouched}
+                editable={!formFields.authCode.isTouched}
               />
               <CommonInput
                 style={{ flex: 1, width: width / 2 - 28 }}
                 defaultValue={domain}
-                isValid={authField.email.isValid}
+                isValid={formFields.email.isValid}
                 editable={false}
               />
             </View>
           </View>
         )}
 
-        {authField.email.isVerified && !authField.authCode.isVerified && (
+        {formFields.email.isVerified && !formFields.authCode.isVerified && (
           <View style={styles.heading}>
             <Heading title="인증번호 입력하기" />
             <CommonInput
@@ -275,7 +214,7 @@ export const Sign = () => {
               checked={inputStatus.checked}
               guideText={`${formatted}분 남음`}
               isGuide
-              editable={!authField.authCode.isVerified && isRunning}
+              editable={!formFields.authCode.isVerified && isRunning}
             />
             <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
               <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
@@ -288,7 +227,7 @@ export const Sign = () => {
             </Text>
           </View>
         )}
-        {authField.authCode.isVerified && (
+        {formFields.authCode.isVerified && (
           <>
             <View style={styles.heading}>
               <Heading title="비밀번호 입력하기" />
@@ -296,25 +235,25 @@ export const Sign = () => {
                 style={{ width: width - 56 }}
                 secureTextEntry
                 defaultValue=""
-                value={authField.password.value}
+                value={formFields.password.value}
                 onChangeText={onChangePasswordText}
                 placeholder="이용할 비밀번호를 입력하세요."
-                isError={!authField.password.isValid && authField.password.isTouched}
+                isError={!formFields.password.isValid && formFields.password.isTouched}
                 errorMessage="10자 이상 25자 이내의 영문, 숫자, 특수문자를 조합해주세요."
               />
             </View>
 
-            {authField.password.isValid && (
+            {formFields.password.isValid && (
               <View style={styles.heading}>
                 <Heading title="비밀번호 확인하기" />
                 <CommonInput
                   style={{ width: width - 56 }}
                   secureTextEntry
                   defaultValue=""
-                  value={authField.recheck}
+                  value={formFields.recheck}
                   onChangeText={onRecheckPasswordText}
                   placeholder="비밀번호를 다시 한 번 입력해주세요."
-                  isError={authField.password.value !== authField.recheck}
+                  isError={formFields.password.value !== formFields.recheck}
                   errorMessage="비밀번호가 일치하지 않습니다."
                 />
               </View>
@@ -324,10 +263,10 @@ export const Sign = () => {
       </KeyboardScrollContainer>
 
       <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
-        {authField.email.isValid && !authField.email.isVerified && (
+        {formFields.email.isValid && !formFields.email.isVerified && (
           <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
         )}
-        {authField.password.isVerified && (
+        {formFields.password.isVerified && (
           <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
         )}
       </BottomButtonContainer>
