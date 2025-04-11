@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native';
 
+import colors from '@/types/colors';
+
 const styles = StyleSheet.create({
   view: {
     alignItems: 'flex-start',
@@ -23,6 +25,13 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 12,
     paddingBottom: 12,
+  },
+  signText: {
+    color: colors.text.white,
+    textAlign: 'center',
+    marginTop: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.text.white,
   },
 });
 
