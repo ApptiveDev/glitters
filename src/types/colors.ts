@@ -21,7 +21,7 @@ const colors = {
     dark: '#FFE9A1',
   },
   gray: {
-    light: '#F5F5F5',
+    light: '#DEDEDE',
     main: '#B2B4BF',
     dark: '#A0A3B1',
   },
@@ -33,6 +33,7 @@ const colors = {
   guide: '#FFF7C1',
   text: {
     white: '#FBFBFB',
+    gray: '#B1B3BB',
   },
 };
 

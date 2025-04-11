@@ -37,7 +37,7 @@ const testStyles = StyleSheet.create({
   disable: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: colors.absolute.black,
+    color: colors.text.gray,
   },
 });
 
