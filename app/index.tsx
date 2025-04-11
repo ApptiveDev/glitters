@@ -3,13 +3,15 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { getToken } from '@/utils/authStorage';
+import { getToken, removeToken } from '@/utils/authStorage';
 
 SplashScreen.preventAutoHideAsync();
 
 export const Index = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+
+  removeToken();
 
   useEffect(() => {
     const prepare = async () => {

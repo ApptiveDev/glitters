@@ -33,6 +33,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.text.white,
   },
+  failText: {
+    color: colors.error,
+    fontSize: 12,
+    marginBottom: 8,
+  },
 });
 
 export default styles;

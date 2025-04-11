@@ -92,8 +92,7 @@ export const loginUser = async (userLogin: UserLoginRequest) => {
       password,
     });
     return response.data;
-  } catch (error) {
-    console.error('Error logging in user:', error);
+  } catch {
     throw new Error('Failed to login user');
   }
 };

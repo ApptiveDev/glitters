@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Dimensions, Text } from 'react-native';
 
 import { loginUser } from '@/api/auth';
@@ -18,6 +19,7 @@ export const Login = () => {
   const { width } = Dimensions.get('window');
   const { setUser } = useUser();
   const { formFields, setFieldValue } = useFormFields();
+  const [failText, setFailText] = useState('');
 
   const emailValidate = (val: string) =>
     val.length >= 2 && val.length < 32 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
@@ -38,8 +40,8 @@ export const Login = () => {
       setUser(response.member);
       storeToken(response.token);
       router.replace('/maps');
-    } catch (error) {
-      console.error('Error logging in:', error);
+    } catch {
+      setFailText('존재하지 않는 이메일이거나, 이메일과 비밀번호가 일치하지 않습니다.');
     }
   };
 
@@ -82,6 +84,8 @@ export const Login = () => {
         isError={!formFields.password.isValid && formFields.password.isTouched}
         errorMessage="비밀번호를 입력해주세요."
       />
+      <Spacing height={8} />
+      <Text style={styles.failText}>{failText}</Text>
       <CommonButton
         title="로그인"
         onPress={handleLogin}
