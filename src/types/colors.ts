@@ -21,7 +21,7 @@ const colors = {
     dark: '#FFE9A1',
   },
   gray: {
-    light: '#F5F5F5',
+    light: '#DEDEDE',
     main: '#B2B4BF',
     dark: '#A0A3B1',
   },
@@ -31,6 +31,10 @@ const colors = {
   },
   error: '#FFA0A0',
   guide: '#FFF7C1',
+  text: {
+    white: '#FBFBFB',
+    gray: '#B1B3BB',
+  },
 };
 
 export default colors;

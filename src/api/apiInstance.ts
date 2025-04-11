@@ -1,8 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance } from 'axios';
+import { router } from 'expo-router';
+
+import { getToken } from '@/utils/authStorage';
 
 const apiInstance: AxiosInstance = axios.create({
-  baseURL: `https://banjjak.me:8444/api/`,
+  baseURL: `https://banjjak.me:8445/api/`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,21 +13,26 @@ const apiInstance: AxiosInstance = axios.create({
 
 apiInstance.interceptors.request.use(
   async (config) => {
-    let token = null;
-    const newConfig = { ...config };
+    const token = await getToken();
 
-    if (__DEV__) {
-      token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRXhhbXBsZSIsImVtYWlsIjoiY2xhNnNoYWRlQGdtYWlsLmNvbSIsImlkIjoyLCJpYXQiOjE3NDM2NTQzODMsImV4cCI6MjA1OTAxNDM4M30.ccmESMMwwRHbrUOCUeN9uUZeNIT7X5CHnA4nUv02NNw';
-    } else {
-      token = await AsyncStorage.getItem('Authorization');
-    }
     if (token) {
-      newConfig.headers.Authorization = `Bearer ${token}`;
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
-    return newConfig;
+    return config;
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+apiInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      router.replace('/login');
+    }
+    return Promise.reject(error);
+  },
 );
 
 export default apiInstance;
