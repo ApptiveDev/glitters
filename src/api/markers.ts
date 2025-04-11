@@ -5,8 +5,7 @@ export const getMarkers = async (): Promise<MarkerType[]> => {
   try {
     const response = await apiInstance.get('/markers');
     return response.data.markers;
-  } catch (error) {
-    console.error('Error fetching markers:', error);
+  } catch {
     throw new Error('Failed to fetch markers');
   }
 };

@@ -1,94 +1,96 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
+import React, { useState } from 'react';
+import { FlatList, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import colors from '@/types/colors';
 
-interface DropdownComponentProps {
-  data: { label: string; value: string }[];
+interface DropdownItem {
+  label: string;
+  value: string;
+}
+
+interface CustomDropdownProps {
+  data: DropdownItem[];
   value: string | null;
-  setValue: (value: string) => void;
+  setValue: (val: string) => void;
+  placeholder?: string;
+  style?: object;
 }
 
 const styles = StyleSheet.create({
-  view: {
-    width: 346,
-  },
-  container: {
-    position: 'absolute',
-    bottom: 0,
+  wrapper: {
     width: '100%',
-    borderRadius: 12,
-    padding: 36,
-    height: 437,
+    zIndex: 10,
   },
-  dropdown: {
-    height: 50,
-    backgroundColor: `${colors.primary}`,
-    borderRadius: 12,
-    borderColor: '#FBFBFB',
-    borderWidth: 1,
+  selector: {
+    width: '100%',
+    backgroundColor: colors.background,
     padding: 16,
-    color: `${colors.absolute.white}`,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FBFBFB',
   },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-    color: `${colors.absolute.white}`,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    color: `${colors.absolute.white}`,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
+  placeholderText: {
+    color: '#aaa',
     fontSize: 16,
   },
-  itemContainerStyle: {
-    backgroundColor: 'transparent',
+  selectedText: {
+    color: 'white',
+    fontSize: 16,
   },
-  itemTextStyle: {
-    fontSize: 14,
-    color: '#393939',
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  bottomList: {
+    backgroundColor: 'white',
+    paddingVertical: 52,
+    paddingHorizontal: 44,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: 400,
+  },
+  item: {
+    padding: 16,
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#000',
   },
 });
 
-const DropdownComponent = ({ data, value, setValue }: DropdownComponentProps) => {
+const CustomDropdown = ({ data, value, setValue, placeholder = '학교를 선택하세요.', style }: CustomDropdownProps) => {
+  const [open, setOpen] = useState(false);
+  const selectedLabel = data.find((item) => item.value === value)?.label;
+
+  const handleSelect = (val: string) => {
+    setValue(val);
+    setOpen(false);
+  };
+
   return (
-    <View style={styles.view}>
-      <Dropdown
-        mode="modal"
-        dropdownPosition="bottom"
-        style={[styles.dropdown]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        containerStyle={styles.container}
-        itemContainerStyle={styles.itemContainerStyle}
-        itemTextStyle={styles.itemTextStyle}
-        activeColor="transparent"
-        showsVerticalScrollIndicator
-        autoScroll={false}
-        data={data}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="학교를 선택하세요"
-        searchPlaceholder="Search..."
-        value={value}
-        onChange={(item) => {
-          setValue(item.value);
-        }}
-      />
+    <View style={(styles.wrapper, style)}>
+      <TouchableOpacity style={styles.selector} onPress={() => setOpen(true)}>
+        <Text style={value ? styles.selectedText : styles.placeholderText}>{selectedLabel || placeholder}</Text>
+      </TouchableOpacity>
+
+      <Modal visible={open} transparent animationType="fade">
+        <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
+          <View style={styles.bottomList}>
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.item} onPress={() => handleSelect(item.value)}>
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
 
-export default DropdownComponent;
+export default CustomDropdown;
