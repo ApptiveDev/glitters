@@ -21,7 +21,7 @@ export const SignInfo = () => {
   const { user, setUser } = useUser();
   const { formFields, setFieldValue, setAgreedToPrivacyPolicy, setAgreedToTermsOfService } = useFormFields();
   const { width } = Dimensions.get('window');
-  const isKeyboardVisible = useKeyboardVisible();
+  const { isKeyboardVisible } = useKeyboardVisible();
 
   const usePostMutation = () => {
     return useMutation({

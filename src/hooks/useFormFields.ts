@@ -13,6 +13,8 @@ interface FormFields {
   name: FieldState;
   birth: FieldState;
   gender: FieldState;
+  title: FieldState;
+  content: FieldState;
   recheck: string;
   agreedToPrivacyPolicy: boolean;
   agreedToTermsOfService: boolean;
@@ -33,13 +35,15 @@ export const useFormFields = () => {
     name: { ...initialField },
     birth: { ...initialField },
     gender: { ...initialField },
+    title: { ...initialField },
+    content: { ...initialField },
     recheck: '',
     agreedToPrivacyPolicy: false,
     agreedToTermsOfService: false,
   });
 
   const setFieldValue = (
-    key: keyof Pick<FormFields, 'email' | 'password' | 'authCode' | 'name' | 'birth' | 'gender'>,
+    key: keyof Pick<FormFields, 'email' | 'password' | 'authCode' | 'name' | 'birth' | 'gender' | 'title' | 'content'>,
     value: string,
     validateFn: (val: string) => boolean,
   ) => {

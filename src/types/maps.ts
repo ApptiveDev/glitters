@@ -24,13 +24,3 @@ export type MarkerType = {
   expiresAt: string;
   isWrittenBySelf: boolean;
 };
-
-export type PostRequestType = {
-  title: string;
-  content: string;
-  address: string;
-  addressDetail: string;
-  isDeactivated: boolean;
-  latitude: number;
-  longitude: number;
-};

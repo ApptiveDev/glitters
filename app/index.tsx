@@ -29,7 +29,7 @@ export const Index = () => {
       } else {
         router.replace('/login');
       }
-      // router.replace('/sign');
+      // router.replace('/maps/create/complete');
 
       await SplashScreen.hideAsync();
     }

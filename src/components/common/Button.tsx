@@ -1,6 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import { useEffect } from 'react';
+import { LayoutAnimation, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 
-import GlitterIcon from '@/assets/icons/glitter.svg';
 import colors from '@/types/colors';
 
 interface ButtonProps {
@@ -9,6 +9,8 @@ interface ButtonProps {
   style?: object;
   variant?: 'primary' | 'disable' | 'maps';
   isKeyboardVisible?: boolean;
+  fontSize?: number;
+  buttonIcon?: React.ReactNode;
 }
 
 const baseStyle: ViewStyle = {
@@ -29,12 +31,18 @@ const buttonStyles = StyleSheet.create({
     backgroundColor: colors.gray.light,
   },
   maps: {
-    ...baseStyle,
+    flexShrink: 1,
     backgroundColor: colors.background,
-    width: 130,
-    height: 36,
     borderRadius: 36,
     paddingVertical: 8,
+    paddingLeft: 12,
+    paddingRight: 16,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    minHeight: 35,
   },
 });
 
@@ -53,17 +61,31 @@ const testStyles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: colors.yellow.dark,
+    textAlign: 'center',
   },
 });
 
-export const CommonButton = ({ title, onPress, style = {}, variant = 'primary', isKeyboardVisible }: ButtonProps) => {
+export const CommonButton = ({
+  title,
+  onPress,
+  style = {},
+  variant = 'primary',
+  isKeyboardVisible,
+  fontSize = 12,
+  buttonIcon = null,
+}: ButtonProps) => {
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, [title]);
+
   return (
     <TouchableOpacity
       style={[isKeyboardVisible ? { borderRadius: 0 } : { borderRadius: 12 }, buttonStyles[variant], style]}
       onPress={onPress}
+      disabled={variant === 'disable'}
     >
-      {variant === 'maps' && <GlitterIcon width={20} height={18} />}
-      <Text style={testStyles[variant]}>{title}</Text>
+      {buttonIcon}
+      <Text style={[testStyles[variant], { fontSize }]}>{title}</Text>
     </TouchableOpacity>
   );
 };

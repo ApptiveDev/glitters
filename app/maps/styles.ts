@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center' },
+  container: { flex: 1, justifyContent: 'center', position: 'relative' },
   map: { flex: 1 },
   overlay: { position: 'absolute', top: 50, left: 20 },
   loadingContainer: {
@@ -37,6 +37,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomContentView: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingVertical: 24,
     height: 200,
     backgroundColor: 'transparent',
   },
@@ -46,12 +49,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bottomSheetMainText: {
-    fontSize: 16,
-    color: '#FBFBFB',
+    fontSize: 20,
+    color: colors.text.white,
+    fontWeight: 'bold',
   },
   bottomSheetSubText: {
     fontSize: 12,
     color: '#B2B4BF',
+    textDecorationLine: 'underline',
   },
 });
 

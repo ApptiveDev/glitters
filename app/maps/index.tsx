@@ -6,9 +6,11 @@ import { Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
+import GlitterIcon from '@/assets/icons/glitter.svg';
 import MarkerIcon from '@/assets/icons/marker.svg';
+import MarkerBySelfIcon from '@/assets/icons/markerBySelf.svg';
 import { CommonButton } from '@/components/common/Button';
-import Loading from '@/components/common/Loading';
+import Loading from '@/components/features/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
@@ -24,6 +26,9 @@ const MapSearch = () => {
   const { data: markers, isLoading } = useQuery({
     queryKey: ['markers'],
     queryFn: getMarkers,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const handleButtonPress = () => {
@@ -33,8 +38,6 @@ const MapSearch = () => {
   if (!location || isLoading) {
     return <Loading />;
   }
-
-  console.log(typeof MarkerIcon);
 
   return (
     <View style={styles.container}>
@@ -58,7 +61,11 @@ const MapSearch = () => {
                 longitude: marker.longitude,
               }}
             >
-              <MarkerIcon style={{ width: 40, height: 40 }} />
+              {marker.isWrittenBySelf ? (
+                <MarkerBySelfIcon style={{ width: 40, height: 40 }} />
+              ) : (
+                <MarkerIcon style={{ width: 40, height: 40 }} />
+              )}
             </Marker>
           ))}
       </MapView>
@@ -84,6 +91,8 @@ const MapSearch = () => {
           left: '50%',
           transform: [{ translateX: -65 }],
         }}
+        fontSize={16}
+        buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
       />
     </View>
   );

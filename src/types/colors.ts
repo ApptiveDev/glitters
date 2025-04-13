@@ -34,6 +34,7 @@ const colors = {
   text: {
     white: '#FBFBFB',
     gray: '#B1B3BB',
+    lightgray: '#F6F6F7',
   },
 };
 
