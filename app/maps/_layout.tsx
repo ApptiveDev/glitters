@@ -1,12 +1,26 @@
 import { Slot } from 'expo-router';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { BottomNav } from '@/components/features/BottomNav';
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
+  content: {
+    flex: 1,
+    paddingBottom: 40,
+  },
+});
+
 export const MapLayout = () => {
   return (
-    <View style={{ flex: 1 }}>
-      <Slot />
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Slot />
+      </View>
+
       <BottomNav />
     </View>
   );

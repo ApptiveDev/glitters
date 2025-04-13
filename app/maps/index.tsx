@@ -87,7 +87,7 @@ const MapSearch = () => {
         variant="maps"
         style={{
           position: 'absolute',
-          bottom: 80,
+          bottom: 60,
           left: '50%',
           transform: [{ translateX: -65 }],
         }}

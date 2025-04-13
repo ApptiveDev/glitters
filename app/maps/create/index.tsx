@@ -1,7 +1,7 @@
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import ExitIcon from '@/assets/icons/exit.svg';
@@ -101,6 +101,17 @@ export const CreateMarker = () => {
     }
   };
 
+  const onPressExitButton = () => {
+    Alert.alert('경고!', '진행중인 작업이 취소될 수 있습니다.', [
+      {
+        text: '이동하기',
+        onPress: () => {
+          router.replace('/maps');
+        },
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       {location && (
@@ -182,6 +193,7 @@ export const CreateMarker = () => {
               onPress={handleButtonPress}
               variant={isValid ? 'primary' : 'disable'}
             />
+            <Spacing height={24} />
           </View>
         </BottomSheetScrollView>
       </BottomSheet>
@@ -215,7 +227,7 @@ export const CreateMarker = () => {
         }}
         width={28}
         height={28}
-        onPress={() => router.back()}
+        onPress={onPressExitButton}
       />
     </View>
   );

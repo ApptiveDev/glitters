@@ -78,7 +78,7 @@ export const Write = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <KeyboardScrollContainer>
+      <KeyboardScrollContainer paddingTop={12}>
         <Heading title="반짝이 기록하기" alignItems="center" />
         <Spacing height={16} />
         <TextArea
@@ -98,7 +98,7 @@ export const Write = () => {
           maxLength={255}
           numberOfLines={4}
           multiline
-          height={278}
+          height={240}
           onChangeText={onContentChangeText}
           placeholder="내용을 입력하세요."
           isError={!formFields.content.isValid && formFields.content.isTouched}
@@ -114,6 +114,7 @@ export const Write = () => {
           variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
           style={{ marginTop: 16 }}
         />
+        <Spacing height={32} />
       </KeyboardScrollContainer>
     </SafeAreaView>
   );
