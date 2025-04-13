@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, justifyContent: 'center' },
   map: { flex: 1 },
   overlay: { position: 'absolute', top: 50, left: 20 },
   loadingContainer: {
@@ -11,12 +11,6 @@ const styles = StyleSheet.create({
     backgroundColor: `${colors.background}`,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonContainer: {
-    position: 'absolute',
-    left: '50%',
-    bottom: 50,
-    transform: [{ translateX: -75 }, { translateY: -25 }],
   },
   button: {
     backgroundColor: '#4A90E2',

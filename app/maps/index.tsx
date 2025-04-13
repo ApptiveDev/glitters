@@ -2,11 +2,12 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useRef } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { getMarkers } from '@/api/markers';
 import MarkerIcon from '@/assets/icons/marker.svg';
+import { CommonButton } from '@/components/common/Button';
 import Loading from '@/components/common/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
@@ -73,11 +74,17 @@ const MapSearch = () => {
           <Text style={styles.bottomSheetSubText}>포스트 여기다가 써야지</Text>
         </BottomSheetView>
       </BottomSheet>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
-          <Text style={styles.buttonText}>기록하기</Text>
-        </TouchableOpacity>
-      </View>
+      <CommonButton
+        title="반짝이 기록하기"
+        onPress={handleButtonPress}
+        variant="maps"
+        style={{
+          position: 'absolute',
+          bottom: 80,
+          left: '50%',
+          transform: [{ translateX: -65 }],
+        }}
+      />
     </View>
   );
 };
