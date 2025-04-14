@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Text, useWindowDimensions, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import { addLike, deleteLike, getMarkers } from '@/api/markers';
+import { addLike, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
@@ -21,6 +21,7 @@ import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import darkMapStyle from '@/utils/darkMapStyles';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
+import { sleep } from '@/utils/sleep';
 
 import styles from './styles';
 
@@ -34,6 +35,7 @@ const MapSearch = () => {
   const [post, setPost] = useState<GetPostResponseType>();
   const [sheetIndex, setSheetIndex] = useState<number>(-1);
   const windowHeight = useWindowDimensions().height;
+  const [buttonText, setButtonText] = useState('반짝이가 본인 같다면 버튼을 눌러주세요!');
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -82,30 +84,12 @@ const MapSearch = () => {
     if (isWrittenBySelf) {
       Alert.alert('내가 쓴 글입니다');
     } else if (isLikedBySelf) {
-      Alert.alert('좋아요를 취소할까요?', '', [
-        {
-          text: '취소',
-          onPress: () => {},
-          style: 'cancel',
-        },
-        {
-          text: '확인',
-          onPress: () => {
-            deleteLike(postId);
-            setPost((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    isLikedBySelf: false,
-                    likeCount: prev.likeCount - 1,
-                  }
-                : undefined,
-            );
-          },
-        },
-      ]);
+      Alert.alert('이미 누른 글이에요');
     } else {
+      setButtonText('반짝반짝');
       await addLike(postId);
+      await sleep(1000);
+      setButtonText('반짝이가 본인 같다면 버튼을 눌러주세요!');
       setPost((prev) =>
         prev
           ? {
@@ -196,7 +180,7 @@ const MapSearch = () => {
             editable={false}
           />
           <CommonButton
-            title="반짝이가 본인 같다면 버튼을 눌러주세요!"
+            title={post?.isWrittenBySelf ? '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.' : buttonText}
             variant="view"
             onPress={() =>
               onPressBottomButton({

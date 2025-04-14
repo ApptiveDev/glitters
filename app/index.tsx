@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
+import Splash from '@/components/features/Splash';
 import { getToken } from '@/utils/authStorage';
 
 SplashScreen.preventAutoHideAsync();
@@ -35,7 +36,7 @@ export const Index = () => {
     }
   }, [isReady, router]);
 
-  if (!isReady) return null;
+  if (!isReady) return <Splash />;
 
   return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} onLayout={onLayoutRootView} />;
 };
