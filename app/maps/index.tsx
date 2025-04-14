@@ -19,6 +19,7 @@ import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
+import darkMapStyle from '@/utils/darkMapStyles';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
 import styles from './styles';
@@ -130,6 +131,7 @@ const MapSearch = () => {
         }}
         showsUserLocation
         onPress={handleMapPress}
+        customMapStyle={darkMapStyle}
       >
         {markers &&
           markers.map((marker: MarkerType) => (
