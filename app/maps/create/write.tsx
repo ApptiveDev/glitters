@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, SafeAreaView, Text } from 'react-native';
+import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text } from 'react-native';
 
 import { createMarker } from '@/api/markers';
 import Heart from '@/assets/icons/heart.svg';
@@ -12,11 +12,13 @@ import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 
 export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
   const { post } = usePost();
+  const { isKeyboardVisible } = useKeyboardVisible();
 
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -58,7 +60,6 @@ export const Write = () => {
         title: formFields.title.value,
         content: formFields.content.value,
         address: post.address,
-        isDeactivated: false,
         latitude: post.latitude,
         longitude: post.longitude,
       });
@@ -108,14 +109,25 @@ export const Write = () => {
         <Text style={{ fontSize: 10, color: colors.text.lightgray }}>
           한 번 작성된 반짝이는 수정할 수 없어요. 24시간 동안만 유지됩니다.
         </Text>
+      </KeyboardScrollContainer>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={{
+          position: 'absolute',
+          width: '100%',
+          bottom: 40,
+          paddingHorizontal: isKeyboardVisible ? 0 : 28,
+        }}
+      >
         <CommonButton
           title="등록하기"
           onPress={handleButtonPress}
           variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
-          style={{ marginTop: 16 }}
+          style={{}}
+          isKeyboardVisible={isKeyboardVisible}
         />
-        <Spacing height={32} />
-      </KeyboardScrollContainer>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

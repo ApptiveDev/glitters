@@ -48,6 +48,7 @@ export const BottomNav = () => {
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         alignItems: 'center',
+        zIndex: 11,
       }}
     >
       <ChatIcon onPress={onPressChat} />

@@ -23,4 +23,8 @@ export type MarkerType = {
   longitude: number;
   expiresAt: string;
   isWrittenBySelf: boolean;
+  isDeactivated: boolean;
+  likeCount: number;
+  viewCount: number;
+  isLikedBySelf: boolean;
 };

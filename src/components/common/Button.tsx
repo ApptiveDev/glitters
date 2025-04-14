@@ -7,7 +7,7 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   style?: object;
-  variant?: 'primary' | 'disable' | 'maps';
+  variant?: 'primary' | 'disable' | 'maps' | 'view';
   isKeyboardVisible?: boolean;
   fontSize?: number;
   buttonIcon?: React.ReactNode;
@@ -44,6 +44,10 @@ const buttonStyles = StyleSheet.create({
     borderWidth: 1,
     minHeight: 35,
   },
+  view: {
+    ...baseStyle,
+    backgroundColor: '#4A5789',
+  },
 });
 
 const testStyles = StyleSheet.create({
@@ -62,6 +66,12 @@ const testStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.yellow.dark,
     textAlign: 'center',
+    borderWidth: 0,
+  },
+  view: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.text.white,
   },
 });
 
