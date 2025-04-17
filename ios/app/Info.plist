@@ -17,7 +17,7 @@
     <key>NSFaceIDUsageDescription</key>
     <string>YOUR TEXT</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>YOUR TEXT</string>
+    <string>현재 위치 기반으로 작성한 게시글을 지도에 표현하기 위해 사용합니다.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>YOUR TEXT</string>
     <key>NSLocationWhenInUseUsageDescription</key>

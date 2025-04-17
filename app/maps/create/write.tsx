@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text } from 'react-native';
+import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
-import Heart from '@/assets/icons/heart.svg';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
@@ -14,6 +14,7 @@ import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
+import { threeDIcons } from '@/utils/threeDIcons';
 
 export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
@@ -21,6 +22,12 @@ export const Write = () => {
   const { isKeyboardVisible } = useKeyboardVisible();
 
   const translateY = useRef(new Animated.Value(0)).current;
+
+  const RandomIcon = useMemo(() => {
+    const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
+    const randomIndex = Math.floor(Math.random() * iconsArray.length);
+    return iconsArray[randomIndex];
+  }, []);
 
   useEffect(() => {
     Animated.loop(
@@ -92,7 +99,7 @@ export const Write = () => {
           maxLength={63}
         />
         <Animated.View style={{ transform: [{ translateY }] }}>
-          <Heart width={216} height={216} />
+          <RandomIcon width={216} height={216} />
         </Animated.View>
         <TextArea
           value={formFields.content.value}

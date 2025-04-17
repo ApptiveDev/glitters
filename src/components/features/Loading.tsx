@@ -1,24 +1,49 @@
-import styles from 'app/maps/styles';
-import { ActivityIndicator, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CommonButton } from '@/components/common/Button';
-import { Spacing } from '@/components/common/Spacing';
+import loadingImage from '@/assets/images/loading-image.png';
 import colors from '@/types/colors';
 
 const Loading = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color={colors.absolute.white} />
-      <Spacing height={20} />
-      <CommonButton
-        title="지도를 불러오는 중이에요..."
-        variant="maps"
-        onPress={() => {}}
+    <View
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: -insets.bottom,
+        flex: 1,
+        backgroundColor: colors.background,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        zIndex: 999,
+      }}
+    >
+      <Text
         style={{
-          borderWidth: 1,
-          borderColor: colors.yellow.dark,
+          color: colors.text.white,
+          fontWeight: 'bold',
+          fontSize: 20,
+          lineHeight: 32,
+          textAlign: 'center',
         }}
-      />
+      >
+        어쩌면 오늘 주변 어딘가에서 당신이
+      </Text>
+      <Text
+        style={{
+          color: colors.text.white,
+          fontWeight: 'bold',
+          fontSize: 20,
+          lineHeight: 32,
+          textAlign: 'center',
+        }}
+      >
+        반짝였을지도 몰라요!
+      </Text>
+      <Image source={loadingImage} resizeMode="contain" style={{ width: 512, height: 528 }} />
     </View>
   );
 };

@@ -91,8 +91,6 @@ export const CreateMarker = () => {
 
   if (isLoading) return <Loading />;
 
-  console.log(contentHeight, 'contentHeight');
-
   return (
     <View style={styles.container}>
       {location && (
@@ -200,7 +198,7 @@ export const CreateMarker = () => {
           position: 'absolute',
           top: 85,
           right: 20,
-          zIndex: 10,
+          zIndex: 20,
           elevation: 10,
         }}
         width={28}

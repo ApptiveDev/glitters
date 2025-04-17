@@ -1,8 +1,8 @@
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Text, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { addLike, getMarkers } from '@/api/markers';
@@ -12,30 +12,26 @@ import GlitterIcon from '@/assets/icons/glitter.svg';
 import MarkerIcon from '@/assets/icons/marker.svg';
 import MarkerBySelfIcon from '@/assets/icons/markerBySelf.svg';
 import { CommonButton } from '@/components/common/Button';
-import { Heading } from '@/components/common/Heading';
 import { CustomTextArea } from '@/components/common/TextArea';
+import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
 import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
-import darkMapStyle from '@/utils/darkMapStyles';
+import { darkMapStyle } from '@/utils/darkMapStyles';
 import { PNU_BOUND_MOCK } from '@/utils/mocks';
 import { sleep } from '@/utils/sleep';
 
 import styles from './styles';
 
 const MapSearch = () => {
-  const [contentHeight, setContentHeight] = useState(0);
-  const snapPoints = useMemo(() => {
-    return contentHeight > 0 ? [contentHeight + 40] : ['25%'];
-  }, [contentHeight]);
+  const [contentHeight, setContentHeight] = useState(300);
 
   const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
   const [post, setPost] = useState<GetPostResponseType>();
-  const [sheetIndex, setSheetIndex] = useState<number>(-1);
-  const windowHeight = useWindowDimensions().height;
   const [buttonText, setButtonText] = useState('반짝이가 본인 같다면 버튼을 눌러주세요!');
+  const [isVisible, setIsVisible] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -52,10 +48,10 @@ const MapSearch = () => {
   };
 
   useEffect(() => {
-    if (post && contentHeight > 0) {
-      bottomSheetRef.current?.snapToIndex(0);
+    if (post) {
+      setIsVisible(true);
     }
-  }, [post, contentHeight]);
+  }, [post]);
 
   if (!location || isLoading) {
     return <Loading />;
@@ -136,22 +132,16 @@ const MapSearch = () => {
           ))}
       </MapView>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        enablePanDownToClose
-        snapPoints={snapPoints}
-        backgroundStyle={{ backgroundColor: `${colors.background}` }}
-        onChange={(index) => {
-          setSheetIndex(index);
-        }}
-      >
-        <BottomSheetView
-          style={styles.contentContainer}
-          onLayout={(e) => setContentHeight(e.nativeEvent.layout.height)}
+      <CustomBottomSheet isVisible={isVisible} height={contentHeight} onClose={() => setIsVisible(false)}>
+        <View
+          onLayout={(e) => {
+            const measuredHeight = e.nativeEvent.layout.height;
+            setContentHeight(measuredHeight + 40); // + padding
+          }}
+          style={{ paddingTop: 16, gap: 12, alignItems: 'center' }}
         >
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Heading title={post?.title || ''} fontSize={24} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
+            <Text style={{ fontSize: 24, color: 'white', flexShrink: 1 }}>{post?.title}</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -194,15 +184,15 @@ const MapSearch = () => {
           <Text style={{ fontSize: 12, color: colors.text.lightgray }}>
             {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
           </Text>
-        </BottomSheetView>
-      </BottomSheet>
+        </View>
+      </CustomBottomSheet>
       <CommonButton
         title="반짝이 기록하기"
         onPress={handleButtonPress}
         variant="maps"
         style={{
           position: 'absolute',
-          bottom: sheetIndex === -1 ? 60 : windowHeight * 0.5,
+          bottom: isVisible ? contentHeight + 16 : 50,
           left: '50%',
           transform: [{ translateX: -70 }],
           borderWidth: 0,

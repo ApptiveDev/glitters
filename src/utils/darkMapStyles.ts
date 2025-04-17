@@ -1,4 +1,4 @@
-const darkMapStyle = [
+export const darkMapStyle = [
   {
     elementType: 'geometry',
     stylers: [{ color: '#242f3e' }],
@@ -15,6 +15,21 @@ const darkMapStyle = [
     featureType: 'administrative.locality',
     elementType: 'labels.text.fill',
     stylers: [{ color: '#d59563' }],
+  },
+  {
+    featureType: 'landscape.man_made',
+    elementType: 'geometry.stroke',
+    stylers: [
+      {
+        color: '#ffeb3b',
+      },
+      {
+        visibility: 'on',
+      },
+      {
+        weight: 8,
+      },
+    ],
   },
   {
     featureType: 'poi',

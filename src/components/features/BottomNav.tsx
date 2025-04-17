@@ -44,7 +44,7 @@ export const BottomNav = () => {
         flexDirection: 'row',
         justifyContent: 'space-around',
         padding: 10,
-        paddingTop: 32,
+        paddingTop: 36,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         alignItems: 'center',
