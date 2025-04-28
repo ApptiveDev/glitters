@@ -1,5 +1,6 @@
 import { Slot } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav } from '@/components/features/BottomNav';
 
@@ -16,12 +17,12 @@ const styles = StyleSheet.create({
 
 export const GuideLayout = () => {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Slot />
       </View>
       <BottomNav />
-    </View>
+    </SafeAreaView>
   );
 };
 

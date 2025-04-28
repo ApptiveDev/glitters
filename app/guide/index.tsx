@@ -1,16 +1,37 @@
 import { Text, View } from 'react-native';
 
+import { ListItem } from '@/components/common/ListItem';
+import colors from '@/types/colors';
+
 export const Guide = () => {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: colors.background,
+        alignItems: 'flex-start',
+        padding: 28,
       }}
     >
-      <Text style={{ color: '#fff' }}>Guide</Text>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: colors.text.white,
+        }}
+      >
+        도움말
+      </Text>
+      <View
+        style={{
+          gap: 12,
+          marginTop: 32,
+        }}
+      >
+        <ListItem text="고객센터" />
+        <ListItem text="서비스이용약관" />
+        <ListItem text="개인정보처리방침" />
+      </View>
     </View>
   );
 };
