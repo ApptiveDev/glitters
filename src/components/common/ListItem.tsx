@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 
-import CaretRightIcon from '@/assets/icons/CaretRight.svg';
+import CaretRightIcon from '@/assets/icons/caret_right.svg';
 import colors from '@/types/colors';
 
 interface ListItemProps {

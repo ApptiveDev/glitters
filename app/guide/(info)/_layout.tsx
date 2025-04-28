@@ -1,7 +1,7 @@
 import { router, Slot } from 'expo-router';
 import { View } from 'react-native';
 
-import CaretLeftIcon from '@/assets/icons/CaretLeft.svg';
+import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import { Spacing } from '@/components/common/Spacing';
 import colors from '@/types/colors';
 
