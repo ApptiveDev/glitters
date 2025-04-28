@@ -27,3 +27,10 @@ export interface GetPostResponseType {
 }
 
 export type Post = PostRequestType & PostResponseType;
+
+export interface ReportRequestType {
+  reportType: 'POST_REPORT' | 'CHATROOM_REPORT';
+  postId?: number;
+  chatroomId?: number;
+  reason: string;
+}

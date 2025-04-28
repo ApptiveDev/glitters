@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import { addLike, getMarkers } from '@/api/markers';
+import { addLike, deleteMarker, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
@@ -97,6 +97,31 @@ const MapSearch = () => {
             }
           : undefined,
       );
+    }
+  };
+
+  const handleDeletePost = (postId: number, isWrittenBySelf: boolean) => {
+    if (isWrittenBySelf) {
+      Alert.alert('삭제하시겠어요?', '삭제된 반짝이는 다시 복구되지 않아요', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            await deleteMarker(postId);
+            router.replace('/maps');
+          },
+        },
+      ]);
+    } else {
+      Alert.alert('신고하시겠어요?', '', [
+        {
+          text: '확인',
+          onPress: async () => {},
+        },
+      ]);
     }
   };
 
@@ -204,7 +229,10 @@ const MapSearch = () => {
             }
             buttonIcon={<GlitterIcon />}
           />
-          <Text style={{ fontSize: 12, color: colors.text.lightgray }}>
+          <Text
+            style={{ fontSize: 12, color: colors.text.lightgray }}
+            onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+          >
             {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
           </Text>
         </View>
