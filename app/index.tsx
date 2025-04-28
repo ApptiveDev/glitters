@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import Splash from '@/components/features/Splash';
+import { getToken } from '@/utils/authStorage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,14 +23,14 @@ export const Index = () => {
 
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
-      // const token = await getToken();
-      // console.log('token', token);
-      // if (token) {
-      //   router.replace('/maps');
-      // } else {
-      //   router.replace('/login');
-      // }
-      router.replace('/sign-info');
+      const token = await getToken();
+      console.log('token', token);
+      if (token) {
+        router.replace('/maps');
+      } else {
+        router.replace('/login');
+      }
+      // router.replace('/sign-info');
 
       await SplashScreen.hideAsync();
     }

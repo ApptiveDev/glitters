@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useRef } from 'react';
-import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
@@ -10,6 +10,8 @@ import { Heading } from '@/components/common/Heading';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
+import CustomBottomSheet from '@/components/features/BottomSheet';
+import { WritePolicyList } from '@/components/features/WritePolicyList';
 import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
@@ -20,13 +22,18 @@ export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
   const { post } = usePost();
   const { isKeyboardVisible } = useKeyboardVisible();
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(true);
+  const [contentHeight, setContentHeight] = useState(300);
 
   const translateY = useRef(new Animated.Value(0)).current;
 
+  const [randomIndex, setRandomIndex] = useState(0);
+
   const RandomIcon = useMemo(() => {
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
-    const randomIndex = Math.floor(Math.random() * iconsArray.length);
-    return iconsArray[randomIndex];
+    const index = Math.floor(Math.random() * iconsArray.length);
+    setRandomIndex(index);
+    return iconsArray[index];
   }, []);
 
   useEffect(() => {
@@ -70,7 +77,10 @@ export const Write = () => {
         latitude: post.latitude,
         longitude: post.longitude,
       });
-      router.replace('./complete');
+      router.replace({
+        pathname: './complete',
+        params: { iconIndex: randomIndex },
+      });
     } catch (error) {
       console.error('Error creating marker:', error);
     }
@@ -108,7 +118,7 @@ export const Write = () => {
           multiline
           height={240}
           onChangeText={onContentChangeText}
-          placeholder="내용을 입력하세요."
+          placeholder="당신의 반짝이를 소개해주세요 (255자 이내)"
           isError={!formFields.content.isValid && formFields.content.isTouched}
           errorMessage="내용은 2자 이상 255자 이하로 입력해주세요."
         />
@@ -135,6 +145,52 @@ export const Write = () => {
           isKeyboardVisible={isKeyboardVisible}
         />
       </KeyboardAvoidingView>
+      <CustomBottomSheet
+        isVisible={bottomSheetVisible}
+        onClose={() => setBottomSheetVisible(false)}
+        height={contentHeight}
+        isKeyboardVisible={false}
+        blockOutsidePress
+      >
+        <View
+          onLayout={(e) => {
+            const measuredHeight = e.nativeEvent.layout.height;
+            setContentHeight(measuredHeight + 52);
+          }}
+          style={{ paddingVertical: 24, gap: 8 }}
+        >
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: 'bold',
+              color: colors.text.white,
+              textAlign: 'center',
+            }}
+          >
+            아래 내용을 꼭 지켜주세요!
+          </Text>
+          <Spacing height={32} />
+          <WritePolicyList />
+          <Spacing height={28} />
+          <Text
+            style={{
+              fontSize: 8,
+              color: colors.text.lightgray,
+              textAlign: 'center',
+            }}
+          >
+            위의 사항을 위반한 게시물은 관리자가 임의로 삭제 조치를 취할 수 있습니다.
+          </Text>
+          <CommonButton
+            title="동의하고 게시글 작성하러 가기"
+            onPress={() => {
+              setBottomSheetVisible(false);
+            }}
+            style={{ paddingVertical: 12 }}
+            variant="primary"
+          />
+        </View>
+      </CustomBottomSheet>
     </SafeAreaView>
   );
 };

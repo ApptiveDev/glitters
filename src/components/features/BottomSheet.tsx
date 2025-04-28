@@ -11,6 +11,7 @@ interface CustomBottomSheetProps {
   onClose?: () => void;
   height?: number;
   isKeyboardVisible?: boolean;
+  blockOutsidePress?: boolean;
 }
 
 const CustomBottomSheet = ({
@@ -19,6 +20,7 @@ const CustomBottomSheet = ({
   onClose,
   height = 200,
   isKeyboardVisible = false,
+  blockOutsidePress = false,
 }: CustomBottomSheetProps) => {
   const [isMounted, setIsMounted] = useState(false);
   const screenHeight = useWindowDimensions().height;
@@ -61,7 +63,7 @@ const CustomBottomSheet = ({
   return (
     <>
       <Pressable
-        onPress={onPress}
+        onPress={blockOutsidePress ? undefined : onPress}
         style={{
           position: 'absolute',
           top: 0,
@@ -69,6 +71,7 @@ const CustomBottomSheet = ({
           right: 0,
           bottom: 0,
           zIndex: 99,
+          backgroundColor: blockOutsidePress ? 'rgba(0, 0, 0, 0.5)' : 'transparent',
         }}
       />
       <Animated.View
@@ -83,7 +86,7 @@ const CustomBottomSheet = ({
             borderTopRightRadius: 20,
             borderTopWidth: 24,
             borderTopColor: colors.background,
-            zIndex: 100,
+            zIndex: 1000,
             paddingHorizontal: 24,
             paddingBottom: isKeyboardVisible ? padding : 24,
           },
