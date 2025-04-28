@@ -1,8 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
+import { PrivacyPolicy } from 'app/guide/(info)/PrivacyPolicy';
+import { TermsOfService } from 'app/guide/(info)/TermsOfService';
 import { router } from 'expo-router';
-import { Dimensions, View } from 'react-native';
+import { useState } from 'react';
+import { Dimensions, Modal, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
+import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
@@ -13,6 +18,7 @@ import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
+import colors from '@/types/colors';
 import { storeToken } from '@/utils/authStorage';
 
 import styles from './styles';
@@ -22,6 +28,7 @@ export const SignInfo = () => {
   const { formFields, setFieldValue, setAgreedToPrivacyPolicy, setAgreedToTermsOfService } = useFormFields();
   const { width } = Dimensions.get('window');
   const { isKeyboardVisible } = useKeyboardVisible();
+  const [currentModal, setCurrentModal] = useState<'policy' | 'terms' | null>(null);
 
   const usePostMutation = () => {
     return useMutation({
@@ -62,6 +69,16 @@ export const SignInfo = () => {
     } catch (error) {
       console.error('Error creating user:', error);
     }
+  };
+
+  const handlePrivacyPolicy = () => {
+    setAgreedToPrivacyPolicy(!formFields.agreedToPrivacyPolicy);
+    setCurrentModal('policy');
+  };
+
+  const handleTermsOfService = () => {
+    setAgreedToTermsOfService(!formFields.agreedToTermsOfService);
+    setCurrentModal('terms');
   };
 
   return (
@@ -119,12 +136,12 @@ export const SignInfo = () => {
           >
             <TermsItem
               isChecked={formFields.agreedToPrivacyPolicy}
-              onPress={() => setAgreedToPrivacyPolicy(!formFields.agreedToPrivacyPolicy)}
+              onPress={handlePrivacyPolicy}
               title="개인정보 처리방침"
             />
             <TermsItem
               isChecked={formFields.agreedToTermsOfService}
-              onPress={() => setAgreedToTermsOfService(!formFields.agreedToTermsOfService)}
+              onPress={handleTermsOfService}
               title="서비스 이용약관"
             />
           </View>
@@ -135,6 +152,30 @@ export const SignInfo = () => {
           <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
         )}
       </BottomButtonContainer>
+      <Modal visible={currentModal !== null} animationType="slide">
+        <View style={{ flex: 1, backgroundColor: colors.background, paddingHorizontal: 28, paddingTop: 28 }}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: colors.background,
+            }}
+          >
+            <View
+              style={{ flexDirection: 'row', gap: 8, marginBottom: 16, width: '100%', alignItems: 'flex-start' }}
+              onTouchEnd={() => {
+                setCurrentModal(null);
+              }}
+            >
+              <CaretLeftIcon width={16} height={16} />
+              <Text style={{ fontSize: 12, color: colors.text.lightgray }}>회원가입 완료하기</Text>
+            </View>
+            {currentModal === 'policy' && <PrivacyPolicy />}
+            {currentModal === 'terms' && <TermsOfService />}
+          </SafeAreaView>
+        </View>
+      </Modal>
     </View>
   );
 };

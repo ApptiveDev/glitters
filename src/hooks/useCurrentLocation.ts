@@ -1,5 +1,6 @@
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 import { InstitutionBound, LocationType } from '@/types/maps';
 
@@ -17,6 +18,15 @@ export const useCurrentLocation = ({ bound }: UseCurrentLocationProps) => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('위치 권한이 거부되었습니다.');
+        setLocation({
+          latitude: bound.defaultLat,
+          longitude: bound.defaultLon,
+        });
+        Alert.alert(
+          '위치 권한 필요',
+          '위치 권한을 허용하지 않으면 기본 위치가 사용됩니다.\n설정에서 권한을 변경할 수 있어요.',
+          [{ text: '확인' }],
+        );
         setLoading(false);
         return;
       }
