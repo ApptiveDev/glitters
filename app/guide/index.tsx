@@ -9,6 +9,14 @@ export const Guide = () => {
     router.push('/guide/(info)/HelpCenter');
   };
 
+  const termsOfServicePress = () => {
+    router.push('/guide/(info)/TermsOfService');
+  };
+
+  const privacyPolicyPress = () => {
+    router.push('/guide/(info)/PrivacyPolicy');
+  };
+
   return (
     <View
       style={{
@@ -33,8 +41,8 @@ export const Guide = () => {
         }}
       >
         <ListItem text="고객센터" onPress={helpCenterPress} />
-        <ListItem text="서비스이용약관" />
-        <ListItem text="개인정보처리방침" />
+        <ListItem text="서비스이용약관" onPress={termsOfServicePress} />
+        <ListItem text="개인정보처리방침" onPress={privacyPolicyPress} />
       </View>
     </View>
   );
