@@ -31,8 +31,9 @@ export const BottomNav = () => {
   };
 
   const onPressProfile = () => {
-    Alert.alert('준비중이에요.');
+    router.replace('/guide');
   };
+
   return (
     <View
       style={{
