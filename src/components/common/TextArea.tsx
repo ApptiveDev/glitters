@@ -19,7 +19,6 @@ interface TextAreaProps {
 const styles = StyleSheet.create({
   container: {
     minHeight: 50,
-    backgroundColor: '#4A5789',
     borderRadius: 8,
     paddingVertical: 16,
     paddingHorizontal: 20,

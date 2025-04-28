@@ -1,5 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
+import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
@@ -7,6 +8,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { addLike, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
+import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import MarkerIcon from '@/assets/icons/marker.svg';
@@ -138,10 +140,18 @@ const MapSearch = () => {
             const measuredHeight = e.nativeEvent.layout.height;
             setContentHeight(measuredHeight + 40); // + padding
           }}
-          style={{ paddingTop: 16, gap: 12, alignItems: 'center' }}
+          style={{ paddingTop: 16, gap: 12, alignItems: 'center', position: 'relative' }}
         >
+          <HeartIcon
+            width={292}
+            height={292}
+            style={{
+              position: 'absolute',
+              zIndex: 0,
+            }}
+          />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
-            <Text style={{ fontSize: 24, color: 'white', flexShrink: 1 }}>{post?.title}</Text>
+            <Text style={{ fontSize: 24, color: 'white', fontWeight: 'bold', flexShrink: 1 }}>{post?.title}</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -161,14 +171,27 @@ const MapSearch = () => {
               </View>
             </View>
           </View>
-          <CustomTextArea
-            value={post?.content || ''}
-            multiline
-            onChangeText={() => {}}
-            height={184}
-            numberOfLines={10}
-            editable={false}
-          />
+          <BlurView
+            intensity={20}
+            tint="dark"
+            style={{
+              backgroundColor: 'rgba(74, 87, 137, 0.2)',
+              width: '100%',
+              borderRadius: 8,
+              overflow: 'hidden',
+              borderWidth: 1,
+              borderColor: 'rgba(251, 251, 251, 0.2)',
+            }}
+          >
+            <CustomTextArea
+              value={post?.content || ''}
+              multiline
+              onChangeText={() => {}}
+              height={184}
+              numberOfLines={10}
+              editable={false}
+            />
+          </BlurView>
           <CommonButton
             title={post?.isWrittenBySelf ? '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.' : buttonText}
             variant="view"
