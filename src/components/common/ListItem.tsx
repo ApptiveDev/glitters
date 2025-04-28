@@ -5,9 +5,10 @@ import colors from '@/types/colors';
 
 interface ListItemProps {
   text: string;
+  onPress: () => void;
 }
 
-export const ListItem = ({ text }: ListItemProps) => {
+export const ListItem = ({ text, onPress }: ListItemProps) => {
   return (
     <View
       style={{
@@ -17,6 +18,7 @@ export const ListItem = ({ text }: ListItemProps) => {
         width: '100%',
         padding: 16,
       }}
+      onTouchEnd={onPress}
     >
       <Text
         style={{
