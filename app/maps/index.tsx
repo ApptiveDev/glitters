@@ -20,8 +20,9 @@ import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
+import { usePost } from '@/contexts/PostContext';
 import colors from '@/types/colors';
-import { InstitutionBoundType, MarkerType } from '@/types/maps';
+import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { darkMapStyle } from '@/utils/darkMapStyles';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
@@ -32,7 +33,7 @@ import styles from './styles';
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
 
-  const [bound, setBound] = useState<InstitutionBoundType | null>(null);
+  const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
     latitude: number;
     longitude: number;
@@ -83,7 +84,7 @@ const MapSearch = () => {
     };
 
     fetchBound();
-  }, []);
+  }, [setBound]);
 
   useEffect(() => {
     const fetchLocation = async () => {

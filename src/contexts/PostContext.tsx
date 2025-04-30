@@ -1,10 +1,12 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
+import { InstitutionBoundType } from '@/types/maps';
 import { Post } from '@/types/post';
 
 const initialPostState: Post = {
   postId: 0,
   markerId: 0,
+  iconIdx: 0,
   title: '',
   content: '',
   address: '',
@@ -14,6 +16,8 @@ const initialPostState: Post = {
 
 type PostContextType = {
   post: Post | null;
+  bound: InstitutionBoundType | null;
+  setBound: (bound: InstitutionBoundType) => void;
   setPost: (Post: Post) => void;
   updatePost: (fields: Partial<Post>) => void;
 };
@@ -22,12 +26,13 @@ const PostContext = createContext<PostContextType | null>(null);
 
 export const PostProvider = ({ children }: { children: React.ReactNode }) => {
   const [post, setPost] = useState<Post>(initialPostState);
+  const [bound, setBound] = useState<InstitutionBoundType | null>(null);
 
   const updatePost = (fields: Partial<Post>) => {
     setPost((prev) => ({ ...prev, ...fields }));
   };
 
-  const value = useMemo(() => ({ post, setPost, updatePost }), [post]);
+  const value = useMemo(() => ({ post, setPost, updatePost, bound, setBound }), [post, bound]);
 
   return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
 };

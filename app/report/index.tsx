@@ -46,7 +46,7 @@ export const Report = () => {
             multiline
             height={240}
             onChangeText={setText}
-            placeholder="당신의 반짝이를 소개해주세요 (255자 이내)"
+            placeholder="신고하는 이유를 작성해주세요 (255자 이내)"
             isError={text.length < 2 || text.length > 255}
             errorMessage="신고하는 이유를 작성해주세요."
             backgroundColor={colors.backgroundLight}

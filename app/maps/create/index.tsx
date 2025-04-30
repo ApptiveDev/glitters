@@ -29,9 +29,10 @@ export const CreateMarker = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const inputRef = useRef<TextInput>(null);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const mapRef = useRef<MapView>(null);
 
   const { isKeyboardVisible } = useKeyboardVisible();
-  const { updatePost } = usePost();
+  const { updatePost, bound } = usePost();
 
   const handleMapPress = async (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
@@ -77,11 +78,21 @@ export const CreateMarker = () => {
     ]);
   };
 
+  const isOutOfBound = (latitude: number, longitude: number) => {
+    return (
+      bound &&
+      (latitude < bound.startLat || latitude > bound.endLat || longitude < bound.startLon || longitude > bound.endLon)
+    );
+  };
+
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
+        maxZoomLevel={20}
+        minZoomLevel={15}
         initialRegion={{
           latitude: lat,
           longitude: lon,
@@ -90,6 +101,17 @@ export const CreateMarker = () => {
         }}
         showsUserLocation
         onPress={handleMapPress}
+        onRegionChangeComplete={(region) => {
+          const { latitude, longitude } = region;
+          if (isOutOfBound(latitude, longitude)) {
+            mapRef.current?.animateToRegion({
+              latitude: bound?.defaultLat ?? 0,
+              longitude: bound?.defaultLon ?? 0,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+          }
+        }}
       >
         {markerPlace && (
           <Marker
