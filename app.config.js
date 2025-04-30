@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: '반짝이',
+    name: '반짝이맵',
     slug: 'banjjak',
     version: '1.0.0',
     orientation: 'portrait',
