@@ -4,6 +4,7 @@ import { Alert, Linking, Text, View } from 'react-native';
 import { withdrawUser } from '@/api/auth';
 import { Spacing } from '@/components/common/Spacing';
 import colors from '@/types/colors';
+import { removeToken } from '@/utils/authStorage';
 
 const TextStyle = {
   lineHeight: 24,
@@ -30,6 +31,7 @@ export const HelpCenter = () => {
           text: '확인',
           onPress: async () => {
             try {
+              await removeToken();
               await withdrawUser();
               Alert.alert('탈퇴 완료', '회원 탈퇴가 정상적으로 처리되었습니다.');
               router.replace('/login');

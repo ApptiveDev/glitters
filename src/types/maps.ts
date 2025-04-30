@@ -3,17 +3,17 @@ export type LocationType = {
   longitude: number;
 };
 
-export type InstitutionBound = {
-  id: number;
-  institutionId: number;
+export type InstitutionBounds = {
+  bounds: InstitutionBoundType[];
+};
+
+export type InstitutionBoundType = {
   startLat: number;
   startLon: number;
   endLat: number;
   endLon: number;
   defaultLat: number;
   defaultLon: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type MarkerType = {

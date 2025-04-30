@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -9,21 +9,19 @@ import TelescopeIcon from '@/assets/icons/telescope.svg';
 import { CommonButton } from '@/components/common/Button';
 import { Spacing } from '@/components/common/Spacing';
 import CustomBottomSheet from '@/components/features/BottomSheet';
-import Loading from '@/components/features/Loading';
 import { usePost } from '@/contexts/PostContext';
-import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
 import colors from '@/types/colors';
 import { LocationType } from '@/types/maps';
-import { PNU_BOUND_MOCK } from '@/utils/mocks';
 
 import styles from '../styles';
 
 export const CreateMarker = () => {
-  const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
+  const { currentlat, currentlon } = useLocalSearchParams();
+  const lat = Number(currentlat);
+  const lon = Number(currentlon);
   const [placeName, setPlaceName] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFetchingPlace, setIsFetchingPlace] = useState(false);
   const [markerPlace, setMarkerPlace] = useState<LocationType>();
   const [isEditable, setIsEditable] = useState(false);
@@ -56,16 +54,6 @@ export const CreateMarker = () => {
     return undefined;
   }, [placeName]);
 
-  useEffect(() => {
-    if (location) {
-      const timeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 800);
-      return () => clearTimeout(timeout);
-    }
-    return undefined;
-  }, [location]);
-
   const handleButtonPress = () => {
     updatePost({
       address: placeName || '',
@@ -89,35 +77,31 @@ export const CreateMarker = () => {
     ]);
   };
 
-  if (isLoading) return <Loading />;
-
   return (
     <View style={styles.container}>
-      {location && (
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={{
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.002,
-            longitudeDelta: 0.002,
-          }}
-          showsUserLocation
-          onPress={handleMapPress}
-        >
-          {markerPlace && (
-            <Marker
-              coordinate={{
-                latitude: markerPlace.latitude,
-                longitude: markerPlace.longitude,
-              }}
-            >
-              <MarkerIcon style={{ width: 40, height: 40 }} />
-            </Marker>
-          )}
-        </MapView>
-      )}
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        initialRegion={{
+          latitude: lat,
+          longitude: lon,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        }}
+        showsUserLocation
+        onPress={handleMapPress}
+      >
+        {markerPlace && (
+          <Marker
+            coordinate={{
+              latitude: markerPlace.latitude,
+              longitude: markerPlace.longitude,
+            }}
+          >
+            <MarkerIcon style={{ width: 40, height: 40 }} />
+          </Marker>
+        )}
+      </MapView>
 
       {isFetchingPlace && (
         <View

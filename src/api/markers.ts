@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { MarkerType } from '@/types/maps';
+import { InstitutionBoundType, MarkerType } from '@/types/maps';
 import { PostRequestType, ReportRequestType } from '@/types/post';
 
 export const getMarkers = async (): Promise<MarkerType[]> => {
@@ -53,5 +53,15 @@ export const reportMarker = async (report: ReportRequestType): Promise<void> => 
   } catch (error) {
     console.error('Error reporting marker:', error);
     throw new Error('Failed to report marker');
+  }
+};
+
+export const getBoundMarkers = async (): Promise<InstitutionBoundType[]> => {
+  try {
+    const response = await apiInstance.get('/institutions/bounds');
+    return response.data.bounds;
+  } catch (error) {
+    console.error('Error fetching bound markers:', error);
+    throw new Error('Failed to fetch bound markers');
   }
 };

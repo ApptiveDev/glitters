@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import { addLike, deleteMarker, getMarkers } from '@/api/markers';
+import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
@@ -17,26 +17,28 @@ import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
-import { useCurrentLocation } from '@/hooks/useCurrentLocation';
 import colors from '@/types/colors';
-import { MarkerType } from '@/types/maps';
+import { InstitutionBoundType, MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { darkMapStyle } from '@/utils/darkMapStyles';
-import { PNU_BOUND_MOCK } from '@/utils/mocks';
-import { sleep } from '@/utils/sleep';
+import { getCurrentLocation } from '@/utils/getCurrentLocation';
 
 import styles from './styles';
 
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
 
-  const { location } = useCurrentLocation({ bound: PNU_BOUND_MOCK });
+  const [bound, setBound] = useState<InstitutionBoundType | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [post, setPost] = useState<GetPostResponseType>();
-  const [buttonText, setButtonText] = useState('반짝이가 본인 같다면 버튼을 눌러주세요!');
+  const [overrideButtonText, setOverrideButtonText] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const mapRef = useRef<MapView>(null);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-
   const { data: markers, isLoading } = useQuery({
     queryKey: ['markers'],
     queryFn: getMarkers,
@@ -46,8 +48,41 @@ const MapSearch = () => {
   });
 
   const handleButtonPress = () => {
-    router.push('/maps/create');
+    router.push({
+      pathname: '/maps/create',
+      params: {
+        currentLat: currentPosition?.latitude,
+        currentLon: currentPosition?.longitude,
+      },
+    });
   };
+
+  useEffect(() => {
+    const fetchBound = async () => {
+      try {
+        const response = await getBoundMarkers();
+        setBound(response[0]);
+      } catch (error) {
+        console.error('Bound markers error:', error);
+      }
+    };
+
+    fetchBound();
+  }, []);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (!bound) return;
+      const { location, errorMsg } = await getCurrentLocation({ bound });
+      if (location) {
+        setCurrentPosition(location);
+      } else {
+        console.warn(errorMsg);
+      }
+    };
+
+    fetchLocation();
+  }, [bound]);
 
   useEffect(() => {
     if (post) {
@@ -55,19 +90,38 @@ const MapSearch = () => {
     }
   }, [post]);
 
-  if (!location || isLoading) {
+  if (!currentPosition || isLoading) {
     return <Loading />;
   }
 
+  if (!bound) {
+    return <Loading />;
+  }
+
+  const isOutOfBound = (latitude: number, longitude: number) => {
+    return (
+      bound &&
+      (latitude < bound.startLat || latitude > bound.endLat || longitude < bound.startLon || longitude > bound.endLon)
+    );
+  };
+
   const onPressMarker = async (marker: MarkerType) => {
-    console.log('Marker pressed:', marker);
     const response = await getPostById(marker);
-    console.log('Post response:', response);
     setPost(response);
   };
 
   const handleMapPress = () => {
     bottomSheetRef.current?.close();
+  };
+
+  const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
+    if (isWrittenBySelf) {
+      return '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
+    }
+    if (isLikedBySelf) {
+      return '마음에 들어온 반짝이에요';
+    }
+    return '이 반짝이가 마음에 들어요';
   };
 
   const onPressBottomButton = async ({
@@ -84,10 +138,11 @@ const MapSearch = () => {
     } else if (isLikedBySelf) {
       Alert.alert('이미 누른 글이에요');
     } else {
-      setButtonText('반짝반짝');
+      setOverrideButtonText('반짝반짝');
       await addLike(postId);
-      await sleep(1000);
-      setButtonText('반짝이가 본인 같다면 버튼을 눌러주세요!');
+      setTimeout(() => {
+        setOverrideButtonText(null);
+      }, 1000);
       setPost((prev) =>
         prev
           ? {
@@ -131,13 +186,25 @@ const MapSearch = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
           latitudeDelta: 0.003,
           longitudeDelta: 0.003,
         }}
         showsUserLocation
         onPress={handleMapPress}
+        onRegionChangeComplete={(region) => {
+          const { latitude, longitude } = region;
+          if (isOutOfBound(latitude, longitude)) {
+            mapRef.current?.animateToRegion({
+              latitude: bound?.defaultLat,
+              longitude: bound?.defaultLon,
+              latitudeDelta: 0.003,
+              longitudeDelta: 0.003,
+            });
+          }
+        }}
+        ref={mapRef}
         customMapStyle={darkMapStyle}
       >
         {markers &&
@@ -218,7 +285,7 @@ const MapSearch = () => {
             />
           </BlurView>
           <CommonButton
-            title={post?.isWrittenBySelf ? '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.' : buttonText}
+            title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
             variant="view"
             onPress={() =>
               onPressBottomButton({
