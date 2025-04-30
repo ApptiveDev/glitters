@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { Alert, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import MapView from 'react-native-map-clustering';
+import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
 
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
@@ -38,7 +40,9 @@ const MapSearch = () => {
   const [post, setPost] = useState<GetPostResponseType>();
   const [overrideButtonText, setOverrideButtonText] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<any>(null);
+  const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
+  const [isListOpen, setIsListOpen] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { data: markers, isLoading } = useQuery({
@@ -101,7 +105,7 @@ const MapSearch = () => {
     }
   }, [post]);
 
-  if (!currentPosition || isLoading) {
+  if (!currentPosition || isLoading || !markers) {
     return <Loading />;
   }
 
@@ -191,6 +195,25 @@ const MapSearch = () => {
     }
   };
 
+  const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
+    const matchedMarkers = geoJsonMarkers
+      .map((geoMarker) => {
+        const coord = geoMarker.properties.coordinate;
+        return markers.find(
+          (original) =>
+            Math.abs(original.latitude - coord.latitude) < 0.00001 &&
+            Math.abs(original.longitude - coord.longitude) < 0.00001,
+        );
+      })
+      .filter((m): m is MarkerType => !!m);
+
+    const postIds = matchedMarkers.map((m) => m.postId);
+
+    const posts = await Promise.all(postIds.map((id) => getPostById({ postId: id })));
+    setClusterPosts(posts);
+    setIsListOpen(true);
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -202,21 +225,28 @@ const MapSearch = () => {
           latitudeDelta: 0.003,
           longitudeDelta: 0.003,
         }}
+        maxZoomLevel={20}
+        maxZoom={18}
+        minZoom={0}
+        minZoomLevel={15}
+        preserveClusterPressBehavior
         showsUserLocation
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
           if (isOutOfBound(latitude, longitude)) {
             mapRef.current?.animateToRegion({
-              latitude: bound?.defaultLat,
-              longitude: bound?.defaultLon,
-              latitudeDelta: 0.003,
-              longitudeDelta: 0.003,
+              latitude: bound?.defaultLat ?? 0,
+              longitude: bound?.defaultLon ?? 0,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
             });
           }
         }}
         ref={mapRef}
         customMapStyle={darkMapStyle}
+        clusterColor={colors.primary.main}
+        onClusterPress={handleClusterPress}
       >
         {markers &&
           markers.map((marker: MarkerType) => (
@@ -329,6 +359,74 @@ const MapSearch = () => {
         fontSize={16}
         buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
       />
+      {isListOpen && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <TouchableWithoutFeedback onPress={() => setIsListOpen(false)}>
+            <BlurView
+              intensity={20}
+              tint="dark"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 15,
+                backgroundColor: 'rgba(0,0,0,0.2)',
+              }}
+            />
+          </TouchableWithoutFeedback>
+          <ScrollView
+            style={{
+              position: 'absolute',
+              top: 100,
+              left: '50%',
+              transform: [{ translateX: -150 }],
+              width: 300,
+              height: 200,
+              backgroundColor: colors.background,
+              borderRadius: 12,
+              padding: 28,
+              zIndex: 20,
+            }}
+          >
+            {clusterPosts.map((clusterPost) => (
+              <TouchableOpacity
+                key={clusterPost.id}
+                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
+                onPress={() => {
+                  setPost(clusterPost);
+                  setIsVisible(true);
+                  setIsListOpen(false);
+                }}
+              >
+                {clusterPost.isWrittenBySelf ? (
+                  <MarkerBySelfIcon width={24} height={24} />
+                ) : (
+                  <MarkerIcon width={24} height={24} />
+                )}
+                <Text
+                  style={{
+                    color: colors.text.white,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {clusterPost.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 };

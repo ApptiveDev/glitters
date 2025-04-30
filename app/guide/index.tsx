@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 
+import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
 import colors from '@/types/colors';
+import { removeToken } from '@/utils/authStorage';
 
 export const Guide = () => {
   const helpCenterPress = () => {
@@ -15,6 +17,12 @@ export const Guide = () => {
 
   const privacyPolicyPress = () => {
     router.push('/guide/(info)/PrivacyPolicy');
+  };
+
+  const onPressLogout = async () => {
+    await logout();
+    removeToken();
+    router.replace('/login');
   };
 
   return (
@@ -44,6 +52,21 @@ export const Guide = () => {
         <ListItem text="서비스이용약관" onPress={termsOfServicePress} />
         <ListItem text="개인정보처리방침" onPress={privacyPolicyPress} />
       </View>
+      <Text
+        style={{
+          fontSize: 12,
+          color: colors.text.lightgray,
+          marginTop: 24,
+          textDecorationLine: 'underline',
+          position: 'absolute',
+          bottom: 24,
+          left: '50%',
+          transform: [{ translateX: -20 }],
+        }}
+        onPress={onPressLogout}
+      >
+        로그아웃
+      </Text>
     </View>
   );
 };

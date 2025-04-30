@@ -23,4 +23,13 @@ export const getSchoolList = async (): Promise<SchoolListResponse> => {
   }
 };
 
+export const logout = async (): Promise<void> => {
+  try {
+    await apiInstance.post('/logout');
+  } catch (error) {
+    console.error('Error during logout:', error);
+    throw new Error('Failed to logout');
+  }
+};
+
 export default getSchoolList;

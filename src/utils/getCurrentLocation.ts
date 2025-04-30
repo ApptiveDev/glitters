@@ -24,8 +24,6 @@ export const getCurrentLocation = async ({
       '위치 권한을 허용하지 않으면 기본 위치가 사용됩니다.\n설정에서 권한을 변경할 수 있어요.',
       [{ text: '확인' }],
     );
-    console.log('Location permission denied');
-    console.log('Default location:', bound);
     return {
       location: {
         latitude: bound.defaultLat,
