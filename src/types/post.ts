@@ -2,6 +2,7 @@ export interface PostRequestType {
   title: string;
   content: string;
   address: string;
+  iconIdx: number;
   latitude: number;
   longitude: number;
 }
@@ -13,6 +14,7 @@ export interface PostResponseType {
 
 export interface GetPostResponseType {
   id: number;
+  iconIdx: number;
   title: string;
   content: string;
   createdAt: string;

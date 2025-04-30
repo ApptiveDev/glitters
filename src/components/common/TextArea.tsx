@@ -14,6 +14,7 @@ interface TextAreaProps {
   errorMessage?: string;
   isError?: boolean;
   editable?: boolean;
+  backgroundColor?: string;
 }
 
 const styles = StyleSheet.create({
@@ -39,6 +40,7 @@ export const CustomTextArea = ({
   errorMessage = '',
   isError = false,
   editable = true,
+  backgroundColor = 'transparent',
 }: TextAreaProps) => {
   return (
     <View style={{ width: '100%' }}>
@@ -51,7 +53,11 @@ export const CustomTextArea = ({
         multiline={multiline}
         textAlignVertical="top"
         placeholderTextColor={colors.gray.main}
-        style={{ ...styles.container, height }}
+        style={{
+          ...styles.container,
+          height,
+          backgroundColor,
+        }}
         editable={editable}
       />
       {isError ? (

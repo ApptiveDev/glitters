@@ -2,9 +2,10 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { SvgProps } from 'react-native-svg';
 
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
@@ -22,6 +23,7 @@ import { InstitutionBoundType, MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { darkMapStyle } from '@/utils/darkMapStyles';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import { threeDIcons } from '@/utils/threeDIcons';
 
 import styles from './styles';
 
@@ -47,12 +49,21 @@ const MapSearch = () => {
     staleTime: 0,
   });
 
+  const PostIcon = useMemo(() => {
+    if (post?.iconIdx == null) return HeartIcon;
+
+    const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
+    const index = Number(post.iconIdx);
+
+    return iconsArray[index] ?? HeartIcon;
+  }, [post?.iconIdx]);
+
   const handleButtonPress = () => {
     router.push({
       pathname: '/maps/create',
       params: {
-        currentLat: currentPosition?.latitude,
-        currentLon: currentPosition?.longitude,
+        currentLat: String(currentPosition?.latitude),
+        currentLon: String(currentPosition?.longitude),
       },
     });
   };
@@ -234,7 +245,7 @@ const MapSearch = () => {
           }}
           style={{ paddingTop: 16, gap: 12, alignItems: 'center', position: 'relative' }}
         >
-          <HeartIcon
+          <PostIcon
             width={292}
             height={292}
             style={{

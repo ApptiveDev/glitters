@@ -46,7 +46,7 @@ const buttonStyles = StyleSheet.create({
   },
   view: {
     ...baseStyle,
-    backgroundColor: '#4A5789',
+    backgroundColor: colors.backgroundLight,
   },
 });
 

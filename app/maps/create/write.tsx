@@ -76,6 +76,7 @@ export const Write = () => {
         address: post.address,
         latitude: post.latitude,
         longitude: post.longitude,
+        iconIdx: randomIndex,
       });
       router.replace({
         pathname: './complete',
@@ -107,6 +108,7 @@ export const Write = () => {
           isError={!formFields.title.isValid && formFields.title.isTouched}
           errorMessage="제목은 2자 이상 63자 이하로 입력해주세요."
           maxLength={63}
+          backgroundColor={colors.backgroundLight}
         />
         <Animated.View style={{ transform: [{ translateY }] }}>
           <RandomIcon width={216} height={216} />
@@ -121,6 +123,7 @@ export const Write = () => {
           placeholder="당신의 반짝이를 소개해주세요 (255자 이내)"
           isError={!formFields.content.isValid && formFields.content.isTouched}
           errorMessage="내용은 2자 이상 255자 이하로 입력해주세요."
+          backgroundColor={colors.backgroundLight}
         />
         <Spacing height={8} />
         <Text style={{ fontSize: 10, color: colors.text.lightgray }}>

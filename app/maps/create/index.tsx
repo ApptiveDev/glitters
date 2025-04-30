@@ -18,9 +18,9 @@ import { LocationType } from '@/types/maps';
 import styles from '../styles';
 
 export const CreateMarker = () => {
-  const { currentlat, currentlon } = useLocalSearchParams();
-  const lat = Number(currentlat);
-  const lon = Number(currentlon);
+  const { currentLat, currentLon } = useLocalSearchParams();
+  const lat = Number(currentLat);
+  const lon = Number(currentLon);
   const [placeName, setPlaceName] = useState<string | null>(null);
   const [isFetchingPlace, setIsFetchingPlace] = useState(false);
   const [markerPlace, setMarkerPlace] = useState<LocationType>();
