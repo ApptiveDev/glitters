@@ -170,6 +170,15 @@ const MapSearch = () => {
     }
   };
 
+  const goToReportPage = () => {
+    router.push({
+      pathname: '/report',
+      params: {
+        postId: post?.id,
+      },
+    });
+  };
+
   const handleDeletePost = (postId: number, isWrittenBySelf: boolean) => {
     if (isWrittenBySelf) {
       Alert.alert('삭제하시겠어요?', '삭제된 반짝이는 다시 복구되지 않아요', [
@@ -189,7 +198,7 @@ const MapSearch = () => {
       Alert.alert('신고하시겠어요?', '', [
         {
           text: '확인',
-          onPress: async () => {},
+          onPress: goToReportPage,
         },
       ]);
     }

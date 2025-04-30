@@ -7,7 +7,7 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   style?: object;
-  variant?: 'primary' | 'disable' | 'maps' | 'view';
+  variant?: 'primary' | 'disable' | 'maps' | 'view' | 'blueDisable' | 'blue';
   isKeyboardVisible?: boolean;
   fontSize?: number;
   buttonIcon?: React.ReactNode;
@@ -30,6 +30,14 @@ const buttonStyles = StyleSheet.create({
     ...baseStyle,
     backgroundColor: colors.gray.light,
   },
+  blue: {
+    ...baseStyle,
+    backgroundColor: colors.primary.main,
+  },
+  blueDisable: {
+    ...baseStyle,
+    backgroundColor: colors.primary.dark,
+  },
   maps: {
     flexShrink: 1,
     backgroundColor: colors.background,
@@ -50,7 +58,7 @@ const buttonStyles = StyleSheet.create({
   },
 });
 
-const testStyles = StyleSheet.create({
+const textStyles = StyleSheet.create({
   primary: {
     fontSize: 12,
     fontWeight: 'bold',
@@ -73,6 +81,16 @@ const testStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.text.white,
   },
+  blue: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.text.white,
+  },
+  blueDisable: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: colors.primary.main,
+  },
 });
 
 export const CommonButton = ({
@@ -92,10 +110,10 @@ export const CommonButton = ({
     <TouchableOpacity
       style={[isKeyboardVisible ? { borderRadius: 0 } : { borderRadius: 12 }, buttonStyles[variant], style]}
       onPress={onPress}
-      disabled={variant === 'disable'}
+      disabled={variant === 'disable' || variant === 'blueDisable'}
     >
       {buttonIcon}
-      <Text style={[testStyles[variant], { fontSize }]}>{title}</Text>
+      <Text style={[textStyles[variant], { fontSize }]}>{title}</Text>
     </TouchableOpacity>
   );
 };
