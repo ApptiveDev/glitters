@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
@@ -19,10 +19,26 @@ export const Guide = () => {
     router.push('/guide/(info)/PrivacyPolicy');
   };
 
-  const onPressLogout = async () => {
-    await logout();
-    removeToken();
-    router.replace('/login');
+  const onPressLogout = () => {
+    Alert.alert(
+      '로그아웃',
+      '정말 로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            await logout();
+            removeToken();
+            router.replace('/login');
+          },
+        },
+      ],
+      { cancelable: false },
+    );
   };
 
   return (

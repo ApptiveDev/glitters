@@ -14,6 +14,7 @@ import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
+import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
 import MarkerIcon from '@/assets/icons/marker.svg';
 import MarkerBySelfIcon from '@/assets/icons/markerBySelf.svg';
 import { CommonButton } from '@/components/common/Button';
@@ -154,7 +155,7 @@ const MapSearch = () => {
     } else if (isLikedBySelf) {
       Alert.alert('이미 누른 글이에요');
     } else {
-      setOverrideButtonText('반짝반짝');
+      setOverrideButtonText(' 반짝반짝');
       await addLike(postId);
       setTimeout(() => {
         setOverrideButtonText(null);
@@ -337,7 +338,7 @@ const MapSearch = () => {
           </BlurView>
           <CommonButton
             title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
-            variant="view"
+            variant={overrideButtonText === ' 반짝반짝' ? 'primary' : 'view'}
             onPress={() =>
               onPressBottomButton({
                 isWrittenBySelf: post?.isWrittenBySelf ?? false,
@@ -345,7 +346,7 @@ const MapSearch = () => {
                 postId: post?.id ?? 0,
               })
             }
-            buttonIcon={<GlitterIcon />}
+            buttonIcon={overrideButtonText === ' 반짝반짝' ? <GlitterBlueIcon /> : <GlitterIcon />}
           />
           <Text
             style={{ fontSize: 12, color: colors.text.lightgray }}
