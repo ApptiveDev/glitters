@@ -25,8 +25,8 @@ import { usePost } from '@/contexts/PostContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
-import { darkMapStyle } from '@/utils/darkMapStyles';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import simpleMapStyle from '@/utils/simpleMapStyle';
 import { threeDIcons } from '@/utils/threeDIcons';
 
 import styles from './styles';
@@ -255,7 +255,7 @@ const MapSearch = () => {
           }
         }}
         ref={mapRef}
-        customMapStyle={darkMapStyle}
+        customMapStyle={simpleMapStyle}
         clusterColor={colors.primary.main}
         onClusterPress={handleClusterPress}
       >
