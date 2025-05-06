@@ -17,8 +17,8 @@ export const getCurrentLocation = async ({
     return { location: null, errorMsg: null };
   }
 
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
+  const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
+  if (fgStatus !== 'granted') {
     Alert.alert(
       '위치 권한 필요',
       '위치 권한을 허용하지 않으면 기본 위치가 사용됩니다.\n설정에서 권한을 변경할 수 있어요.',
