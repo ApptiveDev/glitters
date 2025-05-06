@@ -3,15 +3,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { getToken, removeToken } from '@/utils/authStorage';
+import Splash from '@/components/features/Splash';
+import { getToken } from '@/utils/authStorage';
 
 SplashScreen.preventAutoHideAsync();
 
 export const Index = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
-
-  removeToken();
 
   useEffect(() => {
     const prepare = async () => {
@@ -25,18 +24,19 @@ export const Index = () => {
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
       const token = await getToken();
+      console.log('token', token);
       if (token) {
         router.replace('/maps');
       } else {
         router.replace('/login');
       }
-      // router.replace('/sign');
+      // router.replace('/sign-complete');
 
       await SplashScreen.hideAsync();
     }
   }, [isReady, router]);
 
-  if (!isReady) return null;
+  if (!isReady) return <Splash />;
 
   return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} onLayout={onLayoutRootView} />;
 };

@@ -3,6 +3,16 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+def localPropertiesFile = new File(projectRoot, "/android/local.properties")
+
+def localProperties = new Properties()
+if (localPropertiesFile.exists()) {
+  localProperties.load(new FileInputStream(localPropertiesFile))
+} else {
+  throw new GradleException("cannot load ${localPropertiesFile}. ")
+}
+
+def MAPS_API_KEY = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -93,6 +103,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+        resValue "string", "google_maps_key", MAPS_API_KEY
+        buildConfigField "String", "MAPS_API_KEY", "\"${MAPS_API_KEY}\""
     }
     signingConfigs {
         debug {

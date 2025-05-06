@@ -24,7 +24,7 @@ export const BottomButtonContainer = ({ children, isKeyboardVisible = false, sty
       <View
         style={[
           {
-            paddingBottom: insets.bottom + 20,
+            paddingBottom: insets.bottom + 24,
             paddingHorizontal: isKeyboardVisible ? 0 : 28,
           },
           style,

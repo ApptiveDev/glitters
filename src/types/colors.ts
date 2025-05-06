@@ -10,6 +10,7 @@ const colors = {
     dark: '#354BA5',
   },
   background: '#404C7A',
+  backgroundLight: '#536199',
   blue: {
     light: '#E1E7FD',
     main: '#5F78DA',
@@ -34,6 +35,7 @@ const colors = {
   text: {
     white: '#FBFBFB',
     gray: '#B1B3BB',
+    lightgray: '#F6F6F7',
   },
 };
 

@@ -6,9 +6,15 @@ interface HeadingProps {
   title: string;
   justifyContent?: 'flex-start' | 'center' | 'flex-end';
   alignItems?: 'flex-start' | 'center' | 'flex-end';
+  fontSize?: number;
 }
 
-export const Heading = ({ title, justifyContent = 'flex-start', alignItems = 'flex-start' }: HeadingProps) => {
+export const Heading = ({
+  title,
+  justifyContent = 'flex-start',
+  alignItems = 'flex-start',
+  fontSize = 20,
+}: HeadingProps) => {
   const styles = {
     justifyContent,
     alignItems,
@@ -23,7 +29,7 @@ export const Heading = ({ title, justifyContent = 'flex-start', alignItems = 'fl
     >
       <Text
         style={{
-          fontSize: 20,
+          fontSize,
           fontWeight: 'bold',
           color: colors.text.white,
         }}

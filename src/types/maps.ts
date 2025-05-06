@@ -3,34 +3,29 @@ export type LocationType = {
   longitude: number;
 };
 
-export type InstitutionBound = {
-  id: number;
-  institutionId: number;
+export type InstitutionBounds = {
+  bounds: InstitutionBoundType[];
+};
+
+export type InstitutionBoundType = {
   startLat: number;
   startLon: number;
   endLat: number;
   endLon: number;
   defaultLat: number;
   defaultLon: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type MarkerType = {
   id: number;
+  iconIdx: number;
   postId: number;
   latitude: number;
   longitude: number;
   expiresAt: string;
   isWrittenBySelf: boolean;
-};
-
-export type PostRequestType = {
-  title: string;
-  content: string;
-  address: string;
-  addressDetail: string;
   isDeactivated: boolean;
-  latitude: number;
-  longitude: number;
+  likeCount: number;
+  viewCount: number;
+  isLikedBySelf: boolean;
 };

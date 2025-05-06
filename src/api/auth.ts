@@ -15,22 +15,6 @@ export const getSchoolList = async (): Promise<SchoolListResponse> => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-          {
-            id: 2,
-            name: '서울대학교',
-            emailDomain: '@snu.ac.kr',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 3,
-            name: '연세대학교',
-            emailDomain: '@yonsei.ac.kr',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
         ],
       };
     }
@@ -94,5 +78,15 @@ export const loginUser = async (userLogin: UserLoginRequest) => {
     return response.data;
   } catch {
     throw new Error('Failed to login user');
+  }
+};
+
+export const withdrawUser = async () => {
+  try {
+    const response = await apiInstance.delete('/members/me');
+    return response.data;
+  } catch (error) {
+    console.error('Error withdrawing user:', error);
+    throw new Error('Failed to withdraw user');
   }
 };

@@ -7,9 +7,10 @@ interface Props {
   contentStyle?: ViewStyle;
   scrollStyle?: ViewStyle;
   viewStyle?: ViewStyle;
+  paddingTop?: number;
 }
 
-export const KeyboardScrollContainer = ({ children, contentStyle, scrollStyle, viewStyle }: Props) => {
+export const KeyboardScrollContainer = ({ children, contentStyle, scrollStyle, viewStyle, paddingTop = 48 }: Props) => {
   return (
     <KeyboardAwareScrollView
       style={[{ flex: 1 }, scrollStyle]}
@@ -36,7 +37,7 @@ export const KeyboardScrollContainer = ({ children, contentStyle, scrollStyle, v
           justifyContent: 'flex-start',
           alignItems: 'center',
           paddingHorizontal: 28,
-          paddingTop: 48,
+          paddingTop,
           ...viewStyle,
         }}
       >

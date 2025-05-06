@@ -1,5 +1,6 @@
 import apiInstance from '@/api/apiInstance';
-import { MarkerType, PostRequestType } from '@/types/maps';
+import { InstitutionBoundType, MarkerType } from '@/types/maps';
+import { PostRequestType, ReportRequestType } from '@/types/post';
 
 export const getMarkers = async (): Promise<MarkerType[]> => {
   try {
@@ -16,5 +17,51 @@ export const createMarker = async (marker: PostRequestType): Promise<void> => {
   } catch (error) {
     console.error('Error creating marker:', error);
     throw new Error('Failed to create marker');
+  }
+};
+
+export const addLike = async (postId: number): Promise<void> => {
+  try {
+    await apiInstance.post(`/likes?postId=${postId}`);
+  } catch (error) {
+    console.error('Error adding like:', error);
+    throw new Error('Failed to add like');
+  }
+};
+
+export const deleteLike = async (postId: number): Promise<void> => {
+  try {
+    await apiInstance.delete(`/likes?postId=${postId}`);
+  } catch (error) {
+    console.error('Error deleting like:', error);
+    throw new Error('Failed to delete like');
+  }
+};
+
+export const deleteMarker = async (postId: number): Promise<void> => {
+  try {
+    await apiInstance.delete(`/posts/${postId}`);
+  } catch (error) {
+    console.error('Error deleting marker:', error);
+    throw new Error('Failed to delete marker');
+  }
+};
+
+export const reportMarker = async (report: ReportRequestType): Promise<void> => {
+  try {
+    await apiInstance.post(`/reports`, report);
+  } catch (error) {
+    console.error('Error reporting marker:', error);
+    throw new Error('Failed to report marker');
+  }
+};
+
+export const getBoundMarkers = async (): Promise<InstitutionBoundType[]> => {
+  try {
+    const response = await apiInstance.get('/institutions/bounds');
+    return response.data.bounds;
+  } catch (error) {
+    console.error('Error fetching bound markers:', error);
+    throw new Error('Failed to fetch bound markers');
   }
 };

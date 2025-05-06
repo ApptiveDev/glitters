@@ -37,7 +37,7 @@ export const Sign = () => {
 
   const { user, updateUser } = useUser();
 
-  const isKeyboardVisible = useKeyboardVisible();
+  const { isKeyboardVisible } = useKeyboardVisible();
 
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
 

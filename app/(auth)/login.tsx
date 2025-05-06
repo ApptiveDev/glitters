@@ -92,7 +92,7 @@ export const Login = () => {
         variant={formFields.email.isValid && formFields.password.isValid ? 'primary' : 'disable'}
       />
       <Text style={styles.signText} onPress={goToSignUpPage}>
-        보이는 반짝이가 처음이신가요?
+        반짝이맵이 처음이신가요?
       </Text>
     </KeyboardScrollContainer>
   );

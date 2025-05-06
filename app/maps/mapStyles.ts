@@ -1,12 +1,4 @@
-import { type SymbolLayerStyle } from '@rnmapbox/maps';
 import { StyleSheet } from 'react-native';
-
-export const mapPinLayer: SymbolLayerStyle = {
-  iconAllowOverlap: true,
-  iconAnchor: 'bottom',
-  iconSize: 0.05,
-  iconImage: 'exampleIcon',
-};
 
 const mapStyles = StyleSheet.create({
   matchParent: {
