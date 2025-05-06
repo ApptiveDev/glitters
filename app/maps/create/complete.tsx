@@ -9,7 +9,7 @@ import { threeDIcons } from '@/utils/threeDIcons';
 
 export const Complete = () => {
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['markers'] });
+    queryClient.refetchQueries({ queryKey: ['markers'] });
     const timeout = setTimeout(() => {
       router.replace('/maps');
     }, 3000);

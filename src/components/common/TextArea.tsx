@@ -26,6 +26,8 @@ const styles = StyleSheet.create({
     color: colors.text.white,
     textAlignVertical: 'top',
     paddingTop: 16,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
 

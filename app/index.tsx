@@ -30,7 +30,7 @@ export const Index = () => {
       } else {
         router.replace('/login');
       }
-      // router.replace('/sign-info');
+      // router.replace('/sign-complete');
 
       await SplashScreen.hideAsync();
     }

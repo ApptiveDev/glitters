@@ -4,7 +4,7 @@ import { TermsOfService } from 'app/guide/(info)/TermsOfService';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Modal, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
@@ -29,6 +29,7 @@ export const SignInfo = () => {
   const { width } = Dimensions.get('window');
   const { isKeyboardVisible } = useKeyboardVisible();
   const [currentModal, setCurrentModal] = useState<'policy' | 'terms' | null>(null);
+  const insets = useSafeAreaInsets();
 
   const usePostMutation = () => {
     return useMutation({
@@ -65,7 +66,7 @@ export const SignInfo = () => {
       });
       setUser(response.member);
       storeToken(response.token);
-      router.replace('/maps');
+      router.replace('/sign-complete');
     } catch (error) {
       console.error('Error creating user:', error);
     }
@@ -153,27 +154,33 @@ export const SignInfo = () => {
         )}
       </BottomButtonContainer>
       <Modal visible={currentModal !== null} animationType="slide">
-        <View style={{ flex: 1, backgroundColor: colors.background, paddingHorizontal: 28, paddingTop: 28 }}>
-          <SafeAreaView
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.background,
+            paddingHorizontal: 28,
+            paddingTop: insets.top + 20,
+          }}
+        >
+          <View
             style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.background,
+              flexDirection: 'row',
+              gap: 8,
+              marginBottom: 16,
+              width: '100%',
+              alignItems: 'flex-start',
+            }}
+            onTouchEnd={() => {
+              setCurrentModal(null);
             }}
           >
-            <View
-              style={{ flexDirection: 'row', gap: 8, marginBottom: 16, width: '100%', alignItems: 'flex-start' }}
-              onTouchEnd={() => {
-                setCurrentModal(null);
-              }}
-            >
-              <CaretLeftIcon width={16} height={16} />
-              <Text style={{ fontSize: 12, color: colors.text.lightgray }}>회원가입 완료하기</Text>
-            </View>
-            {currentModal === 'policy' && <PrivacyPolicy />}
-            {currentModal === 'terms' && <TermsOfService />}
-          </SafeAreaView>
+            <CaretLeftIcon width={16} height={16} />
+            <Text style={{ fontSize: 12, color: colors.text.lightgray }}>회원가입 완료하기</Text>
+          </View>
+          {currentModal === 'policy' && <PrivacyPolicy />}
+          {currentModal === 'terms' && <TermsOfService />}
         </View>
       </Modal>
     </View>

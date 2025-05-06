@@ -1,5 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
+import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -26,13 +27,13 @@ import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
-import simpleMapStyle from '@/utils/simpleMapStyle';
 import { threeDIcons } from '@/utils/threeDIcons';
 
 import styles from './styles';
 
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
+  const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
 
   const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -181,6 +182,20 @@ const MapSearch = () => {
     });
   };
 
+  const handleConfirmDelete = async (postId: number) => {
+    try {
+      setIsVisible(false);
+      setPost(undefined);
+
+      await deleteMarker(postId);
+      await queryClient.invalidateQueries({ queryKey: ['markers'] });
+
+      router.replace('/maps');
+    } catch {
+      Alert.alert('삭제 중 문제가 발생했어요.');
+    }
+  };
+
   const handleDeletePost = (postId: number, isWrittenBySelf: boolean) => {
     if (isWrittenBySelf) {
       Alert.alert('삭제하시겠어요?', '삭제된 반짝이는 다시 복구되지 않아요', [
@@ -190,10 +205,7 @@ const MapSearch = () => {
         },
         {
           text: '확인',
-          onPress: async () => {
-            await deleteMarker(postId);
-            router.replace('/maps');
-          },
+          onPress: () => handleConfirmDelete(postId),
         },
       ]);
     } else {
@@ -218,9 +230,15 @@ const MapSearch = () => {
       })
       .filter((m): m is MarkerType => !!m);
 
-    const postIds = matchedMarkers.map((m) => m.postId);
+    const seen = new Set<number>();
+    const uniqueMarkers = matchedMarkers.filter((marker) => {
+      if (seen.has(marker.postId)) return false;
+      seen.add(marker.postId);
+      return true;
+    });
 
-    const posts = await Promise.all(postIds.map((id) => getPostById({ postId: id })));
+    const posts = await Promise.all(uniqueMarkers.map((m) => getPostById({ postId: m.postId })));
+
     setClusterPosts(posts);
     setIsListOpen(true);
   };
@@ -245,17 +263,19 @@ const MapSearch = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude)) {
+          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+            setHasAnimatedBack(true);
             mapRef.current?.animateToRegion({
-              latitude: bound?.defaultLat ?? 0,
-              longitude: bound?.defaultLon ?? 0,
+              latitude: bound.defaultLat,
+              longitude: bound.defaultLon,
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             });
+          } else if (!isOutOfBound(latitude, longitude) && hasAnimatedBack) {
+            setHasAnimatedBack(false);
           }
         }}
         ref={mapRef}
-        customMapStyle={simpleMapStyle}
         clusterColor={colors.primary.main}
         onClusterPress={handleClusterPress}
       >
@@ -291,11 +311,14 @@ const MapSearch = () => {
             height={292}
             style={{
               position: 'absolute',
+              top: 40,
               zIndex: 0,
             }}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
-            <Text style={{ fontSize: 24, color: 'white', fontWeight: 'bold', flexShrink: 1 }}>{post?.title}</Text>
+            <Text style={{ fontSize: 24, color: 'white', fontWeight: 'bold', flexShrink: 1, marginBottom: 8 }}>
+              {post?.title}
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -338,7 +361,7 @@ const MapSearch = () => {
           </BlurView>
           <CommonButton
             title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
-            variant={overrideButtonText === ' 반짝반짝' ? 'primary' : 'view'}
+            variant={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? 'primary' : 'view'}
             onPress={() =>
               onPressBottomButton({
                 isWrittenBySelf: post?.isWrittenBySelf ?? false,
@@ -347,6 +370,7 @@ const MapSearch = () => {
               })
             }
             buttonIcon={overrideButtonText === ' 반짝반짝' ? <GlitterBlueIcon /> : <GlitterIcon />}
+            disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
           />
           <Text
             style={{ fontSize: 12, color: colors.text.lightgray }}
@@ -412,7 +436,7 @@ const MapSearch = () => {
           >
             {clusterPosts.map((clusterPost) => (
               <TouchableOpacity
-                key={clusterPost.id}
+                key={clusterPost.id + clusterPost.title}
                 style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
                 onPress={() => {
                   setPost(clusterPost);

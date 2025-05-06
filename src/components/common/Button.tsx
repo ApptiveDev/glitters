@@ -11,6 +11,7 @@ interface ButtonProps {
   isKeyboardVisible?: boolean;
   fontSize?: number;
   buttonIcon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 const baseStyle: ViewStyle = {
@@ -101,6 +102,7 @@ export const CommonButton = ({
   isKeyboardVisible,
   fontSize = 12,
   buttonIcon = null,
+  disabled = false,
 }: ButtonProps) => {
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -110,7 +112,7 @@ export const CommonButton = ({
     <TouchableOpacity
       style={[isKeyboardVisible ? { borderRadius: 0 } : { borderRadius: 12 }, buttonStyles[variant], style]}
       onPress={onPress}
-      disabled={variant === 'disable' || variant === 'blueDisable'}
+      disabled={variant === 'disable' || variant === 'blueDisable' || disabled}
     >
       {buttonIcon}
       <Text style={[textStyles[variant], { fontSize }]}>{title}</Text>

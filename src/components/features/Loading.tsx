@@ -1,50 +1,29 @@
-import { Image, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image, Modal, Text, View } from 'react-native';
 
-import loadingImage from '@/assets/images/loading-image.png';
+import BlueBackground from '@/assets/images/blue_background.png';
 import colors from '@/types/colors';
 
 const Loading = () => {
-  const insets = useSafeAreaInsets();
   return (
-    <View
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: -insets.bottom,
-        flex: 1,
-        backgroundColor: colors.background,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        zIndex: 999,
-      }}
-    >
-      <Text
+    <Modal style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Image
+        source={BlueBackground}
+        resizeMode="cover"
         style={{
-          color: colors.text.white,
-          fontWeight: 'bold',
-          fontSize: 20,
-          lineHeight: 32,
-          textAlign: 'center',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
         }}
-      >
-        어쩌면 오늘 주변 어딘가에서 당신이
-      </Text>
-      <Text
-        style={{
-          color: colors.text.white,
-          fontWeight: 'bold',
-          fontSize: 20,
-          lineHeight: 32,
-          textAlign: 'center',
-        }}
-      >
-        반짝였을지도 몰라요!
-      </Text>
-      <Image source={loadingImage} resizeMode="contain" style={{ width: 512, height: 528 }} />
-    </View>
+      />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 24 }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.text.white }}>어쩌면 반짝이가 당신의 글을</Text>
+        <Text style={{ fontSize: 20, color: colors.text.white, fontWeight: 'bold' }}>기다리고 있을지 몰라요.</Text>
+      </View>
+    </Modal>
   );
 };
 

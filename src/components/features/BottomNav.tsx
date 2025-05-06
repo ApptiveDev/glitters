@@ -18,7 +18,7 @@ export const BottomNav = () => {
 
   const onPressMap = () => {
     if (pathname === '/maps') {
-      queryClient.invalidateQueries({ queryKey: ['markers'] });
+      queryClient.refetchQueries({ queryKey: ['markers'] });
     } else if (pathname.startsWith('/guide')) {
       router.replace('/maps');
     } else {
