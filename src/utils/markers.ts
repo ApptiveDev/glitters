@@ -1,6 +1,8 @@
 import { Feature, GeoJsonProperties, Point } from 'geojson';
 
-const mock: Feature<Point, GeoJsonProperties>[] = [
+import { InstitutionBoundType } from '@/types/maps';
+
+export const mock: Feature<Point, GeoJsonProperties>[] = [
   {
     id: 1,
     geometry: {
@@ -27,4 +29,9 @@ const mock: Feature<Point, GeoJsonProperties>[] = [
   },
 ];
 
-export default mock;
+export const isOutOfBound = (latitude: number, longitude: number, bound: InstitutionBoundType | null) => {
+  return (
+    bound &&
+    (latitude < bound.startLat || latitude > bound.endLat || longitude < bound.startLon || longitude > bound.endLon)
+  );
+};

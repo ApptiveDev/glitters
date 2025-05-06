@@ -14,6 +14,7 @@ import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
 import colors from '@/types/colors';
 import { LocationType } from '@/types/maps';
+import { isOutOfBound } from '@/utils/markers';
 
 import styles from '../styles';
 
@@ -36,6 +37,10 @@ export const CreateMarker = () => {
 
   const handleMapPress = async (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
+    if (isOutOfBound(latitude, longitude, bound)) {
+      Alert.alert('경고!', '이 위치는 반짝일 수 없어요.');
+      return;
+    }
     setMarkerPlace({ latitude, longitude });
     setIsFetchingPlace(true);
     try {
@@ -78,13 +83,6 @@ export const CreateMarker = () => {
     ]);
   };
 
-  const isOutOfBound = (latitude: number, longitude: number) => {
-    return (
-      bound &&
-      (latitude < bound.startLat || latitude > bound.endLat || longitude < bound.startLon || longitude > bound.endLon)
-    );
-  };
-
   return (
     <View style={styles.container}>
       <MapView
@@ -103,7 +101,7 @@ export const CreateMarker = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude)) {
+          if (isOutOfBound(latitude, longitude, bound)) {
             mapRef.current?.animateToRegion({
               latitude: bound?.defaultLat ?? 0,
               longitude: bound?.defaultLon ?? 0,

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import { Alert, Dimensions, Text, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
 import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
@@ -85,7 +85,8 @@ export const Sign = () => {
       await verifyEmailMutate(`${localPart}${domain}`);
       setFieldVerified('email', true);
     } catch (error) {
-      console.error('Error verifying email:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      Alert.alert('이메일 인증 실패', errorMessage);
     }
   };
 

@@ -27,6 +27,7 @@ import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import { isOutOfBound } from '@/utils/markers';
 import { threeDIcons } from '@/utils/threeDIcons';
 
 import styles from './styles';
@@ -116,13 +117,6 @@ const MapSearch = () => {
     return <Loading />;
   }
 
-  const isOutOfBound = (latitude: number, longitude: number) => {
-    return (
-      bound &&
-      (latitude < bound.startLat || latitude > bound.endLat || longitude < bound.startLon || longitude > bound.endLon)
-    );
-  };
-
   const onPressMarker = async (marker: MarkerType) => {
     const response = await getPostById(marker);
     setPost(response);
@@ -137,24 +131,14 @@ const MapSearch = () => {
       return '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
     }
     if (isLikedBySelf) {
-      return '마음에 들어온 반짝이에요';
+      return ' 마음에 들어온 반짝이에요';
     }
     return '이 반짝이가 마음에 들어요';
   };
 
-  const onPressBottomButton = async ({
-    isWrittenBySelf,
-    isLikedBySelf,
-    postId,
-  }: {
-    isWrittenBySelf: boolean;
-    isLikedBySelf: boolean;
-    postId: number;
-  }) => {
+  const onPressBottomButton = async ({ isWrittenBySelf, postId }: { isWrittenBySelf: boolean; postId: number }) => {
     if (isWrittenBySelf) {
-      Alert.alert('내가 쓴 글입니다');
-    } else if (isLikedBySelf) {
-      Alert.alert('이미 누른 글이에요');
+      Alert.alert('내가 쓴 글이에요.');
     } else {
       setOverrideButtonText(' 반짝반짝');
       await addLike(postId);
@@ -263,16 +247,22 @@ const MapSearch = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+          if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
             setHasAnimatedBack(true);
+            Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
+              {
+                text: '확인',
+                onPress: () => {
+                  setHasAnimatedBack(false);
+                },
+              },
+            ]);
             mapRef.current?.animateToRegion({
               latitude: bound.defaultLat,
               longitude: bound.defaultLon,
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             });
-          } else if (!isOutOfBound(latitude, longitude) && hasAnimatedBack) {
-            setHasAnimatedBack(false);
           }
         }}
         ref={mapRef}
@@ -365,11 +355,12 @@ const MapSearch = () => {
             onPress={() =>
               onPressBottomButton({
                 isWrittenBySelf: post?.isWrittenBySelf ?? false,
-                isLikedBySelf: post?.isLikedBySelf ?? false,
                 postId: post?.id ?? 0,
               })
             }
-            buttonIcon={overrideButtonText === ' 반짝반짝' ? <GlitterBlueIcon /> : <GlitterIcon />}
+            buttonIcon={
+              overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? <GlitterBlueIcon /> : <GlitterIcon />
+            }
             disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
           />
           <Text
