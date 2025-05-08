@@ -4,7 +4,7 @@ import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -16,8 +16,8 @@ import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
-import MarkerIcon from '@/assets/icons/marker.svg';
-import MarkerBySelfIcon from '@/assets/icons/markerBySelf.svg';
+import MarkerIcon from '@/assets/icons/marker.png';
+import MarkerBySelfIcon from '@/assets/icons/marker_by_self.png';
 import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
@@ -294,9 +294,9 @@ const MapSearch = () => {
               onPress={() => onPressMarker(marker)}
             >
               {marker.isWrittenBySelf ? (
-                <MarkerBySelfIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
               ) : (
-                <MarkerIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
               )}
             </Marker>
           ))}
@@ -449,9 +449,9 @@ const MapSearch = () => {
                 }}
               >
                 {clusterPost.isWrittenBySelf ? (
-                  <MarkerBySelfIcon width={24} height={24} />
+                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
                 ) : (
-                  <MarkerIcon width={24} height={24} />
+                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
                 )}
                 <Text
                   style={{
