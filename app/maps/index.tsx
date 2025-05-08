@@ -235,10 +235,10 @@ const MapSearch = () => {
         initialRegion={{
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude,
-          latitudeDelta: 0.003,
-          longitudeDelta: 0.003,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         }}
-        maxZoomLevel={20}
+        maxZoomLevel={18}
         maxZoom={18}
         minZoom={0}
         minZoomLevel={15}

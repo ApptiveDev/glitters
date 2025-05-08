@@ -48,8 +48,10 @@ export const CreateMarker = () => {
       setPlaceName(data.name);
       setIsFetchingPlace(false);
       setBottomSheetVisible(true);
-    } catch (err) {
-      console.error('장소 불러오기 실패', err);
+    } catch {
+      setPlaceName('기본값');
+      setIsFetchingPlace(false);
+      setBottomSheetVisible(true);
     }
   };
 
