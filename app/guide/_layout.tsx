@@ -1,5 +1,5 @@
 import { Slot } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav } from '@/components/features/BottomNav';
@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingBottom: 40,
+    marginBottom: 80,
     padding: 28,
   },
 });
@@ -19,9 +19,9 @@ const styles = StyleSheet.create({
 export const GuideLayout = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <KeyboardAvoidingView style={styles.content}>
         <Slot />
-      </View>
+      </KeyboardAvoidingView>
       <BottomNav />
     </SafeAreaView>
   );

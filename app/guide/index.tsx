@@ -3,10 +3,12 @@ import { Alert, Text, View } from 'react-native';
 
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
+import { useLayout } from '@/contexts/LayoutContext';
 import colors from '@/types/colors';
 import { removeToken } from '@/utils/authStorage';
 
 export const Guide = () => {
+  const { insetBottom } = useLayout();
   const helpCenterPress = () => {
     router.push('/guide/(info)/HelpCenter');
   };
@@ -70,14 +72,13 @@ export const Guide = () => {
       </View>
       <Text
         style={{
-          fontSize: 12,
+          fontSize: 14,
           color: colors.text.lightgray,
-          marginTop: 24,
           textDecorationLine: 'underline',
           position: 'absolute',
-          bottom: 24,
+          bottom: insetBottom + 24,
           left: '50%',
-          transform: [{ translateX: -20 }],
+          transform: [{ translateX: -24 }],
         }}
         onPress={onPressLogout}
       >
