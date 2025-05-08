@@ -251,13 +251,14 @@ const MapSearch = () => {
         initialRegion={{
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude,
-          latitudeDelta: 0.003,
-          longitudeDelta: 0.003,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         }}
-        maxZoomLevel={20}
+        maxZoomLevel={19}
         maxZoom={18}
         minZoom={0}
         minZoomLevel={15}
+        tracksViewChanges={false}
         preserveClusterPressBehavior
         showsUserLocation
         onPress={handleMapPress}
@@ -280,22 +281,24 @@ const MapSearch = () => {
         onClusterPress={handleClusterPress}
       >
         {markers &&
-          markers.map((marker: MarkerType) => (
-            <Marker
-              key={marker.id}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              onPress={() => onPressMarker(marker)}
-            >
-              {marker.isWrittenBySelf ? (
-                <MarkerBySelfIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
-              ) : (
-                <MarkerIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
-              )}
-            </Marker>
-          ))}
+          markers
+            .filter((marker): marker is MarkerType => !!marker)
+            .map((marker) => (
+              <Marker
+                key={marker.id}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                onPress={() => onPressMarker(marker)}
+              >
+                {marker.isWrittenBySelf ? (
+                  <MarkerBySelfIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                ) : (
+                  <MarkerIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                )}
+              </Marker>
+            ))}
       </MapView>
 
       <CustomBottomSheet isVisible={isVisible} height={contentHeight} onClose={() => setIsVisible(false)}>

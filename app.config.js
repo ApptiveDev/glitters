@@ -10,8 +10,11 @@ export default {
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
-      supportsTablet: true,
+      supportsTablet: false,
       bundleIdentifier: 'me.banjjak.Banjjak',
+      infoPlist: {
+        UIDeviceFamily: [1],
+      },
     },
     android: {
       adaptiveIcon: {
