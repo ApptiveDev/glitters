@@ -7,9 +7,11 @@ import MapIcon from '@/assets/icons/map.svg';
 import ProfileIcon from '@/assets/icons/profile.svg';
 import SelectedMapIcon from '@/assets/icons/selected_map.svg';
 import SelectedProfileIcon from '@/assets/icons/selected_profile.svg';
+import { useLayout } from '@/contexts/LayoutContext';
 import colors from '@/types/colors';
 
 export const BottomNav = () => {
+  const { insetBottom } = useLayout();
   const onPressChat = () => {
     Alert.alert('준비중이에요.');
   };
@@ -47,23 +49,31 @@ export const BottomNav = () => {
         bottom: 0,
         backgroundColor: colors.background,
         width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        padding: 10,
-        paddingTop: 36,
+        height: 120 - insetBottom,
+        overflow: 'hidden',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
+        justifyContent: 'center',
         alignItems: 'center',
         zIndex: 11,
       }}
     >
-      <ChatIcon onPress={onPressChat} />
-      {isSelected('/maps') ? <SelectedMapIcon onPress={onPressMap} /> : <MapIcon onPress={onPressMap} />}
-      {isSelected('/guide') ? (
-        <SelectedProfileIcon onPress={onPressProfile} />
-      ) : (
-        <ProfileIcon onPress={onPressProfile} />
-      )}
+      <View
+        style={{
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}
+      >
+        <ChatIcon onPress={onPressChat} />
+        {isSelected('/maps') ? <SelectedMapIcon onPress={onPressMap} /> : <MapIcon onPress={onPressMap} />}
+        {isSelected('/guide') ? (
+          <SelectedProfileIcon onPress={onPressProfile} />
+        ) : (
+          <ProfileIcon onPress={onPressProfile} />
+        )}
+      </View>
     </View>
   );
 };

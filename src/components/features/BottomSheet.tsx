@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Pressable, useWindowDimensions } from 'react-native';
+import { Keyboard, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import { useLayout } from '@/contexts/LayoutContext';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 
@@ -23,28 +24,29 @@ const CustomBottomSheet = ({
   blockOutsidePress = false,
 }: CustomBottomSheetProps) => {
   const [isMounted, setIsMounted] = useState(false);
-  const screenHeight = useWindowDimensions().height;
-  const top = useSharedValue(screenHeight);
+  const { insetBottom, safeHeight, entireHeight } = useLayout();
+  const top = useSharedValue(safeHeight);
   const { keyboardHeight } = useKeyboardVisible();
-  const padding = isKeyboardVisible ? keyboardHeight - 224 : 0;
+  const padding = isKeyboardVisible ? keyboardHeight - height : 0;
 
   useEffect(() => {
     if (isVisible) {
       setIsMounted(true);
-      top.value = withTiming(screenHeight - (height + 70) - padding, {
+      // 전체 높이 - content 높이 - padding - 96 ( 120에서 borderRadius 24 제외)
+      top.value = withTiming(entireHeight - height - 40 - 96, {
         duration: 300,
       });
     } else {
-      top.value = withTiming(screenHeight, {
-        duration: 500,
+      top.value = withTiming(entireHeight, {
+        duration: 300,
       });
       const timeout = setTimeout(() => {
         setIsMounted(false);
-      }, 500);
+      }, 300);
       return () => clearTimeout(timeout);
     }
     return undefined;
-  }, [height, isVisible, padding, screenHeight, top]);
+  }, [entireHeight, height, insetBottom, isVisible, padding, top]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     top: top.value,
@@ -80,7 +82,7 @@ const CustomBottomSheet = ({
             position: 'absolute',
             left: 0,
             right: 0,
-            height: isKeyboardVisible ? screenHeight - keyboardHeight : height,
+            height: isKeyboardVisible ? safeHeight - keyboardHeight : height + 40,
             backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
@@ -88,7 +90,6 @@ const CustomBottomSheet = ({
             borderTopColor: colors.background,
             zIndex: 1000,
             paddingHorizontal: 24,
-            paddingBottom: isKeyboardVisible ? padding : 24,
           },
           animatedStyle,
         ]}

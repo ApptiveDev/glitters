@@ -22,6 +22,7 @@ import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
+import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
@@ -34,6 +35,7 @@ import styles from './styles';
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
+  const { insetBottom } = useLayout();
 
   const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -218,6 +220,8 @@ const MapSearch = () => {
     }
   };
 
+  console.log('safe height', 120 - insetBottom + contentHeight + 16);
+
   const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
     const matchedMarkers = geoJsonMarkers
       .map((geoMarker) => {
@@ -302,7 +306,7 @@ const MapSearch = () => {
         <View
           onLayout={(e) => {
             const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight + 40); // + padding
+            setContentHeight(measuredHeight);
           }}
           style={{ paddingTop: 16, gap: 12, alignItems: 'center', position: 'relative' }}
         >
@@ -386,7 +390,7 @@ const MapSearch = () => {
         variant="maps"
         style={{
           position: 'absolute',
-          bottom: isVisible ? contentHeight + 16 : 50,
+          bottom: isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16,
           left: '50%',
           transform: [{ translateX: -70 }],
           borderWidth: 0,
