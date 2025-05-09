@@ -148,7 +148,7 @@ export const CreateMarker = () => {
         <View
           onLayout={(e) => {
             const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight + 52); // + padding
+            setContentHeight(measuredHeight); // + padding
           }}
           style={{ paddingVertical: 24, gap: 8 }}
         >
