@@ -11,6 +11,7 @@ const colors = {
   },
   background: '#404C7A',
   backgroundLight: '#536199',
+  backgroundmypage: '#4A5789',
   blue: {
     light: '#E1E7FD',
     main: '#5F78DA',
@@ -36,6 +37,7 @@ const colors = {
     white: '#FBFBFB',
     gray: '#B1B3BB',
     lightgray: '#F6F6F7',
+    lightblue: '#818FC5',
   },
 };
 
