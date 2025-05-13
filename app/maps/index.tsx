@@ -275,26 +275,6 @@ const MapSearch = () => {
         onClusterPress={handleClusterPress}
       >
         {markers &&
-<<<<<<< HEAD
-          markers
-            .filter((marker): marker is MarkerType => !!marker)
-            .map((marker) => (
-              <Marker
-                key={marker.id}
-                coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude,
-                }}
-                onPress={() => onPressMarker(marker)}
-              >
-                {marker.isWrittenBySelf ? (
-                  <MarkerBySelfIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
-                ) : (
-                  <MarkerIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
-                )}
-              </Marker>
-            ))}
-=======
           markers.map((marker: MarkerType) => (
             <Marker
               key={marker.id}
@@ -311,7 +291,6 @@ const MapSearch = () => {
               )}
             </Marker>
           ))}
->>>>>>> 570c70b (refactor: MarkerIcon svg -> png 교체)
       </MapView>
 
       <CustomBottomSheet isVisible={isVisible} height={contentHeight} onClose={() => setIsVisible(false)}>
