@@ -3,9 +3,11 @@ import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav } from '@/components/features/BottomNav';
+import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: colors.backgroundmypage,
     flex: 1,
     position: 'relative',
   },

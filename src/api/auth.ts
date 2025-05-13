@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { UserLoginRequest, UserRegistrationRequest } from '@/types/auth';
+import { UserInfoResponse, UserLoginRequest, UserRegistrationRequest } from '@/types/auth';
 import { SchoolListResponse } from '@/types/utils';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
@@ -88,5 +88,15 @@ export const withdrawUser = async () => {
   } catch (error) {
     console.error('Error withdrawing user:', error);
     throw new Error('Failed to withdraw user');
+  }
+};
+
+export const getUserInfo = async (): Promise<UserInfoResponse> => {
+  try {
+    const response = await apiInstance.get('/members/me');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    throw new Error('Failed to fetch user info');
   }
 };
