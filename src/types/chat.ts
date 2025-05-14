@@ -1,6 +1,7 @@
 export interface Chat {
   id: number;
   peerNickname: string;
+  myNickname: string;
   post: {
     id: number;
     iconIdx: number;
@@ -17,10 +18,23 @@ export interface Chat {
     createdAt: string;
     content: string;
   };
+  unreadMessageCount: number;
 }
 
 export interface ChatListResponse {
   chatrooms: Chat[];
+}
+
+export interface ChatMessage {
+  id: number;
+  content: string;
+  createdAt: string;
+  type: 'sentChat' | 'receivedChat';
+}
+
+export interface ChatMessageResponse {
+  chats: ChatMessage[];
+  lastChatId: number;
 }
 
 export interface CreateChatRequest {

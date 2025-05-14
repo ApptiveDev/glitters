@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 
+import Heart3DIcon from '@/assets/icons/3d/heart_red.svg';
 import Scope3DIcon from '@/assets/icons/3d/scope_3d.svg';
 import { SlidingSidebar } from '@/components/common/SlidingSidebar';
 import { useLayout } from '@/contexts/LayoutContext';
@@ -11,6 +12,7 @@ interface ChatroomSideBarProps {
   peerNickname: string;
   chatroomId: number;
   sidebarVisible: boolean;
+  myNickname: string;
   setSidebarVisible: (visible: boolean) => void;
 }
 
@@ -19,6 +21,7 @@ export const ChatroomSideBar = ({
   peerNickname,
   chatroomId,
   sidebarVisible,
+  myNickname,
   setSidebarVisible,
 }: ChatroomSideBarProps) => {
   const { insetTop, insetBottom } = useLayout();
@@ -102,6 +105,38 @@ export const ChatroomSideBar = ({
           >
             {peerNickname}
           </Text>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+          <Heart3DIcon width={44} height={44} />
+          <Text
+            style={{
+              color: colors.absolute.white,
+              fontSize: 12,
+              fontWeight: 'bold',
+            }}
+          >
+            {myNickname}
+          </Text>
+          <View
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: 999,
+              backgroundColor: colors.primary.main,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              style={{
+                color: colors.text.grayblue,
+                fontSize: 10,
+                fontWeight: 'bold',
+              }}
+            >
+              나
+            </Text>
+          </View>
         </View>
       </View>
       <Text

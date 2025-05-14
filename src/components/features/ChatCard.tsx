@@ -10,10 +10,11 @@ interface ChatCardProps {
   lastMessage: string;
   lastMessageTime: string;
   iconIndex: number;
+  unreadCount: number;
   onPress: () => void;
 }
 
-export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPress }: ChatCardProps) => {
+export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPress, unreadCount }: ChatCardProps) => {
   const Icon = useMemo(() => {
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(iconIndex);
@@ -85,6 +86,25 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
           }}
         >
           {lastMessageTimeFormatted}
+        </Text>
+      </View>
+      <View
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+          backgroundColor: unreadCount > 0 ? colors.primary.main : colors.backgroundLight,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 12,
+            color: colors.text.white,
+          }}
+        >
+          {unreadCount > 99 ? '99+' : unreadCount}
         </Text>
       </View>
     </TouchableOpacity>

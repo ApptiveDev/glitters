@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { ChatListResponse, CreateChatRequest } from '@/types/chat';
+import { ChatListResponse, ChatMessageResponse, CreateChatRequest } from '@/types/chat';
 
 export const createChat = async ({ postId, content }: CreateChatRequest) => {
   try {
@@ -21,5 +21,25 @@ export const getChatList = async (): Promise<ChatListResponse> => {
   } catch (error) {
     console.error('Error fetching chat list:', error);
     throw new Error('Failed to fetch chat list');
+  }
+};
+
+export const getChatMessages = async (
+  chatroomId: number,
+  cursor?: number,
+  limit?: number,
+): Promise<ChatMessageResponse> => {
+  try {
+    const response = await apiInstance.get(`/chatrooms/${chatroomId}`, {
+      params: {
+        cursor,
+        limit,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching chat messages:', error);
+    throw new Error('Failed to fetch chat messages');
   }
 };

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
+import { getChatMessages } from '@/api/chat';
 import MenuIcon from '@/assets/icons/menu.svg';
 import SendIcon from '@/assets/icons/send.svg';
 import { ChatMessageItem } from '@/components/features/ChatMessageItem';
@@ -10,23 +11,14 @@ import { ChatroomSideBar } from '@/components/features/ChatroomSideBar';
 import { useChatMessages } from '@/contexts/ChatMessageContext';
 import { useChatroom } from '@/contexts/ChatroomContext';
 import { useLayout } from '@/contexts/LayoutContext';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { useWebSocketContext } from '@/contexts/WebSocketContext';
+import { ChatMessage } from '@/types/chat';
 import colors from '@/types/colors';
-import { getToken } from '@/utils/authStorage';
 
-const ChatInput = ({ chatroomId }: { chatroomId: number }) => {
+const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (message: string) => void }) => {
   const [message, setMessage] = useState('');
-  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      const resolvedToken = await getToken();
-      setToken(resolvedToken);
-    };
-    fetchToken();
-  }, []);
-
-  const { sendChat } = useWebSocket(token || '');
+  const { sendChat } = useWebSocketContext();
 
   const handleSend = () => {
     if (!message.trim()) return;
@@ -36,6 +28,7 @@ const ChatInput = ({ chatroomId }: { chatroomId: number }) => {
     }
 
     sendChat(chatroomId, message);
+    onSend(message);
     setMessage('');
   };
 
@@ -105,6 +98,7 @@ export const Chatroom = () => {
   const { messages } = useChatMessages();
   const scrollRef = useRef<ScrollView | null>(null);
   const { insetTop } = useLayout();
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const filteredMessages = messages.filter((msg) => msg.chatroomId === selectedChatroom?.id);
 
@@ -118,6 +112,31 @@ export const Chatroom = () => {
     Alert.alert('에러', '채팅방을 불러올 수 없습니다.');
     router.back();
   }
+
+  const handleSend = (text: string) => {
+    const newMessage: ChatMessage = {
+      id: Date.now(),
+      content: text,
+      createdAt: new Date().toISOString(),
+      type: 'sentChat',
+    };
+    setChatMessages((prev) => [...prev, newMessage]);
+  };
+
+  useEffect(() => {
+    const fetchChatMessages = async () => {
+      if (!selectedChatroom) return;
+      try {
+        const response = await getChatMessages(selectedChatroom.id, undefined, 20);
+        setChatMessages(response.chats.reverse());
+      } catch (error) {
+        console.error('Error fetching chat messages:', error);
+      }
+    };
+
+    fetchChatMessages();
+  }, [selectedChatroom]);
+
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <View
@@ -136,7 +155,7 @@ export const Chatroom = () => {
         style={{
           flex: 1,
           width: '100%',
-          bottom: 0,
+          paddingTop: 24,
         }}
       >
         <ScrollView
@@ -148,9 +167,10 @@ export const Chatroom = () => {
             scrollRef.current?.scrollToEnd({ animated: true });
           }}
         >
-          {filteredMessages.length > 0 ? (
-            filteredMessages.map((message) => (
+          {chatMessages.length > 0 ? (
+            chatMessages.map((message) => (
               <ChatMessageItem
+                key={message.id}
                 content={message.content}
                 isMine={message.type === 'sentChat'}
                 createdAt={message.createdAt}
@@ -169,13 +189,14 @@ export const Chatroom = () => {
             </View>
           )}
         </ScrollView>
-        <ChatInput chatroomId={selectedChatroom?.id || 0} />
+        <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
       </KeyboardAvoidingView>
       <ChatroomSideBar
         title={selectedChatroom?.post.title || ''}
         peerNickname={selectedChatroom?.peerNickname || ''}
         chatroomId={selectedChatroom?.id || 0}
         sidebarVisible={sidebarVisible}
+        myNickname={selectedChatroom?.myNickname || ''}
         setSidebarVisible={setSidebarVisible}
       />
     </View>

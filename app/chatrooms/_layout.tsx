@@ -7,6 +7,7 @@ import { BottomNav } from '@/components/features/BottomNav';
 import { ChatMessageProvider } from '@/contexts/ChatMessageContext';
 import { ChatroomProvider } from '@/contexts/ChatroomContext';
 import { useLayout } from '@/contexts/LayoutContext';
+import { WebSocketProvider } from '@/contexts/WebSocketContext';
 import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
@@ -53,14 +54,18 @@ export const ChatLayout = () => {
         </>
       ) : null}
       <View style={{ flex: 1, position: 'relative', marginTop: insetTop }}>
-        <ChatroomProvider>
-          <ChatMessageProvider>
-            <KeyboardAvoidingView style={[styles.content, pathname !== '/chatrooms/chatroom' && { marginBottom: 80 }]}>
-              <Slot />
-            </KeyboardAvoidingView>
-            {pathname !== '/chatrooms/chatroom' ? <BottomNav /> : null}
-          </ChatMessageProvider>
-        </ChatroomProvider>
+        <ChatMessageProvider>
+          <WebSocketProvider>
+            <ChatroomProvider>
+              <KeyboardAvoidingView
+                style={[styles.content, pathname !== '/chatrooms/chatroom' && { marginBottom: 80 }]}
+              >
+                <Slot />
+              </KeyboardAvoidingView>
+              {pathname !== '/chatrooms/chatroom' ? <BottomNav /> : null}
+            </ChatroomProvider>
+          </WebSocketProvider>
+        </ChatMessageProvider>
       </View>
     </>
   );
