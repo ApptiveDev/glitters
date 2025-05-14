@@ -30,6 +30,7 @@ export const CreateMarker = () => {
   const inputRef = useRef<TextInput>(null);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
+  const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
 
   const { isKeyboardVisible } = useKeyboardVisible();
   const { updatePost, bound } = usePost();
@@ -91,7 +92,7 @@ export const CreateMarker = () => {
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        maxZoomLevel={20}
+        maxZoomLevel={19}
         minZoomLevel={15}
         initialRegion={{
           latitude: lat,
@@ -103,13 +104,17 @@ export const CreateMarker = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude)) {
+          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+            Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
+            setHasAnimatedBack(true);
             mapRef.current?.animateToRegion({
-              latitude: bound?.defaultLat ?? 0,
-              longitude: bound?.defaultLon ?? 0,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
+              latitude: lat,
+              longitude: lon,
+              latitudeDelta: 0.002,
+              longitudeDelta: 0.002,
             });
+          } else if (!isOutOfBound(latitude, longitude) && hasAnimatedBack) {
+            setHasAnimatedBack(false);
           }
         }}
       >

@@ -297,6 +297,7 @@ const MapSearch = () => {
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
           if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+            Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
             setHasAnimatedBack(true);
             mapRef.current?.animateToRegion({
               latitude: bound.defaultLat,
