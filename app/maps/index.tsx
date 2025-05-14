@@ -10,6 +10,7 @@ import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
 
+import { blockUser } from '@/api/block';
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
@@ -247,6 +248,33 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
+  const handleBlockUser = async (postId: number) => {
+    try {
+      Alert.alert('사용자 차단', '한 번 차단한 사용자는 해제할 수 없어요.', [
+        {
+          text: '차단하기',
+          onPress: async () => {
+            setIsVisible(false);
+            await blockUser({
+              blockType: 'post',
+              postId,
+            });
+            await queryClient.invalidateQueries({ queryKey: ['markers'] });
+            await queryClient.invalidateQueries({ queryKey: ['posts'] });
+          },
+        },
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+      ]);
+      setPost(undefined);
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -376,12 +404,30 @@ const MapSearch = () => {
             buttonIcon={overrideButtonText === ' 반짝반짝' ? <GlitterBlueIcon /> : <GlitterIcon />}
             disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
           />
-          <Text
-            style={{ fontSize: 12, color: colors.text.lightgray }}
-            onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 8,
+            }}
           >
-            {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
-          </Text>
+            <Text
+              style={{ fontSize: 12, color: colors.text.lightgray }}
+              onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+            >
+              {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
+            </Text>
+            {!post?.isWrittenBySelf && (
+              <>
+                <Text style={{ fontSize: 12, color: colors.text.lightgray }}>|</Text>
+                <Text
+                  style={{ fontSize: 12, color: colors.text.lightgray }}
+                  onPress={() => handleBlockUser(post?.id ?? 0)}
+                >
+                  이 유저 차단하기
+                </Text>
+              </>
+            )}
+          </View>
         </View>
       </CustomBottomSheet>
       <CommonButton
