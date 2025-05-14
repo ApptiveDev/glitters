@@ -1,8 +1,9 @@
-import { Slot } from 'expo-router';
+import { Slot, usePathname } from 'expo-router';
 import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav } from '@/components/features/BottomNav';
+import { ChatroomProvider } from '@/contexts/ChatroomContext';
 import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
@@ -19,12 +20,15 @@ const styles = StyleSheet.create({
 });
 
 export const ChatLayout = () => {
+  const pathname = usePathname();
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={styles.content}>
-        <Slot />
-      </KeyboardAvoidingView>
-      <BottomNav />
+      <ChatroomProvider>
+        <KeyboardAvoidingView style={styles.content}>
+          <Slot />
+        </KeyboardAvoidingView>
+        {pathname !== '/chatrooms/chatroom' && <BottomNav />}
+      </ChatroomProvider>
     </SafeAreaView>
   );
 };

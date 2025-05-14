@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import colors from '@/types/colors';
@@ -10,9 +10,10 @@ interface ChatCardProps {
   lastMessage: string;
   lastMessageTime: string;
   iconIndex: number;
+  onPress: () => void;
 }
 
-export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex }: ChatCardProps) => {
+export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPress }: ChatCardProps) => {
   const Icon = useMemo(() => {
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(iconIndex);
@@ -25,7 +26,7 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex }: Cha
   });
 
   return (
-    <View
+    <TouchableOpacity
       style={{
         flexDirection: 'row',
         padding: 20,
@@ -37,6 +38,7 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex }: Cha
         gap: 16,
         height: 100,
       }}
+      onPress={onPress}
     >
       <Icon width={44} height={44} />
       <View
@@ -85,7 +87,7 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex }: Cha
           {lastMessageTimeFormatted}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
