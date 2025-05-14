@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { CreateChatRequest, CreateChatResponse } from '@/types/chat';
+import { ChatListResponse, CreateChatRequest } from '@/types/chat';
 
 export const createChat = async ({ postId, content }: CreateChatRequest) => {
   try {
@@ -14,7 +14,7 @@ export const createChat = async ({ postId, content }: CreateChatRequest) => {
   }
 };
 
-export const getChatList = async (): Promise<CreateChatResponse> => {
+export const getChatList = async (): Promise<ChatListResponse> => {
   try {
     const response = await apiInstance.get('/chatrooms');
     return response.data;

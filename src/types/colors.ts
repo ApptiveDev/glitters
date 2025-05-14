@@ -38,6 +38,7 @@ const colors = {
     gray: '#B1B3BB',
     lightgray: '#F6F6F7',
     lightblue: '#818FC5',
+    black: '#1A1A1B',
   },
 };
 
