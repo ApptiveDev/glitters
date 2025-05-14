@@ -21,7 +21,7 @@ export const MapLayout = () => {
       <KeyboardAvoidingView style={styles.content}>
         <Slot />
       </KeyboardAvoidingView>
-      {!isKeyboardVisible && <BottomNav />}
+      {!isKeyboardVisible ? <BottomNav /> : null}
     </View>
   );
 };
