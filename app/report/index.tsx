@@ -23,7 +23,6 @@ export const Report = () => {
 
   const handleReportPress = async () => {
     try {
-      console.log(postId, reportType);
       await reportMarker({
         postId: postId ? Number(postId) : undefined,
         chatroomId: chatroomId ? Number(chatroomId) : undefined,
