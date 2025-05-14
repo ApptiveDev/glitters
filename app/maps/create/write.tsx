@@ -134,11 +134,11 @@ export const Write = () => {
       </KeyboardScrollContainer>
       <KeyboardAvoidingView
         behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -120 + insetBottom}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 120 - insetBottom}
         style={{
           position: 'absolute',
           width: '100%',
-          bottom: 120 - insetBottom,
+          bottom: Platform.OS === 'ios' ? 120 - insetBottom : 0,
           paddingHorizontal: isKeyboardVisible ? 0 : 28,
         }}
       >
