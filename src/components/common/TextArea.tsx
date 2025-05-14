@@ -15,6 +15,7 @@ interface TextAreaProps {
   isError?: boolean;
   editable?: boolean;
   backgroundColor?: string;
+  alignItems?: 'flex-start' | 'center' | 'flex-end';
 }
 
 const styles = StyleSheet.create({
@@ -43,6 +44,7 @@ export const CustomTextArea = ({
   isError = false,
   editable = true,
   backgroundColor = 'transparent',
+  alignItems = 'flex-start',
 }: TextAreaProps) => {
   return (
     <View style={{ width: '100%' }}>
@@ -62,11 +64,13 @@ export const CustomTextArea = ({
         }}
         editable={editable}
       />
-      {isError ? (
-        <Text style={{ color: colors.error, marginTop: 4, fontSize: 12, marginLeft: 12 }}>{errorMessage}</Text>
-      ) : (
-        <Text style={{ marginTop: 4 }}>{}</Text>
-      )}
+      <View style={{ alignItems }}>
+        {isError ? (
+          <Text style={{ color: colors.error, marginTop: 4, fontSize: 12, marginLeft: 12 }}>{errorMessage}</Text>
+        ) : (
+          <Text style={{ marginTop: 4 }}>{}</Text>
+        )}
+      </View>
     </View>
   );
 };

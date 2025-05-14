@@ -17,6 +17,9 @@ const colors = {
     main: '#5F78DA',
     dark: '#4F6EE8',
   },
+  blueGray: {
+    light: '#ADB7D2',
+  },
   yellow: {
     light: '#FFFCE7',
     main: '#FFF7C1',

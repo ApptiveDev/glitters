@@ -369,12 +369,19 @@ const MapSearch = () => {
             }
             disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
           />
-          <Text
-            style={{ fontSize: 12, color: colors.text.lightgray }}
-            onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 8,
+            }}
           >
-            {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
-          </Text>
+            <Text
+              style={{ fontSize: 12, color: colors.text.lightgray }}
+              onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+            >
+              {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
+            </Text>
+          </View>
         </View>
       </CustomBottomSheet>
       <CommonButton
