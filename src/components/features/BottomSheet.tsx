@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Keyboard, Pressable, useWindowDimensions } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Keyboard, Pressable } from 'react-native';
+import Animated, { runOnUI, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import { useLayout } from '@/contexts/LayoutContext';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 
@@ -23,31 +24,32 @@ const CustomBottomSheet = ({
   blockOutsidePress = false,
 }: CustomBottomSheetProps) => {
   const [isMounted, setIsMounted] = useState(false);
-  const screenHeight = useWindowDimensions().height;
-  const top = useSharedValue(screenHeight);
+  const { safeHeight, insetBottom } = useLayout();
   const { keyboardHeight } = useKeyboardVisible();
-  const padding = isKeyboardVisible ? keyboardHeight - 224 : 0;
+
+  const BOTTOM_OFFSET = 96 - insetBottom;
+  const translateY = useSharedValue(safeHeight);
 
   useEffect(() => {
     if (isVisible) {
       setIsMounted(true);
-      top.value = withTiming(screenHeight - (height + 70) - padding, {
-        duration: 300,
-      });
+      runOnUI(() => {
+        translateY.value = withTiming(0, { duration: 300 });
+      })();
     } else {
-      top.value = withTiming(screenHeight, {
-        duration: 500,
-      });
+      runOnUI(() => {
+        translateY.value = withTiming(safeHeight - BOTTOM_OFFSET, { duration: 300 });
+      })();
       const timeout = setTimeout(() => {
         setIsMounted(false);
-      }, 500);
+      }, 300);
       return () => clearTimeout(timeout);
     }
     return undefined;
-  }, [height, isVisible, padding, screenHeight, top]);
+  }, [isVisible, safeHeight, BOTTOM_OFFSET, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    top: top.value,
+    transform: [{ translateY: translateY.value }],
   }));
 
   if (!isMounted) return null;
@@ -55,6 +57,9 @@ const CustomBottomSheet = ({
   const onPress = () => {
     if (isKeyboardVisible) {
       Keyboard.dismiss();
+      setTimeout(() => {
+        onClose?.();
+      }, 100); // 키보드 내리는 시간 고려
     } else {
       onClose?.();
     }
@@ -80,7 +85,8 @@ const CustomBottomSheet = ({
             position: 'absolute',
             left: 0,
             right: 0,
-            height: isKeyboardVisible ? screenHeight - keyboardHeight : height,
+            bottom: BOTTOM_OFFSET,
+            height: isKeyboardVisible ? safeHeight - keyboardHeight : height + 40,
             backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
@@ -88,7 +94,6 @@ const CustomBottomSheet = ({
             borderTopColor: colors.background,
             zIndex: 1000,
             paddingHorizontal: 24,
-            paddingBottom: isKeyboardVisible ? padding : 24,
           },
           animatedStyle,
         ]}

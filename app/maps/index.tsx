@@ -4,24 +4,26 @@ import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Image, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
 
+import { blockUser } from '@/api/block';
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
-import MarkerIcon from '@/assets/icons/marker.svg';
-import MarkerBySelfIcon from '@/assets/icons/markerBySelf.svg';
+import MarkerIcon from '@/assets/icons/marker.png';
+import MarkerBySelfIcon from '@/assets/icons/marker_by_self.png';
 import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
+import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
@@ -34,6 +36,7 @@ import styles from './styles';
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
+  const { insetBottom } = useLayout();
 
   const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -218,6 +221,8 @@ const MapSearch = () => {
     }
   };
 
+  console.log('safe height', 120 - insetBottom + contentHeight + 16);
+
   const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
     const matchedMarkers = geoJsonMarkers
       .map((geoMarker) => {
@@ -241,6 +246,33 @@ const MapSearch = () => {
 
     setClusterPosts(posts);
     setIsListOpen(true);
+  };
+
+  const handleBlockUser = async (postId: number) => {
+    try {
+      Alert.alert('사용자 차단', '한 번 차단한 사용자는 해제할 수 없어요.', [
+        {
+          text: '차단하기',
+          onPress: async () => {
+            setIsVisible(false);
+            await blockUser({
+              blockType: 'post',
+              postId,
+            });
+            await queryClient.invalidateQueries({ queryKey: ['markers'] });
+            await queryClient.invalidateQueries({ queryKey: ['posts'] });
+          },
+        },
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+      ]);
+      setPost(undefined);
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
@@ -293,9 +325,9 @@ const MapSearch = () => {
                 onPress={() => onPressMarker(marker)}
               >
                 {marker.isWrittenBySelf ? (
-                  <MarkerBySelfIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
                 ) : (
-                  <MarkerIcon pointerEvents="none" style={{ width: 40, height: 40 }} />
+                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
                 )}
               </Marker>
             ))}
@@ -305,7 +337,7 @@ const MapSearch = () => {
         <View
           onLayout={(e) => {
             const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight + 40); // + padding
+            setContentHeight(measuredHeight);
           }}
           style={{ paddingTop: 16, gap: 12, alignItems: 'center', position: 'relative' }}
         >
@@ -375,12 +407,30 @@ const MapSearch = () => {
             buttonIcon={overrideButtonText === ' 반짝반짝' ? <GlitterBlueIcon /> : <GlitterIcon />}
             disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
           />
-          <Text
-            style={{ fontSize: 12, color: colors.text.lightgray }}
-            onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 8,
+            }}
           >
-            {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
-          </Text>
+            <Text
+              style={{ fontSize: 12, color: colors.text.lightgray }}
+              onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
+            >
+              {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
+            </Text>
+            {!post?.isWrittenBySelf && (
+              <>
+                <Text style={{ fontSize: 12, color: colors.text.lightgray }}>|</Text>
+                <Text
+                  style={{ fontSize: 12, color: colors.text.lightgray }}
+                  onPress={() => handleBlockUser(post?.id ?? 0)}
+                >
+                  이 유저 차단하기
+                </Text>
+              </>
+            )}
+          </View>
         </View>
       </CustomBottomSheet>
       <CommonButton
@@ -389,7 +439,7 @@ const MapSearch = () => {
         variant="maps"
         style={{
           position: 'absolute',
-          bottom: isVisible ? contentHeight + 16 : 50,
+          bottom: isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16,
           left: '50%',
           transform: [{ translateX: -70 }],
           borderWidth: 0,
@@ -448,9 +498,9 @@ const MapSearch = () => {
                 }}
               >
                 {clusterPost.isWrittenBySelf ? (
-                  <MarkerBySelfIcon width={24} height={24} />
+                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
                 ) : (
-                  <MarkerIcon width={24} height={24} />
+                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
                 )}
                 <Text
                   style={{

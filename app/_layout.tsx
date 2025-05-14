@@ -4,6 +4,7 @@ import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LayoutProvider } from '@/contexts/LayoutContext';
 import { PostProvider } from '@/contexts/PostContext';
 import { UserProvider } from '@/contexts/UserContext';
 import colors from '@/types/colors';
@@ -22,11 +23,13 @@ export const RootLayout = () => {
           }}
         >
           <BottomSheetModalProvider>
-            <PostProvider>
-              <UserProvider>
-                <Slot />
-              </UserProvider>
-            </PostProvider>
+            <LayoutProvider>
+              <PostProvider>
+                <UserProvider>
+                  <Slot />
+                </UserProvider>
+              </PostProvider>
+            </LayoutProvider>
           </BottomSheetModalProvider>
         </SafeAreaView>
       </GestureHandlerRootView>
