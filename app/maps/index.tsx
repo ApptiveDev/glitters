@@ -10,6 +10,7 @@ import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
 
+import { createChat } from '@/api/chat';
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
@@ -231,6 +232,18 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
+  const handleCreateChat = async () => {
+    if (!post || !post.id || !post.content) {
+      Alert.alert('게시글 정보가 없습니다.');
+      return;
+    }
+    console.log('post', post.id, post.content);
+    await createChat({
+      postId: post?.id,
+      content: post?.content,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -373,6 +386,9 @@ const MapSearch = () => {
             onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
           >
             {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
+          </Text>
+          <Text style={{ fontSize: 12, color: colors.text.lightgray }} onPress={() => handleCreateChat()}>
+            {!post?.isWrittenBySelf ? '쪽지 보내기' : ''}
           </Text>
         </View>
       </CustomBottomSheet>
