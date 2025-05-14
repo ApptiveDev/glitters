@@ -3,15 +3,18 @@ import { useState } from 'react';
 import { Alert, SafeAreaView, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { blockUser } from '@/api/block';
 import { reportMarker } from '@/api/markers';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import { CommonButton } from '@/components/common/Button';
+import Checkbox from '@/components/common/Checkbox';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import colors from '@/types/colors';
 
 export const Report = () => {
   const [text, setText] = useState('');
+  const [checked, setChecked] = useState(false);
   const { postId } = useLocalSearchParams();
   const handleBackPress = () => {
     router.back();
@@ -19,6 +22,12 @@ export const Report = () => {
 
   const handleReportPress = async () => {
     try {
+      if (checked) {
+        await blockUser({
+          blockType: 'post',
+          postId: Number(postId),
+        });
+      }
       await reportMarker({
         postId: Number(postId),
         reason: text,
@@ -50,8 +59,11 @@ export const Report = () => {
             isError={text.length < 2 || text.length > 255}
             errorMessage="신고하는 이유를 작성해주세요."
             backgroundColor={colors.backgroundLight}
+            alignItems="center"
           />
-          <Spacing height={40} />
+          <Spacing height={8} />
+          <Checkbox checked={checked} onChange={() => setChecked(!checked)} label="해당 게시글 작성자를 차단합니다." />
+          <Spacing height={12} />
           <CommonButton
             title="신고하기"
             onPress={handleReportPress}
