@@ -165,6 +165,7 @@ const MapSearch = () => {
       pathname: '/report',
       params: {
         postId: post?.id,
+        reportType: 'POST_REPORT',
       },
     });
   };

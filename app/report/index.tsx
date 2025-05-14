@@ -12,19 +12,25 @@ import colors from '@/types/colors';
 
 export const Report = () => {
   const [text, setText] = useState('');
-  const { postId } = useLocalSearchParams();
+  const { postId, chatroomId, reportType } = useLocalSearchParams() as {
+    postId?: string;
+    reportType: 'POST_REPORT' | 'CHATROOM_REPORT';
+    chatroomId?: string;
+  };
   const handleBackPress = () => {
     router.back();
   };
 
   const handleReportPress = async () => {
     try {
+      console.log(postId, reportType);
       await reportMarker({
-        postId: Number(postId),
+        postId: postId ? Number(postId) : undefined,
+        chatroomId: chatroomId ? Number(chatroomId) : undefined,
         reason: text,
-        reportType: 'POST_REPORT',
+        reportType,
       });
-      Alert.alert('신고 완료', '신고가 완료되었습니다. 감사합니다.');
+      Alert.alert('신고가 완료되었습니다.', '24시간 이내에 담당자가 처리할 예정입니다.');
       router.back();
     } catch (error) {
       console.error('Error reporting marker:', error);
