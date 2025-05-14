@@ -254,11 +254,12 @@ const MapSearch = () => {
         {
           text: '차단하기',
           onPress: async () => {
-            setIsVisible(false);
             await blockUser({
               blockType: 'post',
               postId,
             });
+            setIsVisible(false);
+            setPost(undefined);
             await queryClient.invalidateQueries({ queryKey: ['markers'] });
             await queryClient.invalidateQueries({ queryKey: ['posts'] });
           },
@@ -268,7 +269,6 @@ const MapSearch = () => {
           style: 'cancel',
         },
       ]);
-      setPost(undefined);
     } catch (error) {
       console.error('Error blocking user:', error);
       Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
