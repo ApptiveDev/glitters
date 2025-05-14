@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav } from '@/components/features/BottomNav';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
@@ -19,12 +20,13 @@ const styles = StyleSheet.create({
 });
 
 export const GuideLayout = () => {
+  const { isKeyboardVisible } = useKeyboardVisible();
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={styles.content}>
+      <KeyboardAvoidingView behavior="padding" style={styles.content}>
         <Slot />
       </KeyboardAvoidingView>
-      <BottomNav />
+      {!isKeyboardVisible && <BottomNav />}
     </SafeAreaView>
   );
 };

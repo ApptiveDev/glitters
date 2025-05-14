@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
+import { Animated, Easing, KeyboardAvoidingView, SafeAreaView, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
@@ -133,8 +133,8 @@ export const Write = () => {
         </Text>
       </KeyboardScrollContainer>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior="padding"
+        keyboardVerticalOffset={0}
         style={{
           position: 'absolute',
           width: '100%',
