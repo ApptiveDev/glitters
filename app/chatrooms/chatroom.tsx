@@ -8,7 +8,6 @@ import MenuIcon from '@/assets/icons/menu.svg';
 import SendIcon from '@/assets/icons/send.svg';
 import { ChatMessageItem } from '@/components/features/ChatMessageItem';
 import { ChatroomSideBar } from '@/components/features/ChatroomSideBar';
-import { useChatMessages } from '@/contexts/ChatMessageContext';
 import { useChatroom } from '@/contexts/ChatroomContext';
 import { useLayout } from '@/contexts/LayoutContext';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
@@ -95,18 +94,27 @@ const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (messag
 export const Chatroom = () => {
   const { selectedChatroom } = useChatroom();
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const { messages } = useChatMessages();
   const scrollRef = useRef<ScrollView | null>(null);
   const { insetTop } = useLayout();
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const { messagesByChatroom } = useWebSocketContext();
+  const currentRoomMessage = messagesByChatroom[selectedChatroom?.id ?? 0];
+  const { readChat } = useWebSocketContext();
 
-  const filteredMessages = messages.filter((msg) => msg.chatroomId === selectedChatroom?.id);
+  useEffect(() => {
+    if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
+      if (selectedChatroom?.id !== undefined) {
+        readChat(selectedChatroom.id);
+      }
+      setChatMessages((prev) => [...prev, { ...currentRoomMessage, type: 'receivedChat' }]);
+    }
+  }, [currentRoomMessage, readChat, selectedChatroom?.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollToEnd({ animated: true });
     }
-  }, [filteredMessages]);
+  }, [chatMessages]);
 
   if (!selectedChatroom) {
     Alert.alert('에러', '채팅방을 불러올 수 없습니다.');

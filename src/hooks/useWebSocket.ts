@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export const useWebSocket = (token: string) => {
   const socketRef = useRef<WebSocket | null>(null);
-  const [messagesByChatroom, setMessagesByChatroom] = useState<Record<number, { content: string; createdAt: string }>>(
-    {},
-  );
+  const [messagesByChatroom, setMessagesByChatroom] = useState<
+    Record<number, { content: string; createdAt: string; type: 'sentChat' | 'receivedChat' }>
+  >({});
 
   useEffect(() => {
     if (!token) return;
@@ -25,6 +25,7 @@ export const useWebSocket = (token: string) => {
           [data.chatroomId]: {
             content: data.content,
             createdAt: data.createdAt,
+            type: 'receivedChat',
           },
         }));
 
@@ -65,6 +66,7 @@ export const useWebSocket = (token: string) => {
         [chatroomId]: {
           content,
           createdAt: new Date().toISOString(),
+          type: 'sentChat',
         },
       }));
     } else {
@@ -72,7 +74,15 @@ export const useWebSocket = (token: string) => {
     }
   };
 
-  return { sendChat, messagesByChatroom };
+  const readChat = (chatroomId: number) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify({ type: 'readChat', chatroomId }));
+    } else {
+      console.warn('WebSocket이 아직 연결되지 않았습니다.');
+    }
+  };
+
+  return { sendChat, readChat, messagesByChatroom };
 };
 
 export default useWebSocket;

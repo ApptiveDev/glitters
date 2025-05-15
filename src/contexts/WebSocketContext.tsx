@@ -5,9 +5,11 @@ import { getToken } from '@/utils/authStorage';
 
 const WebSocketContext = createContext<{
   sendChat: (chatroomId: number, content: string) => void;
-  messagesByChatroom: Record<number, { content: string; createdAt: string }>;
+  readChat: (chatroomId: number) => void;
+  messagesByChatroom: Record<number, { content: string; createdAt: string; type: 'sentChat' | 'receivedChat' }>;
 }>({
   sendChat: () => {},
+  readChat: () => {},
   messagesByChatroom: {},
 });
 
@@ -18,9 +20,12 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     getToken().then(setToken);
   }, []);
 
-  const { sendChat, messagesByChatroom } = useWebSocket(token ?? '');
+  const { sendChat, readChat, messagesByChatroom } = useWebSocket(token ?? '');
 
-  const contextValue = useMemo(() => ({ sendChat, messagesByChatroom }), [sendChat, messagesByChatroom]);
+  const contextValue = useMemo(
+    () => ({ sendChat, readChat, messagesByChatroom }),
+    [sendChat, readChat, messagesByChatroom],
+  );
 
   if (!token) return null;
 

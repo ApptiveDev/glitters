@@ -26,7 +26,7 @@ export interface ChatListResponse {
 }
 
 export interface ChatMessage {
-  id: number;
+  id?: number;
   content: string;
   createdAt: string;
   type: 'sentChat' | 'receivedChat';
