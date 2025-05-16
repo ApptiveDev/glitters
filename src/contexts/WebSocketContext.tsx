@@ -6,7 +6,10 @@ import { getToken } from '@/utils/authStorage';
 const WebSocketContext = createContext<{
   sendChat: (chatroomId: number, content: string) => void;
   readChat: (chatroomId: number) => void;
-  messagesByChatroom: Record<number, { content: string; createdAt: string; type: 'sentChat' | 'receivedChat' }>;
+  messagesByChatroom: Record<
+    number,
+    { content?: string; createdAt?: string; type: 'sentChat' | 'receivedChat' | 'error'; message?: string }
+  >;
 }>({
   sendChat: () => {},
   readChat: () => {},

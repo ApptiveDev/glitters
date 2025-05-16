@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 export const useWebSocket = (token: string) => {
   const socketRef = useRef<WebSocket | null>(null);
   const [messagesByChatroom, setMessagesByChatroom] = useState<
-    Record<number, { content: string; createdAt: string; type: 'sentChat' | 'receivedChat' }>
+    Record<
+      number,
+      { content?: string; createdAt?: string; type: 'sentChat' | 'receivedChat' | 'error'; message?: string }
+    >
   >({});
 
   useEffect(() => {
@@ -47,6 +50,15 @@ export const useWebSocket = (token: string) => {
             ),
           };
         });
+      }
+      if (data.type === 'error') {
+        setMessagesByChatroom((prev) => ({
+          ...prev,
+          [data.chatroomId]: {
+            type: 'error',
+            message: data.message,
+          },
+        }));
       }
     };
 

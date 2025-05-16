@@ -107,7 +107,21 @@ export const Chatroom = () => {
       if (selectedChatroom?.id !== undefined) {
         readChat(selectedChatroom.id);
       }
-      setChatMessages((prev) => [...prev, { ...currentRoomMessage, type: 'receivedChat' }]);
+      if (currentRoomMessage.content) {
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            ...currentRoomMessage,
+            type: 'receivedChat',
+            content: currentRoomMessage.content || '',
+            createdAt: currentRoomMessage.createdAt || new Date().toISOString(),
+          },
+        ]);
+      }
+    }
+    if (currentRoomMessage && currentRoomMessage.type === 'error') {
+      Alert.alert('에러', currentRoomMessage.message);
+      router.back();
     }
   }, [currentRoomMessage, readChat, selectedChatroom?.id]);
 
