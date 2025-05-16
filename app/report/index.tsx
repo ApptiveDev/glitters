@@ -7,7 +7,7 @@ import { blockUser } from '@/api/block';
 import { reportMarker } from '@/api/markers';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import { CommonButton } from '@/components/common/Button';
-import Checkbox from '@/components/common/Checkbox';
+import { Checkbox } from '@/components/common/Checkbox';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import colors from '@/types/colors';

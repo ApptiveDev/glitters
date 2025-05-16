@@ -13,11 +13,14 @@ export const ChatMessageItem = ({
   createdAt: string;
   peerNickname: string;
 }) => {
-  const formattedTime = new Date(createdAt).toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const formatDate = (date: Date): string => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${month}/${day} ${hours}:${minutes}`;
+  };
 
   return (
     <View
@@ -50,7 +53,7 @@ export const ChatMessageItem = ({
               alignSelf: 'flex-end',
             }}
           >
-            {formattedTime}
+            {formatDate(new Date(createdAt))}
           </Text>
         )}
 
@@ -86,7 +89,7 @@ export const ChatMessageItem = ({
               alignSelf: 'flex-end',
             }}
           >
-            {formattedTime}
+            {formatDate(new Date(createdAt))}
           </Text>
         )}
       </View>

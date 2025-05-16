@@ -21,10 +21,14 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
     return iconsArray[index];
   }, [iconIndex]);
 
-  const lastMessageTimeFormatted = new Date(lastMessageTime).toLocaleString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const formatDate = (date: Date): string => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${month}/${day} ${hours}:${minutes}`;
+  };
 
   return (
     <TouchableOpacity
@@ -85,7 +89,7 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
             color: colors.text.gray,
           }}
         >
-          {lastMessageTimeFormatted}
+          {formatDate(new Date(lastMessageTime))}
         </Text>
       </View>
       <View

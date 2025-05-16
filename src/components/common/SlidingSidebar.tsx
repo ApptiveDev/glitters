@@ -14,18 +14,18 @@ interface SlidingSidebarProps {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDTH * 0.7 }: SlidingSidebarProps) => {
-  const translateX = useRef(new Animated.Value(-width)).current;
+  const translateX = useRef(new Animated.Value(width)).current;
   const { insetBottom } = useLayout();
 
   useEffect(() => {
     if (!visible) {
-      translateX.setValue(-width);
+      translateX.setValue(width);
     }
   }, [translateX, visible, width]);
 
   useEffect(() => {
     Animated.timing(translateX, {
-      toValue: visible ? 0 : -width,
+      toValue: visible ? 0 : width,
       duration: 250,
       useNativeDriver: true,
     }).start();
@@ -40,7 +40,7 @@ export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDT
           top: 0,
           bottom: 0,
           paddingBottom: insetBottom,
-          left: 0,
+          right: 0,
           width,
           backgroundColor: colors.backgroundmypage,
           transform: [{ translateX }],
@@ -49,8 +49,8 @@ export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDT
           shadowOffset: { width: 2, height: 0 },
           shadowOpacity: 0.3,
           shadowRadius: 4,
-          borderTopRightRadius: 24,
-          borderBottomRightRadius: 24,
+          borderTopLeftRadius: 24,
+          borderBottomLeftRadius: 24,
         }}
       >
         {children}

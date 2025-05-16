@@ -44,10 +44,11 @@ export const ChatroomSideBar = ({
     <SlidingSidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)}>
       <View
         style={{
-          height: 206,
-          paddingTop: insetTop + 32,
+          height: 180 + insetTop,
+          paddingBottom: 32,
+          justifyContent: 'flex-end',
           backgroundColor: colors.yellow.dark,
-          borderTopRightRadius: 24,
+          borderTopLeftRadius: 24,
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
           paddingHorizontal: 36,
@@ -73,6 +74,7 @@ export const ChatroomSideBar = ({
             height: 38,
             justifyContent: 'center',
             alignItems: 'center',
+            borderRadius: 8,
           }}
         >
           <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>게시글 바로가기</Text>
@@ -147,9 +149,9 @@ export const ChatroomSideBar = ({
           color: colors.text.grayblue,
           fontWeight: 'bold',
         }}
-        onPress={handleReportPress}
+        onPress={handleExitPress}
       >
-        신고하기
+        나가기
       </Text>
       <Text
         style={{
@@ -159,9 +161,9 @@ export const ChatroomSideBar = ({
           color: colors.text.grayblue,
           fontWeight: 'bold',
         }}
-        onPress={handleExitPress}
+        onPress={handleReportPress}
       >
-        나가기
+        신고하기
       </Text>
     </SlidingSidebar>
   );

@@ -4,6 +4,7 @@ import { Alert, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } f
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 import { getChatMessages } from '@/api/chat';
+import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import MenuIcon from '@/assets/icons/menu.svg';
 import SendIcon from '@/assets/icons/send.svg';
 import { ChatMessageItem } from '@/components/features/ChatMessageItem';
@@ -149,14 +150,16 @@ export const Chatroom = () => {
     <View style={{ flex: 1, alignItems: 'center' }}>
       <View
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
+        <CaretLeftIcon width={24} height={24} onPress={() => router.back()} />
         <MenuIcon width={24} height={24} onPress={() => setSidebarVisible(true)} />
       </View>
-      <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 20 }}>커뮤니티 가이드를 준수해주세요.</Text>
+      <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 12 }}>커뮤니티 가이드를 준수해주세요.</Text>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 0}
