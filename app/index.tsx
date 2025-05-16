@@ -1,19 +1,19 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import * as SplashScreen from 'expo-splash-screen';
 import * as TaskManager from 'expo-task-manager';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
+import { postLocation } from '@/api/notifications';
 import Splash from '@/components/features/Splash';
+import { useNotificationListener } from '@/hooks/useNotificationListener';
 import { registerForPushNotificationsAsync, requestBackgroundLocationPermission } from '@/utils/asyncStorage';
 import { getToken } from '@/utils/authStorage';
 
 const LOCATION_TASK_NAME = 'background-location-task';
-
-SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -31,17 +31,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   console.log('🔍 위치 업데이트:', location);
 
   if (location) {
-    const token = await SecureStore.getItemAsync('expoPushToken');
-
-    await fetch('https://banjjak.me:8444/api/locations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        token,
-      }),
-    });
+    await postLocation(location.coords.latitude, location.coords.longitude);
   }
 });
 
@@ -53,8 +43,8 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
 
-      await registerForPushNotificationsAsync();
       await requestBackgroundLocationPermission();
+      await registerForPushNotificationsAsync();
 
       setIsReady(true);
     };
@@ -62,24 +52,7 @@ export const Index = () => {
     prepare();
   }, []);
 
-  useEffect(() => {
-    // 앱이 foreground 상태일 때 알림 수신
-    const subscription1 = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('🔔 알림 수신됨:', notification);
-      // 여기서 Alert.alert 등으로 표시할 수 있어요
-    });
-
-    // 사용자가 알림을 탭했을 때
-    const subscription2 = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('📬 알림 반응:', response);
-      // 원하는 페이지로 이동 등 처리
-    });
-
-    return () => {
-      subscription1.remove();
-      subscription2.remove();
-    };
-  }, []);
+  useNotificationListener();
 
   const onLayoutRootView = useCallback(async () => {
     if (!isReady) return;
@@ -93,7 +66,6 @@ export const Index = () => {
       if (!isStarted) {
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           accuracy: Location.Accuracy.High,
-          timeInterval: 600000,
           deferredUpdatesInterval: 600000,
           distanceInterval: 0,
           showsBackgroundLocationIndicator: true,
