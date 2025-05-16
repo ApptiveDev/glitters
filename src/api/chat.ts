@@ -43,3 +43,13 @@ export const getChatMessages = async (
     throw new Error('Failed to fetch chat messages');
   }
 };
+
+export const deleteChatroom = async (chatroomId: number) => {
+  try {
+    const response = await apiInstance.delete(`/chatrooms/${chatroomId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting chatroom:', error);
+    throw new Error('Failed to delete chatroom');
+  }
+};

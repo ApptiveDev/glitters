@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 
+import { deleteChatroom } from '@/api/chat';
 import Heart3DIcon from '@/assets/icons/3d/heart_red.svg';
 import Scope3DIcon from '@/assets/icons/3d/scope_3d.svg';
 import { SlidingSidebar } from '@/components/common/SlidingSidebar';
@@ -37,7 +38,20 @@ export const ChatroomSideBar = ({
   };
 
   const handleExitPress = () => {
-    router.back();
+    Alert.alert('채팅방을 나가시겠습니까?', '', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: async () => {
+          await deleteChatroom(chatroomId);
+          setSidebarVisible(false);
+          router.back();
+        },
+      },
+    ]);
   };
 
   return (
