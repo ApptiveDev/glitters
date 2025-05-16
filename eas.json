@@ -8,7 +8,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "GOOGLE_API_KEY" : "$GOOGLE_API_KEY"
       }
     },
     "preview": {
@@ -20,7 +21,8 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
+        "GOOGLE_API_KEY" : "$GOOGLE_API_KEY"
       }
     }
   },
