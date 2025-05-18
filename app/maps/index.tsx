@@ -133,7 +133,7 @@ const MapSearch = () => {
 
   const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
     if (isWrittenBySelf) {
-      return '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
+      return ' 당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
     }
     if (isLikedBySelf) {
       return ' 마음에 들어온 반짝이에요';

@@ -16,6 +16,7 @@ interface ChatroomSideBarProps {
   myNickname: string;
   setSidebarVisible: (visible: boolean) => void;
   postId?: number;
+  expiresAt?: string;
 }
 
 export const ChatroomSideBar = ({
@@ -26,6 +27,7 @@ export const ChatroomSideBar = ({
   myNickname,
   setSidebarVisible,
   postId,
+  expiresAt,
 }: ChatroomSideBarProps) => {
   const { insetTop, insetBottom } = useLayout();
 
@@ -69,6 +71,12 @@ export const ChatroomSideBar = ({
     });
   };
 
+  const isExpired = () => {
+    const currentDate = new Date();
+    const expirationDate = new Date(expiresAt || '');
+    return currentDate > expirationDate;
+  };
+
   return (
     <SlidingSidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)}>
       <View
@@ -98,7 +106,7 @@ export const ChatroomSideBar = ({
         <TouchableOpacity
           style={{
             width: '100%',
-            backgroundColor: colors.yellow.light,
+            backgroundColor: isExpired() ? colors.gray.light : colors.yellow.light,
             paddingHorizontal: 60,
             height: 38,
             justifyContent: 'center',
@@ -106,8 +114,11 @@ export const ChatroomSideBar = ({
             borderRadius: 8,
           }}
           onPress={goToPostPage}
+          disabled={isExpired()}
         >
-          <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>게시글 바로가기</Text>
+          <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>
+            {isExpired() ? '만료된 게시글 입니다.' : '게시글 바로가기'}
+          </Text>
         </TouchableOpacity>
       </View>
       <View

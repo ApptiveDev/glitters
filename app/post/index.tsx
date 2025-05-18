@@ -51,7 +51,7 @@ export const PostPage = () => {
 
   const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
     if (isWrittenBySelf) {
-      return '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
+      return '  당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
     }
     if (isLikedBySelf) {
       return '  마음에 들어온 반짝이에요';
@@ -171,15 +171,14 @@ export const PostPage = () => {
         }}
       >
         <BlurView
-          intensity={15}
-          tint="dark"
+          intensity={10}
           style={{
             backgroundColor: 'rgba(74, 87, 137, 0.2)',
             width: '100%',
             borderRadius: 8,
             overflow: 'hidden',
             borderWidth: 1,
-            borderColor: 'rgba(251, 251, 251, 0.2)',
+            borderColor: 'rgba(251, 251, 251, 0.04)',
             zIndex: 10,
           }}
         >
