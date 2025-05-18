@@ -232,6 +232,33 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
+  const handleBlockUser = async (postId: number) => {
+    try {
+      Alert.alert('사용자 차단', '한 번 차단한 사용자는 해제할 수 없어요.', [
+        {
+          text: '차단하기',
+          onPress: async () => {
+            await blockUser({
+              blockType: 'post',
+              postId,
+            });
+            setIsVisible(false);
+            setPost(undefined);
+            await queryClient.invalidateQueries({ queryKey: ['markers'] });
+            await queryClient.invalidateQueries({ queryKey: ['posts'] });
+          },
+        },
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+      ]);
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -253,7 +280,8 @@ const MapSearch = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
+          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+            Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
             setHasAnimatedBack(true);
             Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
               {
@@ -276,22 +304,24 @@ const MapSearch = () => {
         onClusterPress={handleClusterPress}
       >
         {markers &&
-          markers.map((marker: MarkerType) => (
-            <Marker
-              key={marker.id}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              onPress={() => onPressMarker(marker)}
-            >
-              {marker.isWrittenBySelf ? (
-                <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
-              ) : (
-                <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
-              )}
-            </Marker>
-          ))}
+          markers
+            .filter((marker): marker is MarkerType => !!marker)
+            .map((marker) => (
+              <Marker
+                key={marker.id}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                onPress={() => onPressMarker(marker)}
+              >
+                {marker.isWrittenBySelf ? (
+                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
+                ) : (
+                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
+                )}
+              </Marker>
+            ))}
       </MapView>
 
       <CustomBottomSheet isVisible={isVisible} height={contentHeight} onClose={() => setIsVisible(false)}>
