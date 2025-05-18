@@ -102,6 +102,8 @@ export const Chatroom = () => {
   const currentRoomMessage = messagesByChatroom[selectedChatroom?.id ?? 0];
   const { readChat } = useWebSocketContext();
 
+  console.log('selectedChatroom', selectedChatroom);
+
   useEffect(() => {
     if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
       if (selectedChatroom?.id !== undefined) {
@@ -223,6 +225,7 @@ export const Chatroom = () => {
         sidebarVisible={sidebarVisible}
         myNickname={selectedChatroom?.myNickname || ''}
         setSidebarVisible={setSidebarVisible}
+        postId={selectedChatroom?.post.id || 0}
       />
     </View>
   );

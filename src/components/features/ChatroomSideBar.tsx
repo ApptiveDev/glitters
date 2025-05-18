@@ -15,6 +15,7 @@ interface ChatroomSideBarProps {
   sidebarVisible: boolean;
   myNickname: string;
   setSidebarVisible: (visible: boolean) => void;
+  postId?: number;
 }
 
 export const ChatroomSideBar = ({
@@ -24,6 +25,7 @@ export const ChatroomSideBar = ({
   sidebarVisible,
   myNickname,
   setSidebarVisible,
+  postId,
 }: ChatroomSideBarProps) => {
   const { insetTop, insetBottom } = useLayout();
 
@@ -52,6 +54,19 @@ export const ChatroomSideBar = ({
         },
       },
     ]);
+  };
+
+  const goToPostPage = () => {
+    if (!postId) {
+      Alert.alert('게시글을 찾을 수 없습니다.');
+      return;
+    }
+    router.push({
+      pathname: '/post',
+      params: {
+        postId,
+      },
+    });
   };
 
   return (
@@ -90,6 +105,7 @@ export const ChatroomSideBar = ({
             alignItems: 'center',
             borderRadius: 8,
           }}
+          onPress={goToPostPage}
         >
           <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>게시글 바로가기</Text>
         </TouchableOpacity>

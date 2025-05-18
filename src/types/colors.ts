@@ -12,6 +12,7 @@ const colors = {
   background: '#404C7A',
   backgroundLight: '#536199',
   backgroundmypage: '#4A5789',
+  backgrounddark: '#3B4672',
   blue: {
     light: '#E1E7FD',
     main: '#5F78DA',
