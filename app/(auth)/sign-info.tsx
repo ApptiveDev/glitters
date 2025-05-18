@@ -3,7 +3,7 @@ import { PrivacyPolicy } from 'app/guide/(info)/PrivacyPolicy';
 import { TermsOfService } from 'app/guide/(info)/TermsOfService';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Dimensions, Modal, Text, View } from 'react-native';
+import { Alert, Dimensions, Modal, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
@@ -63,12 +63,14 @@ export const SignInfo = () => {
         password: user.password,
         birth: formFields.birth.value,
         termsAccepted: formFields.agreedToPrivacyPolicy && formFields.agreedToTermsOfService,
+        gender: Number(formFields.gender.value),
       });
       setUser(response.member);
       storeToken(response.token);
       router.replace('/sign-complete');
     } catch (error) {
-      console.error('Error creating user:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      Alert.alert('회원가입 실패', errorMessage);
     }
   };
 
@@ -120,8 +122,8 @@ export const SignInfo = () => {
         <View style={styles.heading}>
           <Heading title="성별 선택하기" />
           <GenderSelector
-            selected={formFields.gender.value as '남성' | '여성' | ''}
-            onSelect={(val) => setFieldValue('gender', val, (value) => value === '남성' || value === '여성')}
+            selected={Number(formFields.gender.value)}
+            onSelect={(val) => setFieldValue('gender', String(val), (value) => value === '0' || value === '1')}
             isError={!formFields.gender.value && formFields.gender.isTouched}
             errorMessage="성별을 선택해주세요."
           />

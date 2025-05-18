@@ -30,7 +30,7 @@ export const ChatRooms = () => {
         <Text style={{ fontSize: 20, color: colors.text.white, fontWeight: 'bold', marginVertical: 24 }}>쪽지함</Text>
         <ScrollView style={{ gap: 12 }}>
           {data?.chatrooms?.map((chatRoom) => {
-            const liveMessage: { content: string; createdAt: string } = messagesByChatroom?.[chatRoom.id] ?? [];
+            const liveMessage: { content?: string; createdAt?: string } = messagesByChatroom?.[chatRoom.id] ?? [];
 
             const lastMessage = liveMessage?.content ?? chatRoom.lastMessage.content;
             const lastMessageTime = liveMessage?.createdAt ?? chatRoom.lastMessage.createdAt;

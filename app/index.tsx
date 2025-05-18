@@ -7,8 +7,10 @@ import * as TaskManager from 'expo-task-manager';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
+import { getUserInfo } from '@/api/auth';
 import { postLocation } from '@/api/notifications';
 import Splash from '@/components/features/Splash';
+import { useUser } from '@/contexts/UserContext';
 import { useNotificationListener } from '@/hooks/useNotificationListener';
 import { getToken } from '@/utils/authStorage';
 
@@ -27,7 +29,6 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
   const { locations } = data as any;
   const location = locations?.[0];
-  console.log('🔍 위치 업데이트:', location);
 
   if (location) {
     await postLocation(location.coords.latitude, location.coords.longitude);
@@ -37,6 +38,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 export const Index = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+  const { setUser } = useUser();
 
   useEffect(() => {
     const prepare = async () => {
@@ -59,6 +61,8 @@ export const Index = () => {
     const token = await getToken();
 
     if (token) {
+      const user = await getUserInfo();
+      setUser(user.member);
       router.replace('/maps');
 
       const isStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
@@ -76,7 +80,7 @@ export const Index = () => {
     }
 
     await SplashScreen.hideAsync();
-  }, [isReady, router]);
+  }, [isReady, router, setUser]);
 
   if (!isReady) return <Splash />;
   return <View style={{ flex: 1 }} onLayout={onLayoutRootView} />;

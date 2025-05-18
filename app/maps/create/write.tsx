@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
+import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
@@ -85,7 +85,8 @@ export const Write = () => {
         params: { iconIndex: randomIndex },
       });
     } catch (error) {
-      console.error('Error creating marker:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      Alert.alert('게시물 등록 실패', errorMessage);
     }
   };
 

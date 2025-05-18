@@ -24,6 +24,7 @@ import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
+import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
@@ -49,6 +50,7 @@ const MapSearch = () => {
   const mapRef = useRef<any>(null);
   const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
+  const { user } = useUser();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { data: markers, isLoading } = useQuery({
@@ -82,14 +84,15 @@ const MapSearch = () => {
     const fetchBound = async () => {
       try {
         const response = await getBoundMarkers();
-        setBound(response[0]);
+        setBound(response[user.institution.id]);
       } catch (error) {
-        console.error('Bound markers error:', error);
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+        Alert.alert('오류', errorMessage);
       }
     };
 
     fetchBound();
-  }, [setBound]);
+  }, [setBound, user.institution.id]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -98,7 +101,7 @@ const MapSearch = () => {
       if (location) {
         setCurrentPosition(location);
       } else {
-        console.warn(errorMsg);
+        Alert.alert('위치 정보 오류', errorMsg || '위치 정보를 가져오는 데 실패했습니다.');
       }
     };
 
@@ -232,33 +235,6 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
-  const handleBlockUser = async (postId: number) => {
-    try {
-      Alert.alert('사용자 차단', '한 번 차단한 사용자는 해제할 수 없어요.', [
-        {
-          text: '차단하기',
-          onPress: async () => {
-            await blockUser({
-              blockType: 'post',
-              postId,
-            });
-            setIsVisible(false);
-            setPost(undefined);
-            await queryClient.invalidateQueries({ queryKey: ['markers'] });
-            await queryClient.invalidateQueries({ queryKey: ['posts'] });
-          },
-        },
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-      ]);
-    } catch (error) {
-      console.error('Error blocking user:', error);
-      Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
-    }
-  };
-
   return (
     <View style={styles.container}>
       <MapView
@@ -280,7 +256,7 @@ const MapSearch = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
+          if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
             Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
             setHasAnimatedBack(true);
             Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [

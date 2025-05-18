@@ -4,18 +4,29 @@ export interface User {
   email: string;
   password: string;
   birth: string;
+  gender: number;
   termsAccepted: boolean;
   joinedAt: string;
   reportedCount: number;
   isDeactivated: boolean;
+  institution: {
+    id: number;
+    name: string;
+    emailDomain: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  hasUnreadChat: boolean;
 }
 
 export interface UserRegistrationRequest {
-  email?: string;
-  password?: string;
-  name?: string;
-  birth?: string;
-  termsAccepted?: boolean;
+  email: string;
+  password: string;
+  name: string;
+  birth: string;
+  gender: number;
+  termsAccepted: boolean;
 }
 
 export interface UserRegistrationResponse {
