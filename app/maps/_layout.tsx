@@ -1,7 +1,8 @@
 import { Slot } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 
 import { BottomNav } from '@/components/features/BottomNav';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 
 const styles = StyleSheet.create({
   container: {
@@ -10,18 +11,17 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingBottom: 40,
   },
 });
 
 export const MapLayout = () => {
+  const { isKeyboardVisible } = useKeyboardVisible();
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <KeyboardAvoidingView style={styles.content}>
         <Slot />
-      </View>
-
-      <BottomNav />
+      </KeyboardAvoidingView>
+      {!isKeyboardVisible ? <BottomNav /> : null}
     </View>
   );
 };

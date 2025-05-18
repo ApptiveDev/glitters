@@ -1,22 +1,46 @@
+import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { Alert, Text, View } from 'react-native';
 
+import { getUserInfo, withdrawUser } from '@/api/auth';
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
+import { Spacing } from '@/components/common/Spacing';
+import { useLayout } from '@/contexts/LayoutContext';
 import colors from '@/types/colors';
 import { removeToken } from '@/utils/authStorage';
 
+interface LabelValueProps {
+  label: string;
+  value: string;
+}
+
+const LabelValue = ({ label, value }: LabelValueProps) => {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
+        width: '100%',
+      }}
+    >
+      <Text style={{ fontSize: 14, color: colors.text.gray }}>{label}</Text>
+      <Text style={{ fontSize: 14, color: colors.text.white }}>{value}</Text>
+    </View>
+  );
+};
+
 export const Guide = () => {
-  const helpCenterPress = () => {
-    router.push('/guide/(info)/HelpCenter');
-  };
+  const { insetBottom } = useLayout();
+  const user = useQuery({
+    queryKey: ['user'],
+    queryFn: getUserInfo,
+  });
 
-  const termsOfServicePress = () => {
-    router.push('/guide/(info)/TermsOfService');
-  };
-
-  const privacyPolicyPress = () => {
-    router.push('/guide/(info)/PrivacyPolicy');
+  const handleHelpPress = () => {
+    router.push('/guide/(info)/help');
   };
 
   const onPressLogout = () => {
@@ -41,49 +65,88 @@ export const Guide = () => {
     );
   };
 
+  const handleWithdraw = () => {
+    Alert.alert(
+      '정말 탈퇴하시겠습니까?',
+      '삭제된 데이터는 복구할 수 없어요.',
+      [
+        {
+          text: '취소',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            try {
+              await removeToken();
+              await withdrawUser();
+              Alert.alert('탈퇴 완료', '회원 탈퇴가 정상적으로 처리되었습니다.');
+              router.replace('/login');
+            } catch {
+              Alert.alert('탈퇴 실패', '회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-        alignItems: 'flex-start',
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: 'bold',
-          color: colors.text.white,
-        }}
-      >
-        도움말
-      </Text>
+    <>
+      <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.text.white }}>마이페이지</Text>
+        <Spacing height={28} />
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <LabelValue label="이름" value={user.data?.member.name ?? ''} />
+          <LabelValue label="생년월일" value={user.data?.member.birth.slice(0, 10) ?? ''} />
+          <LabelValue label="이메일" value={user.data?.member.email ?? ''} />
+        </View>
+        <ListItem text="도움말" onPress={handleHelpPress} />
+      </View>
       <View
         style={{
-          gap: 12,
-          marginTop: 32,
-        }}
-      >
-        <ListItem text="고객센터" onPress={helpCenterPress} />
-        <ListItem text="서비스이용약관" onPress={termsOfServicePress} />
-        <ListItem text="개인정보처리방침" onPress={privacyPolicyPress} />
-      </View>
-      <Text
-        style={{
-          fontSize: 12,
-          color: colors.text.lightgray,
-          marginTop: 24,
-          textDecorationLine: 'underline',
           position: 'absolute',
-          bottom: 24,
+          bottom: insetBottom + 24,
+          flexDirection: 'row',
+          gap: 2,
           left: '50%',
-          transform: [{ translateX: -20 }],
+          transform: [{ translateX: -12 }],
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
-        onPress={onPressLogout}
       >
-        로그아웃
-      </Text>
-    </View>
+        <Text
+          style={{
+            fontSize: 10,
+            color: colors.text.lightblue,
+            marginTop: 2,
+          }}
+          onPress={onPressLogout}
+        >
+          로그아웃
+        </Text>
+        <Text
+          style={{
+            fontSize: 10,
+            color: colors.text.lightblue,
+          }}
+        >
+          |
+        </Text>
+        <Text
+          style={{
+            color: colors.text.lightblue,
+            fontSize: 10,
+            marginTop: 2,
+          }}
+          onPress={handleWithdraw}
+        >
+          회원탈퇴
+        </Text>
+      </View>
+    </>
   );
 };
 

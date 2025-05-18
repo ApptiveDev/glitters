@@ -12,6 +12,7 @@ import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import { WritePolicyList } from '@/components/features/WritePolicyList';
+import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
@@ -24,6 +25,7 @@ export const Write = () => {
   const { isKeyboardVisible } = useKeyboardVisible();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(true);
   const [contentHeight, setContentHeight] = useState(300);
+  const { safeHeight, insetBottom } = useLayout();
 
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -96,7 +98,7 @@ export const Write = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, height: safeHeight - 120 + insetBottom }}>
       <KeyboardScrollContainer paddingTop={12}>
         <Heading title="반짝이 기록하기" alignItems="center" />
         <Spacing height={16} />
@@ -131,12 +133,12 @@ export const Write = () => {
         </Text>
       </KeyboardScrollContainer>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 120 - insetBottom}
         style={{
           position: 'absolute',
           width: '100%',
-          bottom: 40,
+          bottom: Platform.OS === 'ios' ? 120 - insetBottom : 0,
           paddingHorizontal: isKeyboardVisible ? 0 : 28,
         }}
       >
@@ -158,7 +160,7 @@ export const Write = () => {
         <View
           onLayout={(e) => {
             const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight + 52);
+            setContentHeight(measuredHeight);
           }}
           style={{ paddingVertical: 24, gap: 8 }}
         >

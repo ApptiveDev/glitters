@@ -10,7 +10,6 @@ import { View } from 'react-native';
 import { postLocation } from '@/api/notifications';
 import Splash from '@/components/features/Splash';
 import { useNotificationListener } from '@/hooks/useNotificationListener';
-import { registerForPushNotificationsAsync, requestBackgroundLocationPermission } from '@/utils/asyncStorage';
 import { getToken } from '@/utils/authStorage';
 
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -43,8 +42,8 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
 
-      await requestBackgroundLocationPermission();
-      await registerForPushNotificationsAsync();
+      // await requestBackgroundLocationPermission();
+      // await registerForPushNotificationsAsync();
 
       setIsReady(true);
     };

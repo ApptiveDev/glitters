@@ -11,10 +11,14 @@ const colors = {
   },
   background: '#404C7A',
   backgroundLight: '#536199',
+  backgroundmypage: '#4A5789',
   blue: {
     light: '#E1E7FD',
     main: '#5F78DA',
     dark: '#4F6EE8',
+  },
+  blueGray: {
+    light: '#ADB7D2',
   },
   yellow: {
     light: '#FFFCE7',
@@ -36,6 +40,11 @@ const colors = {
     white: '#FBFBFB',
     gray: '#B1B3BB',
     lightgray: '#F6F6F7',
+    lightblue: '#818FC5',
+    black: '#1A1A1B',
+    darkgray: '#747780',
+    lightblack: '#494D50 ',
+    grayblue: '#C2CAE8',
   },
 };
 

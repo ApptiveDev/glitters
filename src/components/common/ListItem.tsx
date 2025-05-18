@@ -13,7 +13,7 @@ export const ListItem = ({ text, onPress }: ListItemProps) => {
     <View
       style={{
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         width: '100%',
         padding: 16,
@@ -24,7 +24,6 @@ export const ListItem = ({ text, onPress }: ListItemProps) => {
         style={{
           fontSize: 14,
           color: colors.text.white,
-          marginTop: 4,
         }}
       >
         {text}
@@ -34,7 +33,7 @@ export const ListItem = ({ text, onPress }: ListItemProps) => {
         height={16}
         style={{
           marginLeft: 'auto',
-          marginTop: 4,
+          marginTop: 2,
         }}
       />
     </View>
