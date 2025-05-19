@@ -172,6 +172,7 @@ export const CreateMarker = () => {
         onClose={() => setBottomSheetVisible(false)}
         height={contentHeight}
         isKeyboardVisible={isKeyboardVisible}
+        offset={isKeyboardVisible ? 120 : 0}
       >
         <View
           onLayout={(e) => {
