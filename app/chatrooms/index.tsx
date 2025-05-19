@@ -18,7 +18,7 @@ export const ChatRooms = () => {
     queryFn: getChatList,
   });
 
-  const { user, updateUser } = useUser(); // ✅ updateUser 가져오기
+  const { user, updateUser } = useUser();
   const { setSelectedChatroom } = useChatroom();
   const { messagesByChatroom } = useWebSocketContext();
 
@@ -55,6 +55,7 @@ export const ChatRooms = () => {
                 lastMessage={lastMessage}
                 lastMessageTime={lastMessageTime}
                 iconIndex={chatRoom.post.iconIdx}
+                markerIdx={chatRoom.post.markerIdx}
                 unreadCount={chatRoom.unreadMessageCount}
                 onPress={() => handleChatRoomPress(chatRoom)}
               />

@@ -3,23 +3,38 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import colors from '@/types/colors';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 interface ChatCardProps {
   title: string;
   lastMessage: string;
   lastMessageTime: string;
   iconIndex: number;
+  markerIdx: number;
   unreadCount: number;
   onPress: () => void;
 }
 
-export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPress, unreadCount }: ChatCardProps) => {
+export const ChatCard = ({
+  title,
+  lastMessage,
+  lastMessageTime,
+  markerIdx,
+  iconIndex,
+  onPress,
+  unreadCount,
+}: ChatCardProps) => {
   const Icon = useMemo(() => {
+    if (markerIcons[markerIdx].name === 'festival') {
+      const iconsArray = Object.values(festivalIcons) as React.FC<SvgProps>[];
+      const index = Number(iconIndex);
+      return iconsArray[index];
+    }
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(iconIndex);
     return iconsArray[index];
-  }, [iconIndex]);
+  }, [iconIndex, markerIdx]);
 
   const formatDate = (date: Date): string => {
     const month = date.getMonth() + 1;

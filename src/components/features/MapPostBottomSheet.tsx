@@ -16,7 +16,8 @@ import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 interface MapPostBottomSheetProps {
   isVisible: boolean;
@@ -40,11 +41,16 @@ export const MapPostBottomSheet = ({
   const PostIcon = useMemo(() => {
     if (post?.iconIdx == null) return HeartIcon;
 
+    if (markerIcons[post?.markerIdx].name === 'festival') {
+      const iconsArray = Object.values(festivalIcons) as React.FC<SvgProps>[];
+      const index = Number(post.iconIdx);
+      return iconsArray[index];
+    }
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(post.iconIdx);
 
     return iconsArray[index] ?? HeartIcon;
-  }, [post?.iconIdx]);
+  }, [post?.iconIdx, post?.markerIdx]);
 
   const onPressBottomButton = async ({ isWrittenBySelf, postId }: { isWrittenBySelf: boolean; postId: number }) => {
     if (!isWrittenBySelf) {

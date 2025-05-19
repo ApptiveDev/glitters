@@ -2,7 +2,7 @@ import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, Image, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import { addLike, deleteMarker } from '@/api/markers';
@@ -17,7 +17,8 @@ import { Spacing } from '@/components/common/Spacing';
 import { CustomTextArea } from '@/components/common/TextArea';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const PostPage = () => {
   const [post, setPost] = useState<GetPostResponseType | null>(null);
@@ -40,12 +41,17 @@ export const PostPage = () => {
 
   const PostIcon = useMemo(() => {
     if (post?.iconIdx == null) return HeartIcon;
+    if (markerIcons[post?.markerIdx].name === 'festival') {
+      const iconsArray = Object.values(festivalIcons) as React.FC<SvgProps>[];
+      const index = Number(post.iconIdx);
+      return iconsArray[index];
+    }
 
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(post.iconIdx);
 
     return iconsArray[index] ?? HeartIcon;
-  }, [post?.iconIdx]);
+  }, [post?.iconIdx, post?.markerIdx]);
 
   console.log('Post:', post);
 
@@ -137,7 +143,19 @@ export const PostPage = () => {
         <Text style={{ fontSize: 12, color: colors.text.lightgray, marginLeft: 4 }}>돌아가기</Text>
       </View>
       <Spacing height={24} />
-      <View style={{ padding: 20, backgroundColor: colors.backgrounddark, borderRadius: 8, width: '100%' }}>
+      <View
+        style={{
+          height: 40,
+          paddingHorizontal: 8,
+          alignItems: 'center',
+          backgroundColor: colors.backgrounddark,
+          borderRadius: 8,
+          width: '100%',
+          flexDirection: 'row',
+          gap: 8,
+        }}
+      >
+        <Image source={markerIcons[post?.markerIdx || 0].icon} style={{ width: 24, height: 24 }} />
         <Text style={{ fontSize: 12, fontWeight: 'bold', color: colors.text.white }}>{post?.address}</Text>
       </View>
       <Spacing height={32} />

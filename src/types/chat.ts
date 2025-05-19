@@ -4,6 +4,7 @@ export interface Chat {
   myNickname: string;
   post: {
     id: number;
+    markerId: number;
     iconIdx: number;
     title: string;
     content: string;
@@ -13,6 +14,7 @@ export interface Chat {
     isDeactivated: true;
     likeCount: number;
     viewCount: number;
+    markerIdx: number;
   };
   lastMessage: {
     createdAt: string;
