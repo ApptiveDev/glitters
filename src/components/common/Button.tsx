@@ -114,7 +114,7 @@ export const CommonButton = ({
       disabled={variant === 'disable' || variant === 'blueDisable' || disabled}
     >
       {buttonIcon}
-      <Text style={[textStyles[variant], { fontSize }]}>{title}</Text>
+      {title && <Text style={[textStyles[variant], { fontSize }]}>{title}</Text>}
     </TouchableOpacity>
   );
 };

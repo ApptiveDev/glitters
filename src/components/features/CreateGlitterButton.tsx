@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
 
 import { getPostCreationStatus } from '@/api/posts';
+import ClockIcon from '@/assets/icons/clock.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
-import { CommonButton } from '@/components/common/Button';
+import colors from '@/types/colors';
 import { showErrorAlert } from '@/utils/errorMessage';
 
 interface CreateGlitterButtonProps {
@@ -47,8 +49,8 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
         } else {
           const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-          const formattedTime = `${minutes.toString().padStart(2, '0')}분 ${seconds.toString().padStart(2, '0')}초`;
-          setTitle(`${formattedTime}`);
+          const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          setTitle(`${formattedTime} 이후에 작성하기`);
         }
       }, 1000);
     }
@@ -59,21 +61,37 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
   }, [postCreationStatus]);
 
   return (
-    <CommonButton
-      title={title}
+    <TouchableOpacity
       onPress={onPress}
-      variant="maps"
       style={{
         position: 'absolute',
         bottom,
         left: '50%',
-        transform: [{ translateX: -70 }],
-        borderWidth: 0,
+        transform: [{ translateX: postCreationStatus.isAvailable ? -70 : -95 }],
+        borderWidth: 1,
+        backgroundColor: postCreationStatus.isAvailable ? colors.background : colors.gray.bright,
+        borderColor: colors.gray.light,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 36,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
       }}
-      fontSize={16}
       disabled={!postCreationStatus.isAvailable}
-      buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
-    />
+    >
+      {postCreationStatus.isAvailable ? <GlitterIcon width={24} height={24} /> : <ClockIcon width={20} height={20} />}
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: 'bold',
+          color: postCreationStatus.isAvailable ? colors.yellow.dark : colors.text.darkgray,
+        }}
+      >
+        {title}
+      </Text>
+    </TouchableOpacity>
   );
 };
 

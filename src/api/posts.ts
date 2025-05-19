@@ -20,4 +20,14 @@ export const getPostCreationStatus = async (): Promise<PostCreationStatusType> =
   }
 };
 
+export const getActivePost = async () => {
+  try {
+    const response = await apiInstance.get('/members/active_posts');
+    return response.data.count;
+  } catch (error) {
+    console.error('Error fetching active posts:', error);
+    throw new Error(getErrorMessage(error));
+  }
+};
+
 export default getPostById;

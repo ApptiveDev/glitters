@@ -2,22 +2,19 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, View } from 'react-native';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import Toast from 'react-native-toast-message';
 
-import { createChat } from '@/api/chat';
 import { getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
-import SendIcon from '@/assets/icons/send.svg';
-import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
-import { Spacing } from '@/components/common/Spacing';
 import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
 import { CreateGlitterButton } from '@/components/features/CreateGlitterButton';
 import Loading from '@/components/features/Loading';
 import { MapPostBottomSheet } from '@/components/features/MapPostBottomSheet';
+import { RemainPost } from '@/components/features/RemainPost';
+import { StartChatModal } from '@/components/features/StartChatModal';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
@@ -48,7 +45,6 @@ const MapSearch = () => {
   const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
   const { user } = useUser();
-  const [message, setMessage] = useState('');
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { data: markers, isLoading } = useQuery({
@@ -145,27 +141,6 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
-  const startChat = async () => {
-    if (!post) return;
-    try {
-      await createChat({
-        postId: post?.id,
-        content: message,
-      });
-      setMessage('');
-      setSendChatModalVisible(false);
-      Toast.show({
-        type: 'success',
-        text1: '쪽지를 보냈어요',
-        text2: '상대방이 확인할 수 있어요.',
-      });
-    } catch (error) {
-      showErrorAlert('오류', error);
-      setMessage('');
-      setSendChatModalVisible(false);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <MapView
@@ -229,6 +204,7 @@ const MapSearch = () => {
               </Marker>
             ))}
       </MapView>
+      <RemainPost />
       <MapPostBottomSheet
         isVisible={isVisible}
         post={post}
@@ -249,147 +225,13 @@ const MapSearch = () => {
         setIsVisible={setIsVisible}
         setIsListOpen={setIsListOpen}
       />
-      <Modal
-        animationType="fade"
-        transparent
+      <StartChatModal
         visible={sendChatModalVisible}
-        onRequestClose={() => {
-          setSendChatModalVisible(false);
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-          }}
-        >
-          <View
-            style={{
-              width: '80%',
-              height: 200,
-              backgroundColor: colors.background,
-              borderRadius: 12,
-              paddingVertical: 25,
-              paddingHorizontal: 28,
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4,
-              elevation: 4,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 10,
-                color: colors.text.white,
-                fontWeight: 'bold',
-              }}
-            >
-              채팅 시작하기
-            </Text>
-            <Spacing height={25} />
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 4,
-                height: 24,
-                marginBottom: 16,
-              }}
-            >
-              <Image
-                source={post?.isWrittenBySelf ? MarkerBySelfIcon : markerIcons[post?.markerIdx ?? 0].icon}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: colors.text.white,
-                  fontWeight: 'bold',
-                }}
-                ellipsizeMode="tail"
-              >
-                {post?.title}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={{ position: 'absolute', right: 28, top: 25 }}
-              onPress={() => setSendChatModalVisible(false)}
-            >
-              <SimpleExitIcon width={16} height={16} />
-            </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                justifyContent: 'flex-end',
-                width: '100%',
-                gap: 8,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 12,
-                  paddingTop: 8,
-                  paddingBottom: 10,
-                  backgroundColor: colors.backgroundLight,
-                  borderRadius: 20,
-                  gap: 8,
-                  flex: 1,
-                  justifyContent: 'center',
-                }}
-              >
-                <TextInput
-                  style={{
-                    flex: 1,
-                    color: colors.text.white,
-                    fontSize: 10,
-                    paddingVertical: 0,
-                  }}
-                  placeholder="채팅을 입력하세요."
-                  placeholderTextColor="rgba(255,255,255,0.6)"
-                  value={message}
-                  onChangeText={setMessage}
-                  numberOfLines={1}
-                  multiline
-                />
-                <TouchableOpacity
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 999,
-                    backgroundColor: message ? colors.yellow.dark : colors.primary.main,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  onPress={startChat}
-                  disabled={!message}
-                >
-                  <SendIcon width={13} height={13} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Spacing height={20} />
-            <Text
-              style={{
-                fontSize: 10,
-                color: colors.text.gray,
-              }}
-            >
-              채팅 목록에서 보낸 내용을 확인할 수 있어요.
-            </Text>
-          </View>
-        </View>
-      </Modal>
+        setVisible={setSendChatModalVisible}
+        postId={post?.id}
+        markerIdx={post?.markerIdx}
+        title={post?.title}
+      />
     </View>
   );
 };
