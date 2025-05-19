@@ -6,6 +6,7 @@ import MarkerFriend from '@/assets/icons/marker/marker_friend.png';
 import MarkerThanks from '@/assets/icons/marker/marker_thanks.png';
 
 interface MarkerIcon {
+  name: string;
   icon: ImageSourcePropType;
   explain: string;
   backgroundColor: string;
@@ -14,24 +15,28 @@ interface MarkerIcon {
 
 export const markerIcons: MarkerIcon[] = [
   {
+    name: 'default',
     icon: MarkerDefault,
     explain: '반짝였어요.',
     backgroundColor: '#FFE9A1',
     textColor: '#495585',
   },
   {
+    name: 'festival',
     icon: MarkerFestival,
     explain: '대동제 같이 보고 싶어요.',
     backgroundColor: '#303238',
     textColor: '#F7B95B',
   },
   {
+    name: 'friend',
     icon: MarkerFriend,
     explain: '친구가 되고 싶어요.',
     backgroundColor: '#AAE282',
     textColor: '#495585',
   },
   {
+    name: 'thanks',
     icon: MarkerThanks,
     explain: '도와주셔서 너무 감사했어요.',
     backgroundColor: '#FF8585',

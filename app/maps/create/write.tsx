@@ -17,7 +17,8 @@ import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
@@ -32,11 +33,17 @@ export const Write = () => {
   const [randomIndex, setRandomIndex] = useState(0);
 
   const RandomIcon = useMemo(() => {
+    if (markerIcons[post?.markerIdx ?? 0].name === 'festival') {
+      const iconsArray = Object.values(festivalIcons) as React.FC<SvgProps>[];
+      const index = Math.floor(Math.random() * 2);
+      setRandomIndex(index);
+      return iconsArray[index];
+    }
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Math.floor(Math.random() * iconsArray.length);
     setRandomIndex(index);
     return iconsArray[index];
-  }, []);
+  }, [post?.markerIdx]);
 
   useEffect(() => {
     Animated.loop(
@@ -68,7 +75,6 @@ export const Write = () => {
   const handleButtonPress = async () => {
     try {
       if (!post) {
-        console.error('Post is null or undefined');
         return;
       }
 
@@ -83,7 +89,7 @@ export const Write = () => {
       });
       router.replace({
         pathname: './complete',
-        params: { iconIndex: randomIndex },
+        params: { iconIndex: randomIndex, markerIdx: post.markerIdx },
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';

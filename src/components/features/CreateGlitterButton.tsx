@@ -4,7 +4,6 @@ import { Alert } from 'react-native';
 import { getPostCreationStatus } from '@/api/posts';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import { CommonButton } from '@/components/common/Button';
-import colors from '@/types/colors';
 
 interface CreateGlitterButtonProps {
   onPress: () => void;
@@ -71,7 +70,6 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
         left: '50%',
         transform: [{ translateX: -70 }],
         borderWidth: 0,
-        backgroundColor: !postCreationStatus.isAvailable && colors.gray.main,
       }}
       fontSize={16}
       disabled={!postCreationStatus.isAvailable}
