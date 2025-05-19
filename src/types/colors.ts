@@ -27,7 +27,8 @@ const colors = {
     dark: '#FFE9A1',
   },
   gray: {
-    light: '#DEDEDE',
+    bright: '#EDEDF0',
+    light: '#D9D9D9',
     main: '#B2B4BF',
     dark: '#A0A3B1',
   },
