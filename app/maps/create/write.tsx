@@ -5,12 +5,12 @@ import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, 
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
+import CustomBottomSheet from '@/components/common/BottomSheet';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
-import CustomBottomSheet from '@/components/features/BottomSheet';
 import { WritePolicyList } from '@/components/features/WritePolicyList';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
