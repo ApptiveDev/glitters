@@ -4,8 +4,7 @@ import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
@@ -19,7 +18,6 @@ import BubbleIcon from '@/assets/icons/bubble.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
-import MarkerIcon from '@/assets/icons/marker/marker.png';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
 import SendIcon from '@/assets/icons/send.svg';
 import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
@@ -27,6 +25,7 @@ import { CommonButton } from '@/components/common/Button';
 import { Spacing } from '@/components/common/Spacing';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
+import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
 import Loading from '@/components/features/Loading';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
@@ -440,74 +439,13 @@ const MapSearch = () => {
         fontSize={16}
         buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
       />
-      {isListOpen && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10,
-          }}
-        >
-          <TouchableWithoutFeedback onPress={() => setIsListOpen(false)}>
-            <BlurView
-              intensity={20}
-              tint="dark"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 15,
-                backgroundColor: 'rgba(0,0,0,0.2)',
-              }}
-            />
-          </TouchableWithoutFeedback>
-          <ScrollView
-            style={{
-              position: 'absolute',
-              top: 100,
-              left: '50%',
-              transform: [{ translateX: -150 }],
-              width: 300,
-              height: 200,
-              backgroundColor: colors.background,
-              borderRadius: 12,
-              padding: 28,
-              zIndex: 20,
-            }}
-          >
-            {clusterPosts.map((clusterPost) => (
-              <TouchableOpacity
-                key={clusterPost.id + clusterPost.title}
-                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
-                onPress={() => {
-                  setPost(clusterPost);
-                  setIsVisible(true);
-                  setIsListOpen(false);
-                }}
-              >
-                {clusterPost.isWrittenBySelf ? (
-                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
-                ) : (
-                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
-                )}
-                <Text
-                  style={{
-                    color: colors.text.white,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {clusterPost.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
+      <ClusteredMarkerModal
+        isVisible={isListOpen}
+        clusterPosts={clusterPosts}
+        setPost={setPost}
+        setIsVisible={setIsVisible}
+        setIsListOpen={setIsListOpen}
+      />
       <Modal
         animationType="fade"
         transparent
