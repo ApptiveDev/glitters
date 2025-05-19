@@ -22,7 +22,6 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
   useEffect(() => {
     const fetchPostCreationStatus = async () => {
       try {
-        setTitle('불러오는 중......');
         const response = await getPostCreationStatus();
         setPostCreationStatus(response);
       } catch (error) {

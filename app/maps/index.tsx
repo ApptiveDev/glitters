@@ -13,6 +13,7 @@ import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal
 import { CreateGlitterButton } from '@/components/features/CreateGlitterButton';
 import Loading from '@/components/features/Loading';
 import { MapPostBottomSheet } from '@/components/features/MapPostBottomSheet';
+import { RemainPost } from '@/components/features/RemainPost';
 import { StartChatModal } from '@/components/features/StartChatModal';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
@@ -203,6 +204,7 @@ const MapSearch = () => {
               </Marker>
             ))}
       </MapView>
+      <RemainPost />
       <MapPostBottomSheet
         isVisible={isVisible}
         post={post}
