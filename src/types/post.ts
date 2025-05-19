@@ -38,3 +38,8 @@ export interface ReportRequestType {
   chatroomId?: number;
   reason: string;
 }
+
+export interface PostCreationStatusType {
+  isAvailable: boolean;
+  nextAvailableAt: string;
+}

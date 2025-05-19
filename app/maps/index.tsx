@@ -15,7 +15,7 @@ import SendIcon from '@/assets/icons/send.svg';
 import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
 import { Spacing } from '@/components/common/Spacing';
 import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
-import CreateGlitterButton from '@/components/features/CreateGlitterButton';
+import { CreateGlitterButton } from '@/components/features/CreateGlitterButton';
 import Loading from '@/components/features/Loading';
 import { MapPostBottomSheet } from '@/components/features/MapPostBottomSheet';
 import { useLayout } from '@/contexts/LayoutContext';
