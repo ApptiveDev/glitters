@@ -4,22 +4,23 @@ import { Pressable, Text, View } from 'react-native';
 import colors from '@/types/colors';
 
 interface GenderSelectorProps {
-  selected: '남성' | '여성' | '';
-  onSelect: (gender: '남성' | '여성') => void;
+  selected: number;
+  onSelect: (gender: number) => void;
   isError?: boolean;
   errorMessage?: string;
 }
 
 const GenderSelector = ({ selected, onSelect, isError = false, errorMessage = '' }: GenderSelectorProps) => {
+  const genderLabels = ['남성', '여성'];
   return (
     <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start' }}>
       <View style={{ flexDirection: 'row', gap: 12 }}>
-        {['남성', '여성'].map((gender) => {
+        {[0, 1].map((gender) => {
           const isSelected = selected === gender;
           return (
             <Pressable
               key={gender}
-              onPress={() => onSelect(gender as '남성' | '여성')}
+              onPress={() => onSelect(gender)}
               style={{
                 flex: 1,
                 paddingVertical: 16,
@@ -36,7 +37,7 @@ const GenderSelector = ({ selected, onSelect, isError = false, errorMessage = ''
                   fontSize: 16,
                 }}
               >
-                {gender}
+                {genderLabels[gender]}
               </Text>
             </Pressable>
           );

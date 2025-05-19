@@ -1,11 +1,11 @@
 import apiInstance from '@/api/apiInstance';
+import { getErrorMessage } from '@/utils/errorMessage';
 
 export const updateNotificationToken = async (token: string) => {
   try {
     await apiInstance.put('/notifications', { token });
   } catch (error) {
-    console.error('Error updating notification token:', error);
-    throw new Error('Failed to update notification token');
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -13,7 +13,6 @@ export const postLocation = async (latitude: number, longitude: number) => {
   try {
     await apiInstance.post('/locations', { latitude, longitude });
   } catch (error) {
-    console.error('Error posting location:', error);
-    throw new Error('Failed to post location');
+    throw new Error(getErrorMessage(error));
   }
 };

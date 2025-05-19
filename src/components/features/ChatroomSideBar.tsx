@@ -15,6 +15,8 @@ interface ChatroomSideBarProps {
   sidebarVisible: boolean;
   myNickname: string;
   setSidebarVisible: (visible: boolean) => void;
+  postId?: number;
+  expiresAt?: string;
 }
 
 export const ChatroomSideBar = ({
@@ -24,6 +26,8 @@ export const ChatroomSideBar = ({
   sidebarVisible,
   myNickname,
   setSidebarVisible,
+  postId,
+  expiresAt,
 }: ChatroomSideBarProps) => {
   const { insetTop, insetBottom } = useLayout();
 
@@ -52,6 +56,25 @@ export const ChatroomSideBar = ({
         },
       },
     ]);
+  };
+
+  const goToPostPage = () => {
+    if (!postId) {
+      Alert.alert('게시글을 찾을 수 없습니다.');
+      return;
+    }
+    router.push({
+      pathname: '/post',
+      params: {
+        postId,
+      },
+    });
+  };
+
+  const isExpired = () => {
+    const currentDate = new Date();
+    const expirationDate = new Date(expiresAt || '');
+    return currentDate > expirationDate;
   };
 
   return (
@@ -83,15 +106,19 @@ export const ChatroomSideBar = ({
         <TouchableOpacity
           style={{
             width: '100%',
-            backgroundColor: colors.yellow.light,
+            backgroundColor: isExpired() ? colors.gray.light : colors.yellow.light,
             paddingHorizontal: 60,
             height: 38,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 8,
           }}
+          onPress={goToPostPage}
+          disabled={isExpired()}
         >
-          <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>게시글 바로가기</Text>
+          <Text style={{ fontSize: 12, color: colors.text.darkgray, fontWeight: 'bold' }}>
+            {isExpired() ? '만료된 게시글 입니다.' : '게시글 바로가기'}
+          </Text>
         </TouchableOpacity>
       </View>
       <View

@@ -3,13 +3,25 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
-import { LayoutProvider } from '@/contexts/LayoutContext';
+import { LayoutProvider, useLayout } from '@/contexts/LayoutContext';
 import { PostProvider } from '@/contexts/PostContext';
 import { UserProvider } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 
 export const queryClient = new QueryClient();
+
+const InnerLayout = () => {
+  const { insetTop } = useLayout();
+
+  return (
+    <>
+      <Slot />
+      <Toast topOffset={insetTop || 60} />
+    </>
+  );
+};
 
 export const RootLayout = () => {
   return (
@@ -26,7 +38,7 @@ export const RootLayout = () => {
             <LayoutProvider>
               <PostProvider>
                 <UserProvider>
-                  <Slot />
+                  <InnerLayout />
                 </UserProvider>
               </PostProvider>
             </LayoutProvider>

@@ -7,6 +7,7 @@ const initialPostState: Post = {
   postId: 0,
   markerId: 0,
   iconIdx: 0,
+  markerIdx: 0,
   title: '',
   content: '',
   address: '',

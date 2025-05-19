@@ -30,6 +30,7 @@ interface CommonInputProps extends TextInputProps {
   loading?: boolean;
   onChangeText?: (text: string) => void;
   secureTextEntry?: boolean;
+  value?: string;
 }
 
 const styles = StyleSheet.create({
@@ -83,6 +84,7 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
       loading = false,
       secureTextEntry = false,
       style,
+      value = '',
     },
     ref,
   ) => {
@@ -109,6 +111,7 @@ const CommonInput = React.forwardRef<TextInput, CommonInputProps>(
           placeholderTextColor={colors.primary.main}
           editable={editable}
           secureTextEntry={secureTextEntry}
+          value={value}
         />
         {isGuide && !loading && !checked && <Text style={styles.guideText}>{guideText}</Text>}
         {loading && (

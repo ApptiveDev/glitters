@@ -2,7 +2,7 @@ const colors = {
   primary: {
     light: '#AFB9E3',
     main: '#8793C2',
-    dark: '#515F95',
+    dark: '#6271AA',
   },
   secondary: {
     light: '#AAB8F0',
@@ -12,6 +12,7 @@ const colors = {
   background: '#404C7A',
   backgroundLight: '#536199',
   backgroundmypage: '#4A5789',
+  backgrounddark: '#3B4672',
   blue: {
     light: '#E1E7FD',
     main: '#5F78DA',
@@ -35,6 +36,7 @@ const colors = {
     black: '#000000',
   },
   error: '#FFA0A0',
+  alert: '#FF6D6D',
   guide: '#FFF7C1',
   text: {
     white: '#FBFBFB',

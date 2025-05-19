@@ -8,10 +8,20 @@ const initialUserState: User = {
   email: '',
   password: '',
   birth: '',
+  gender: 0,
+  institution: {
+    id: 0,
+    name: '',
+    emailDomain: '',
+    isActive: false,
+    createdAt: '',
+    updatedAt: '',
+  },
   termsAccepted: false,
   joinedAt: '',
   reportedCount: 0,
   isDeactivated: false,
+  hasUnreadChat: false,
 };
 
 interface UserContextType {

@@ -20,6 +20,7 @@ import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { storeToken } from '@/utils/authStorage';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 import styles from './styles';
 
@@ -63,12 +64,13 @@ export const SignInfo = () => {
         password: user.password,
         birth: formFields.birth.value,
         termsAccepted: formFields.agreedToPrivacyPolicy && formFields.agreedToTermsOfService,
+        gender: Number(formFields.gender.value),
       });
       setUser(response.member);
       storeToken(response.token);
       router.replace('/sign-complete');
     } catch (error) {
-      console.error('Error creating user:', error);
+      showErrorAlert('오류', error);
     }
   };
 
@@ -120,8 +122,8 @@ export const SignInfo = () => {
         <View style={styles.heading}>
           <Heading title="성별 선택하기" />
           <GenderSelector
-            selected={formFields.gender.value as '남성' | '여성' | ''}
-            onSelect={(val) => setFieldValue('gender', val, (value) => value === '남성' || value === '여성')}
+            selected={Number(formFields.gender.value)}
+            onSelect={(val) => setFieldValue('gender', String(val), (value) => value === '0' || value === '1')}
             isError={!formFields.gender.value && formFields.gender.isTouched}
             errorMessage="성별을 선택해주세요."
           />

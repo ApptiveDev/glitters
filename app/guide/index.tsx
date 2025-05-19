@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { Alert, Text, View } from 'react-native';
 
-import { getUserInfo, withdrawUser } from '@/api/auth';
+import { withdrawUser } from '@/api/auth';
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
 import { Spacing } from '@/components/common/Spacing';
 import { useLayout } from '@/contexts/LayoutContext';
+import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { removeToken } from '@/utils/authStorage';
 
@@ -34,10 +34,7 @@ const LabelValue = ({ label, value }: LabelValueProps) => {
 
 export const Guide = () => {
   const { insetBottom } = useLayout();
-  const user = useQuery({
-    queryKey: ['user'],
-    queryFn: getUserInfo,
-  });
+  const { user } = useUser();
 
   const handleHelpPress = () => {
     router.push('/guide/(info)/help');
@@ -99,9 +96,11 @@ export const Guide = () => {
         <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.text.white }}>마이페이지</Text>
         <Spacing height={28} />
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <LabelValue label="이름" value={user.data?.member.name ?? ''} />
-          <LabelValue label="생년월일" value={user.data?.member.birth.slice(0, 10) ?? ''} />
-          <LabelValue label="이메일" value={user.data?.member.email ?? ''} />
+          <LabelValue label="이름" value={user.name ?? ''} />
+          <LabelValue label="생년월일" value={user.birth.slice(0, 10) ?? ''} />
+          <LabelValue label="성별" value={user?.gender === 0 ? '남성' : '여성'} />
+          <LabelValue label="이메일" value={user.email ?? ''} />
+          <LabelValue label="소속학교" value={user.institution.name ?? ''} />
         </View>
         <ListItem text="도움말" onPress={handleHelpPress} />
       </View>

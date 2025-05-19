@@ -9,6 +9,7 @@ import SelectedChatIcon from '@/assets/icons/selected_chat.svg';
 import SelectedMapIcon from '@/assets/icons/selected_map.svg';
 import SelectedProfileIcon from '@/assets/icons/selected_profile.svg';
 import { useLayout } from '@/contexts/LayoutContext';
+import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 
 export const BottomNav = () => {
@@ -16,6 +17,7 @@ export const BottomNav = () => {
   const onPressChat = () => {
     router.push('/chatrooms');
   };
+  const { user } = useUser();
 
   const pathname = usePathname();
 
@@ -67,7 +69,22 @@ export const BottomNav = () => {
           alignItems: 'center',
         }}
       >
-        {isSelected('/chatrooms') ? <SelectedChatIcon onPress={onPressChat} /> : <ChatIcon onPress={onPressChat} />}
+        <View style={{ position: 'relative' }}>
+          {isSelected('/chatrooms') ? <SelectedChatIcon onPress={onPressChat} /> : <ChatIcon onPress={onPressChat} />}
+          {user.hasUnreadChat && (
+            <View
+              style={{
+                position: 'absolute',
+                top: -1,
+                right: -1,
+                width: 4,
+                height: 4,
+                borderRadius: 4,
+                backgroundColor: colors.alert,
+              }}
+            />
+          )}
+        </View>
         {isSelected('/maps') ? <SelectedMapIcon onPress={onPressMap} /> : <MapIcon onPress={onPressMap} />}
         {isSelected('/guide') ? (
           <SelectedProfileIcon onPress={onPressProfile} />

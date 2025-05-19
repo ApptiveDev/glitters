@@ -1,3 +1,5 @@
+import { getErrorMessage } from '@/utils/errorMessage';
+
 import apiInstance from './apiInstance';
 
 type BlockUserRequest = {
@@ -21,8 +23,7 @@ export const blockUser = async ({ blockType, postId, chatroomId }: BlockUserRequ
     const response = await apiInstance.post(`/blocks?${queryParams.toString()}`);
     return response.data;
   } catch (error) {
-    console.error('Error blocking user:', error);
-    throw error;
+    throw new Error(getErrorMessage(error));
   }
 };
 

@@ -13,6 +13,7 @@ interface CustomBottomSheetProps {
   height?: number;
   isKeyboardVisible?: boolean;
   blockOutsidePress?: boolean;
+  offset?: number;
 }
 
 const CustomBottomSheet = ({
@@ -22,6 +23,7 @@ const CustomBottomSheet = ({
   height = 200,
   isKeyboardVisible = false,
   blockOutsidePress = false,
+  offset = 0,
 }: CustomBottomSheetProps) => {
   const [isMounted, setIsMounted] = useState(false);
   const { safeHeight, insetBottom } = useLayout();
@@ -86,7 +88,7 @@ const CustomBottomSheet = ({
             left: 0,
             right: 0,
             bottom: BOTTOM_OFFSET,
-            height: isKeyboardVisible ? safeHeight - keyboardHeight : height + 40,
+            height: isKeyboardVisible ? safeHeight - keyboardHeight - offset : height + 40,
             backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

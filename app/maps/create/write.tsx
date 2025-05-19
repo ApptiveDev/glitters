@@ -5,19 +5,21 @@ import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, V
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
+import CustomBottomSheet from '@/components/common/BottomSheet';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
-import CustomBottomSheet from '@/components/features/BottomSheet';
 import { WritePolicyList } from '@/components/features/WritePolicyList';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { showErrorAlert } from '@/utils/errorMessage';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
@@ -32,11 +34,17 @@ export const Write = () => {
   const [randomIndex, setRandomIndex] = useState(0);
 
   const RandomIcon = useMemo(() => {
+    if (markerIcons[post?.markerIdx ?? 0].name === 'festival') {
+      const iconsArray = Object.values(festivalIcons) as React.FC<SvgProps>[];
+      const index = Math.floor(Math.random() * 2);
+      setRandomIndex(index);
+      return iconsArray[index];
+    }
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Math.floor(Math.random() * iconsArray.length);
     setRandomIndex(index);
     return iconsArray[index];
-  }, []);
+  }, [post?.markerIdx]);
 
   useEffect(() => {
     Animated.loop(
@@ -68,7 +76,6 @@ export const Write = () => {
   const handleButtonPress = async () => {
     try {
       if (!post) {
-        console.error('Post is null or undefined');
         return;
       }
 
@@ -79,13 +86,14 @@ export const Write = () => {
         latitude: post.latitude,
         longitude: post.longitude,
         iconIdx: randomIndex,
+        markerIdx: post.markerIdx,
       });
       router.replace({
         pathname: './complete',
-        params: { iconIndex: randomIndex },
+        params: { iconIndex: randomIndex, markerIdx: post.markerIdx },
       });
     } catch (error) {
-      console.error('Error creating marker:', error);
+      showErrorAlert('오류', error);
     }
   };
 

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Dimensions, Text, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
 import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
@@ -17,6 +17,7 @@ import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { SchoolListResponse } from '@/types/utils';
+import { showErrorAlert } from '@/utils/errorMessage';
 import { sleep } from '@/utils/sleep';
 
 import styles from './styles';
@@ -85,8 +86,7 @@ export const Sign = () => {
       await verifyEmailMutate(`${localPart}${domain}`);
       setFieldVerified('email', true);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-      Alert.alert('이메일 인증 실패', errorMessage);
+      showErrorAlert('이메일 인증 오류', error);
     }
   };
 
@@ -98,9 +98,12 @@ export const Sign = () => {
         await sleep(500);
         setInputStatus({ loading: false, checked: true });
         setFieldVerified('authCode', true);
-      } catch {
+      } catch (error) {
+        showErrorAlert('인증번호 오류', error);
         setInputStatus({ loading: false, checked: false });
         setFieldVerified('authCode', false);
+        setFieldValue('authCode', '', () => false);
+        setAuthCode('');
       }
     }, 500),
   );

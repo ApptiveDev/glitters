@@ -1,35 +1,33 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
-import { queryClient } from 'app/_layout';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { SvgProps } from 'react-native-svg';
+import Toast from 'react-native-toast-message';
 
-import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
+import { createChat } from '@/api/chat';
+import { getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
-import HeartIcon from '@/assets/icons/3d/heart.svg';
-import EyeIcon from '@/assets/icons/eye.svg';
-import GlitterIcon from '@/assets/icons/glitter.svg';
-import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
-import MarkerIcon from '@/assets/icons/marker.png';
-import MarkerBySelfIcon from '@/assets/icons/marker_by_self.png';
-import { CommonButton } from '@/components/common/Button';
-import { CustomTextArea } from '@/components/common/TextArea';
-import CustomBottomSheet from '@/components/features/BottomSheet';
+import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
+import SendIcon from '@/assets/icons/send.svg';
+import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
+import { Spacing } from '@/components/common/Spacing';
+import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
+import { CreateGlitterButton } from '@/components/features/CreateGlitterButton';
 import Loading from '@/components/features/Loading';
+import { MapPostBottomSheet } from '@/components/features/MapPostBottomSheet';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
+import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
+import { showErrorAlert } from '@/utils/errorMessage';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
-import { threeDIcons } from '@/utils/threeDIcons';
 
 import styles from './styles';
 
@@ -37,6 +35,7 @@ const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
   const { insetBottom } = useLayout();
+  const [sendChatModalVisible, setSendChatModalVisible] = useState(false);
 
   const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -44,11 +43,12 @@ const MapSearch = () => {
     longitude: number;
   } | null>(null);
   const [post, setPost] = useState<GetPostResponseType>();
-  const [overrideButtonText, setOverrideButtonText] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const mapRef = useRef<any>(null);
   const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
+  const { user } = useUser();
+  const [message, setMessage] = useState('');
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { data: markers, isLoading } = useQuery({
@@ -58,15 +58,6 @@ const MapSearch = () => {
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
-
-  const PostIcon = useMemo(() => {
-    if (post?.iconIdx == null) return HeartIcon;
-
-    const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
-    const index = Number(post.iconIdx);
-
-    return iconsArray[index] ?? HeartIcon;
-  }, [post?.iconIdx]);
 
   const handleButtonPress = () => {
     router.push({
@@ -79,17 +70,18 @@ const MapSearch = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     const fetchBound = async () => {
       try {
         const response = await getBoundMarkers();
-        setBound(response[0]);
+        setBound(response[user.institution.id]);
       } catch (error) {
-        console.error('Bound markers error:', error);
+        showErrorAlert('오류', error);
       }
     };
 
     fetchBound();
-  }, [setBound]);
+  }, [setBound, user, user.institution.id]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -98,7 +90,7 @@ const MapSearch = () => {
       if (location) {
         setCurrentPosition(location);
       } else {
-        console.warn(errorMsg);
+        Alert.alert('위치 정보 오류', errorMsg || '위치 정보를 가져오는 데 실패했습니다.');
       }
     };
 
@@ -128,85 +120,6 @@ const MapSearch = () => {
     bottomSheetRef.current?.close();
   };
 
-  const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
-    if (isWrittenBySelf) {
-      return '당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
-    }
-    if (isLikedBySelf) {
-      return ' 마음에 들어온 반짝이에요';
-    }
-    return '이 반짝이가 마음에 들어요';
-  };
-
-  const onPressBottomButton = async ({ isWrittenBySelf, postId }: { isWrittenBySelf: boolean; postId: number }) => {
-    if (isWrittenBySelf) {
-      Alert.alert('내가 쓴 글이에요.');
-    } else {
-      setOverrideButtonText(' 반짝반짝');
-      await addLike(postId);
-      setTimeout(() => {
-        setOverrideButtonText(null);
-      }, 1000);
-      setPost((prev) =>
-        prev
-          ? {
-              ...prev,
-              isLikedBySelf: true,
-              likeCount: prev.likeCount + 1,
-            }
-          : undefined,
-      );
-    }
-  };
-
-  const goToReportPage = () => {
-    router.push({
-      pathname: '/report',
-      params: {
-        postId: post?.id,
-        reportType: 'POST_REPORT',
-      },
-    });
-  };
-
-  const handleConfirmDelete = async (postId: number) => {
-    try {
-      setIsVisible(false);
-      setPost(undefined);
-
-      await deleteMarker(postId);
-      await queryClient.invalidateQueries({ queryKey: ['markers'] });
-
-      router.replace('/maps');
-    } catch {
-      Alert.alert('삭제 중 문제가 발생했어요.');
-    }
-  };
-
-  const handleDeletePost = (postId: number, isWrittenBySelf: boolean) => {
-    if (isWrittenBySelf) {
-      Alert.alert('삭제하시겠어요?', '삭제된 반짝이는 다시 복구되지 않아요', [
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-        {
-          text: '확인',
-          onPress: () => handleConfirmDelete(postId),
-        },
-      ]);
-    } else {
-      Alert.alert('신고하시겠어요?', '', [
-        {
-          text: '확인',
-          onPress: goToReportPage,
-        },
-      ]);
-    }
-  };
-
-  console.log('safe height', 120 - insetBottom + contentHeight + 16);
-
   const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
     const matchedMarkers = geoJsonMarkers
       .map((geoMarker) => {
@@ -232,30 +145,24 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
-  const handleBlockUser = async (postId: number) => {
+  const startChat = async () => {
+    if (!post) return;
     try {
-      Alert.alert('사용자 차단', '한 번 차단한 사용자는 해제할 수 없어요.', [
-        {
-          text: '차단하기',
-          onPress: async () => {
-            await blockUser({
-              blockType: 'post',
-              postId,
-            });
-            setIsVisible(false);
-            setPost(undefined);
-            await queryClient.invalidateQueries({ queryKey: ['markers'] });
-            await queryClient.invalidateQueries({ queryKey: ['posts'] });
-          },
-        },
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-      ]);
+      await createChat({
+        postId: post?.id,
+        content: message,
+      });
+      setMessage('');
+      setSendChatModalVisible(false);
+      Toast.show({
+        type: 'success',
+        text1: '쪽지를 보냈어요',
+        text2: '상대방이 확인할 수 있어요.',
+      });
     } catch (error) {
-      console.error('Error blocking user:', error);
-      Alert.alert('차단 실패', '차단에 실패했습니다. 다시 시도해주세요.');
+      showErrorAlert('오류', error);
+      setMessage('');
+      setSendChatModalVisible(false);
     }
   };
 
@@ -280,8 +187,7 @@ const MapSearch = () => {
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude) && !hasAnimatedBack) {
-            Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
+          if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
             setHasAnimatedBack(true);
             Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
               {
@@ -318,184 +224,172 @@ const MapSearch = () => {
                 {marker.isWrittenBySelf ? (
                   <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
                 ) : (
-                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
+                  <Image source={markerIcons[marker.markerIdx].icon} style={{ width: 40, height: 40 }} />
                 )}
               </Marker>
             ))}
       </MapView>
-
-      <CustomBottomSheet isVisible={isVisible} height={contentHeight} onClose={() => setIsVisible(false)}>
-        <View
-          onLayout={(e) => {
-            const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight);
-          }}
-          style={{ paddingTop: 16, gap: 12, alignItems: 'center', position: 'relative' }}
-        >
-          <PostIcon
-            width={292}
-            height={292}
-            style={{
-              position: 'absolute',
-              top: 40,
-              zIndex: 0,
-            }}
-          />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
-            <Text style={{ fontSize: 24, color: 'white', fontWeight: 'bold', flexShrink: 1, marginBottom: 8 }}>
-              {post?.title}
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                gap: 12,
-                marginBottom: 8,
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlitterIcon width={16} height={16} />
-                <Text style={{ color: colors.text.white, marginLeft: 4 }}>{post?.likeCount}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <EyeIcon width={16} height={16} />
-                <Text style={{ color: colors.text.white, marginLeft: 4 }}>{post?.viewCount}</Text>
-              </View>
-            </View>
-          </View>
-          <BlurView
-            intensity={20}
-            tint="dark"
-            style={{
-              backgroundColor: 'rgba(74, 87, 137, 0.2)',
-              width: '100%',
-              borderRadius: 8,
-              overflow: 'hidden',
-              borderWidth: 1,
-              borderColor: 'rgba(251, 251, 251, 0.2)',
-            }}
-          >
-            <CustomTextArea
-              value={post?.content || ''}
-              multiline
-              onChangeText={() => {}}
-              height={184}
-              numberOfLines={10}
-              editable={false}
-            />
-          </BlurView>
-          <CommonButton
-            title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
-            variant={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? 'primary' : 'view'}
-            onPress={() =>
-              onPressBottomButton({
-                isWrittenBySelf: post?.isWrittenBySelf ?? false,
-                postId: post?.id ?? 0,
-              })
-            }
-            buttonIcon={
-              overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? <GlitterBlueIcon /> : <GlitterIcon />
-            }
-            disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
-          />
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 8,
-            }}
-          >
-            <Text
-              style={{ fontSize: 12, color: colors.text.lightgray }}
-              onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
-            >
-              {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
-            </Text>
-          </View>
-        </View>
-      </CustomBottomSheet>
-      <CommonButton
-        title="반짝이 기록하기"
-        onPress={handleButtonPress}
-        variant="maps"
-        style={{
-          position: 'absolute',
-          bottom: isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16,
-          left: '50%',
-          transform: [{ translateX: -70 }],
-          borderWidth: 0,
-        }}
-        fontSize={16}
-        buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
+      <MapPostBottomSheet
+        isVisible={isVisible}
+        post={post}
+        setPost={setPost}
+        setIsVisible={setIsVisible}
+        setSendChatModalVisible={setSendChatModalVisible}
+        setContentHeight={setContentHeight}
+        contentHeight={contentHeight}
       />
-      {isListOpen && (
+      <CreateGlitterButton
+        onPress={handleButtonPress}
+        bottom={isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16}
+      />
+      <ClusteredMarkerModal
+        isVisible={isListOpen}
+        clusterPosts={clusterPosts}
+        setPost={setPost}
+        setIsVisible={setIsVisible}
+        setIsListOpen={setIsListOpen}
+      />
+      <Modal
+        animationType="fade"
+        transparent
+        visible={sendChatModalVisible}
+        onRequestClose={() => {
+          setSendChatModalVisible(false);
+        }}
+      >
         <View
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10,
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.3)',
           }}
         >
-          <TouchableWithoutFeedback onPress={() => setIsListOpen(false)}>
-            <BlurView
-              intensity={20}
-              tint="dark"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 15,
-                backgroundColor: 'rgba(0,0,0,0.2)',
-              }}
-            />
-          </TouchableWithoutFeedback>
-          <ScrollView
+          <View
             style={{
-              position: 'absolute',
-              top: 100,
-              left: '50%',
-              transform: [{ translateX: -150 }],
-              width: 300,
+              width: '80%',
               height: 200,
               backgroundColor: colors.background,
               borderRadius: 12,
-              padding: 28,
-              zIndex: 20,
+              paddingVertical: 25,
+              paddingHorizontal: 28,
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 4,
             }}
           >
-            {clusterPosts.map((clusterPost) => (
-              <TouchableOpacity
-                key={clusterPost.id + clusterPost.title}
-                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
-                onPress={() => {
-                  setPost(clusterPost);
-                  setIsVisible(true);
-                  setIsListOpen(false);
+            <Text
+              style={{
+                fontSize: 10,
+                color: colors.text.white,
+                fontWeight: 'bold',
+              }}
+            >
+              채팅 시작하기
+            </Text>
+            <Spacing height={25} />
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                height: 24,
+                marginBottom: 16,
+              }}
+            >
+              <Image
+                source={post?.isWrittenBySelf ? MarkerBySelfIcon : markerIcons[post?.markerIdx ?? 0].icon}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: colors.text.white,
+                  fontWeight: 'bold',
+                }}
+                ellipsizeMode="tail"
+              >
+                {post?.title}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={{ position: 'absolute', right: 28, top: 25 }}
+              onPress={() => setSendChatModalVisible(false)}
+            >
+              <SimpleExitIcon width={16} height={16} />
+            </TouchableOpacity>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                width: '100%',
+                gap: 8,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 12,
+                  paddingTop: 8,
+                  paddingBottom: 10,
+                  backgroundColor: colors.backgroundLight,
+                  borderRadius: 20,
+                  gap: 8,
+                  flex: 1,
+                  justifyContent: 'center',
                 }}
               >
-                {clusterPost.isWrittenBySelf ? (
-                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
-                ) : (
-                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
-                )}
-                <Text
+                <TextInput
                   style={{
+                    flex: 1,
                     color: colors.text.white,
-                    fontWeight: 'bold',
+                    fontSize: 10,
+                    paddingVertical: 0,
                   }}
+                  placeholder="채팅을 입력하세요."
+                  placeholderTextColor="rgba(255,255,255,0.6)"
+                  value={message}
+                  onChangeText={setMessage}
+                  numberOfLines={1}
+                  multiline
+                />
+                <TouchableOpacity
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 999,
+                    backgroundColor: message ? colors.yellow.dark : colors.primary.main,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={startChat}
+                  disabled={!message}
                 >
-                  {clusterPost.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                  <SendIcon width={13} height={13} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Spacing height={20} />
+            <Text
+              style={{
+                fontSize: 10,
+                color: colors.text.gray,
+              }}
+            >
+              채팅 목록에서 보낸 내용을 확인할 수 있어요.
+            </Text>
+          </View>
         </View>
-      )}
+      </Modal>
     </View>
   );
 };

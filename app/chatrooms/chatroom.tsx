@@ -14,6 +14,7 @@ import { useLayout } from '@/contexts/LayoutContext';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { ChatMessage } from '@/types/chat';
 import colors from '@/types/colors';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (message: string) => void }) => {
   const [message, setMessage] = useState('');
@@ -153,7 +154,7 @@ export const Chatroom = () => {
         const response = await getChatMessages(selectedChatroom.id, undefined, 20);
         setChatMessages(response.chats.reverse());
       } catch (error) {
-        console.error('Error fetching chat messages:', error);
+        showErrorAlert('오류', error);
       }
     };
 
@@ -223,6 +224,7 @@ export const Chatroom = () => {
         sidebarVisible={sidebarVisible}
         myNickname={selectedChatroom?.myNickname || ''}
         setSidebarVisible={setSidebarVisible}
+        postId={selectedChatroom?.post.id || 0}
       />
     </View>
   );

@@ -39,7 +39,7 @@ export const Login = () => {
       });
       setUser(response.member);
       storeToken(response.token);
-      router.replace('/maps');
+      router.replace('/');
     } catch {
       setFailText('존재하지 않는 이메일이거나, 이메일과 비밀번호가 일치하지 않습니다.');
     }

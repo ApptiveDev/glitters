@@ -5,7 +5,8 @@ import { Animated, Easing, SafeAreaView, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import colors from '@/types/colors';
-import { threeDIcons } from '@/utils/threeDIcons';
+import { markerIcons } from '@/utils/markerIcons';
+import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const Complete = () => {
   useEffect(() => {
@@ -37,13 +38,16 @@ export const Complete = () => {
     ).start();
   }, [translateY]);
 
-  const { iconIndex } = useLocalSearchParams();
+  const { iconIndex, markerIdx } = useLocalSearchParams();
 
   const RandomIcon = useMemo(() => {
+    if (markerIcons[Number(markerIdx)].name === 'festival') {
+      return festivalIcons[Number(iconIndex)];
+    }
     const iconsArray = Object.values(threeDIcons) as React.FC<SvgProps>[];
     const index = Number(iconIndex);
     return iconsArray[index];
-  }, [iconIndex]);
+  }, [iconIndex, markerIdx]);
 
   return (
     <SafeAreaView
