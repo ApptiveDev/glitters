@@ -12,6 +12,7 @@ import { postLocation } from '@/api/notifications';
 import Splash from '@/components/features/Splash';
 import { useUser } from '@/contexts/UserContext';
 import { useNotificationListener } from '@/hooks/useNotificationListener';
+import { requestBackgroundLocationPermission } from '@/utils/asyncStorage';
 import { getToken } from '@/utils/authStorage';
 
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -44,7 +45,7 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
 
-      // await requestBackgroundLocationPermission();
+      await requestBackgroundLocationPermission();
       // await registerForPushNotificationsAsync();
 
       setIsReady(true);
@@ -78,8 +79,6 @@ export const Index = () => {
     } else {
       router.replace('/login');
     }
-
-    await SplashScreen.hideAsync();
   }, [isReady, router, setUser]);
 
   if (!isReady) return <Splash />;

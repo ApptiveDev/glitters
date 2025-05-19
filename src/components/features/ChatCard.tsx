@@ -42,6 +42,7 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
         marginBottom: 16,
         gap: 16,
         height: 100,
+        position: 'relative',
       }}
       onPress={onPress}
     >
@@ -76,6 +77,8 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
               fontSize: 14,
               color: colors.text.gray,
               marginTop: 4,
+              lineHeight: 16,
+              minHeight: 32,
             }}
             ellipsizeMode="tail"
             numberOfLines={2}
@@ -94,17 +97,21 @@ export const ChatCard = ({ title, lastMessage, lastMessageTime, iconIndex, onPre
       </View>
       <View
         style={{
-          width: 24,
-          height: 24,
+          position: 'absolute',
+          top: '50%',
+          right: 20,
+          transform: [{ translateY: 12 }],
+          width: 16,
+          height: 16,
           borderRadius: 12,
-          backgroundColor: unreadCount > 0 ? colors.primary.main : colors.backgroundLight,
+          backgroundColor: colors.alert,
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
         <Text
           style={{
-            fontSize: 12,
+            fontSize: 8,
             color: colors.text.white,
           }}
         >

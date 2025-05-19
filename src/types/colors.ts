@@ -36,6 +36,7 @@ const colors = {
     black: '#000000',
   },
   error: '#FFA0A0',
+  alert: '#FF6D6D',
   guide: '#FFF7C1',
   text: {
     white: '#FBFBFB',

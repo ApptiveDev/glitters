@@ -13,6 +13,7 @@ import { SvgProps } from 'react-native-svg';
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
+import BubbleIcon from '@/assets/icons/bubble.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
@@ -45,7 +46,6 @@ const MapSearch = () => {
     longitude: number;
   } | null>(null);
   const [post, setPost] = useState<GetPostResponseType>();
-  const [overrideButtonText, setOverrideButtonText] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const mapRef = useRef<any>(null);
   const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
@@ -81,6 +81,7 @@ const MapSearch = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     const fetchBound = async () => {
       try {
         const response = await getBoundMarkers();
@@ -92,7 +93,7 @@ const MapSearch = () => {
     };
 
     fetchBound();
-  }, [setBound, user.institution.id]);
+  }, [setBound, user, user.institution.id]);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -131,25 +132,9 @@ const MapSearch = () => {
     bottomSheetRef.current?.close();
   };
 
-  const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
-    if (isWrittenBySelf) {
-      return ' 당신의 반짝이가 이 글을 읽고 있을 지도 몰라요.';
-    }
-    if (isLikedBySelf) {
-      return ' 마음에 들어온 반짝이에요';
-    }
-    return '이 반짝이가 마음에 들어요';
-  };
-
   const onPressBottomButton = async ({ isWrittenBySelf, postId }: { isWrittenBySelf: boolean; postId: number }) => {
-    if (isWrittenBySelf) {
-      Alert.alert('내가 쓴 글이에요.');
-    } else {
-      setOverrideButtonText(' 반짝반짝');
+    if (!isWrittenBySelf) {
       await addLike(postId);
-      setTimeout(() => {
-        setOverrideButtonText(null);
-      }, 1000);
       setPost((prev) =>
         prev
           ? {
@@ -208,8 +193,6 @@ const MapSearch = () => {
     }
   };
 
-  console.log('safe height', 120 - insetBottom + contentHeight + 16);
-
   const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
     const matchedMarkers = geoJsonMarkers
       .map((geoMarker) => {
@@ -257,7 +240,6 @@ const MapSearch = () => {
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
           if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
-            Alert.alert('안내', '지정된 지역을 벗어났어요. 되돌아갑니다.');
             setHasAnimatedBack(true);
             Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
               {
@@ -361,20 +343,45 @@ const MapSearch = () => {
               editable={false}
             />
           </BlurView>
-          <CommonButton
-            title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
-            variant={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? 'primary' : 'view'}
-            onPress={() =>
-              onPressBottomButton({
-                isWrittenBySelf: post?.isWrittenBySelf ?? false,
-                postId: post?.id ?? 0,
-              })
-            }
-            buttonIcon={
-              overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? <GlitterBlueIcon /> : <GlitterIcon />
-            }
-            disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
-          />
+          {!post?.isWrittenBySelf ? (
+            <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+              <CommonButton
+                title=""
+                variant={post?.isLikedBySelf ? 'primary' : 'view'}
+                onPress={() =>
+                  onPressBottomButton({
+                    isWrittenBySelf: post?.isWrittenBySelf ?? false,
+                    postId: post?.id ?? 0,
+                  })
+                }
+                buttonIcon={post?.isLikedBySelf ? <GlitterBlueIcon /> : <GlitterIcon />}
+                disabled={post?.isLikedBySelf}
+                style={{
+                  flex: 1,
+                }}
+              />
+              <CommonButton
+                title="  채팅하기"
+                variant="view"
+                onPress={() => {}}
+                buttonIcon={<BubbleIcon />}
+                disabled={post?.isLikedBySelf}
+                style={{
+                  flex: 6,
+                }}
+              />
+            </View>
+          ) : (
+            <CommonButton
+              title="  당신의 반짝이가 이 글을 읽고 있을 지도 몰라요"
+              variant="view"
+              onPress={() => {
+                Alert.alert('내가 쓴 글이에요.');
+              }}
+              buttonIcon={<GlitterIcon />}
+              fontSize={12}
+            />
+          )}
           <View
             style={{
               flexDirection: 'row',

@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { getChatList } from '@/api/chat';
 import { ChatCard } from '@/components/features/ChatCard';
 import { useChatroom } from '@/contexts/ChatroomContext';
+import { useUser } from '@/contexts/UserContext';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { Chat } from '@/types/chat';
 import colors from '@/types/colors';
@@ -16,6 +18,7 @@ export const ChatRooms = () => {
     queryFn: getChatList,
   });
 
+  const { user, updateUser } = useUser(); // ✅ updateUser 가져오기
   const { setSelectedChatroom } = useChatroom();
   const { messagesByChatroom } = useWebSocketContext();
 
@@ -23,6 +26,16 @@ export const ChatRooms = () => {
     setSelectedChatroom(chatroom);
     router.push('/chatrooms/chatroom');
   };
+
+  const hasUnreadMessages = data?.chatrooms?.some((chatRoom) => chatRoom.unreadMessageCount > 0);
+
+  useEffect(() => {
+    if (data?.chatrooms && !hasUnreadMessages && user.hasUnreadChat) {
+      updateUser({ hasUnreadChat: false });
+    }
+  }, [data, hasUnreadMessages, updateUser, user.hasUnreadChat]);
+
+  console.log(hasUnreadMessages);
 
   return (
     <View style={{ flex: 1 }}>
