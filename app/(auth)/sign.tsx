@@ -99,8 +99,11 @@ export const Sign = () => {
         setInputStatus({ loading: false, checked: true });
         setFieldVerified('authCode', true);
       } catch {
+        Alert.alert('인증번호 확인 실패', '인증번호가 일치하지 않습니다.');
         setInputStatus({ loading: false, checked: false });
         setFieldVerified('authCode', false);
+        setFieldValue('authCode', '', () => false);
+        setAuthCode('');
       }
     }, 500),
   );
