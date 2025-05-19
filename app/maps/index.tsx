@@ -19,8 +19,8 @@ import BubbleIcon from '@/assets/icons/bubble.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
-import MarkerIcon from '@/assets/icons/marker.png';
-import MarkerBySelfIcon from '@/assets/icons/marker_by_self.png';
+import MarkerIcon from '@/assets/icons/marker/marker.png';
+import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
 import SendIcon from '@/assets/icons/send.svg';
 import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
 import { CommonButton } from '@/components/common/Button';
@@ -35,6 +35,7 @@ import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
 import { threeDIcons } from '@/utils/threeDIcons';
 
@@ -305,7 +306,7 @@ const MapSearch = () => {
                 {marker.isWrittenBySelf ? (
                   <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
                 ) : (
-                  <Image source={MarkerIcon} style={{ width: 40, height: 40 }} />
+                  <Image source={markerIcons[marker.markerIdx].icon} style={{ width: 40, height: 40 }} />
                 )}
               </Marker>
             ))}
@@ -553,14 +554,24 @@ const MapSearch = () => {
               style={{
                 width: '100%',
                 flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                height: 24,
+                marginBottom: 16,
               }}
             >
+              <Image
+                source={post?.isWrittenBySelf ? MarkerBySelfIcon : markerIcons[post?.markerIdx ?? 0].icon}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+              />
               <Text
                 style={{
                   fontSize: 12,
                   color: colors.text.white,
                   fontWeight: 'bold',
-                  marginBottom: 16,
                 }}
                 ellipsizeMode="tail"
               >

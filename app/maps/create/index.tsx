@@ -1,19 +1,20 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
+import CaretLeftIcon from '@/assets/icons/caret_left.svg';
+import CaretRightIcon from '@/assets/icons/caret_right.svg';
 import ExitIcon from '@/assets/icons/exit.svg';
-import MarkerIcon from '@/assets/icons/marker.svg';
 import TelescopeIcon from '@/assets/icons/telescope.svg';
 import { CommonButton } from '@/components/common/Button';
-import { Spacing } from '@/components/common/Spacing';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import { usePost } from '@/contexts/PostContext';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import fetchNearestPlaceName from '@/lib/googlePlaces';
 import colors from '@/types/colors';
 import { LocationType } from '@/types/maps';
+import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
 
 import styles from '../styles';
@@ -32,6 +33,7 @@ export const CreateMarker = () => {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
+  const [currentMarkerIconIndex, setCurrentMarkerIconIndex] = useState(0);
 
   const { isKeyboardVisible } = useKeyboardVisible();
   const { updatePost, bound } = usePost();
@@ -64,7 +66,12 @@ export const CreateMarker = () => {
   }, [placeName]);
 
   const handleButtonPress = () => {
+    if (!isValid) {
+      Alert.alert('경고!', '위치 정보를 입력해주세요.');
+      return;
+    }
     updatePost({
+      markerIdx: currentMarkerIconIndex,
       address: placeName || '',
       latitude: markerPlace?.latitude || 0,
       longitude: markerPlace?.longitude || 0,
@@ -84,6 +91,22 @@ export const CreateMarker = () => {
         onPress: () => router.replace('/maps'),
       },
     ]);
+  };
+
+  const handleNextButtonPress = () => {
+    if (currentMarkerIconIndex < markerIcons.length - 1) {
+      setCurrentMarkerIconIndex((prev) => prev + 1);
+    } else {
+      setCurrentMarkerIconIndex(0);
+    }
+  };
+
+  const handlePrevButtonPress = () => {
+    if (currentMarkerIconIndex > 0) {
+      setCurrentMarkerIconIndex((prev) => prev - 1);
+    } else {
+      setCurrentMarkerIconIndex(markerIcons.length - 1);
+    }
   };
 
   return (
@@ -125,7 +148,7 @@ export const CreateMarker = () => {
               longitude: markerPlace.longitude,
             }}
           >
-            <MarkerIcon style={{ width: 40, height: 40 }} />
+            <Image source={markerIcons[currentMarkerIconIndex].icon} style={{ width: 40, height: 40 }} />
           </Marker>
         )}
       </MapView>
@@ -155,7 +178,7 @@ export const CreateMarker = () => {
             const measuredHeight = e.nativeEvent.layout.height;
             setContentHeight(measuredHeight); // + padding
           }}
-          style={{ paddingVertical: 24, gap: 8 }}
+          style={{ paddingVertical: 24, gap: 12 }}
         >
           <TextInput
             style={styles.bottomSheetMainText}
@@ -173,12 +196,55 @@ export const CreateMarker = () => {
           >
             이 위치가 아닌가요?
           </Text>
-          <Spacing height={24} />
-          <CommonButton
-            title="이 위치 반짝이기"
+          <View
+            style={{
+              width: '100%',
+              height: 92,
+              backgroundColor: colors.backgroundLight,
+              borderRadius: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}
+          >
+            <CaretLeftIcon width={20} height={20} onPress={handlePrevButtonPress} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+                width: '80%',
+              }}
+            >
+              <Image source={markerIcons[currentMarkerIconIndex].icon} style={{ width: 40, height: 40 }} />
+              <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.text.white }}>
+                {markerIcons[currentMarkerIconIndex].explain}
+              </Text>
+            </View>
+            <CaretRightIcon width={20} height={20} onPress={handleNextButtonPress} />
+          </View>
+          <TouchableOpacity
+            style={{
+              width: '100%',
+              height: 48,
+              backgroundColor: markerIcons[currentMarkerIconIndex].backgroundColor,
+              borderRadius: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             onPress={handleButtonPress}
-            variant={isValid ? 'primary' : 'disable'}
-          />
+          >
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: 'bold',
+                color: markerIcons[currentMarkerIconIndex].textColor,
+              }}
+            >
+              이 위치 반짝이기
+            </Text>
+          </TouchableOpacity>
         </View>
       </CustomBottomSheet>
 

@@ -79,6 +79,7 @@ export const Write = () => {
         latitude: post.latitude,
         longitude: post.longitude,
         iconIdx: randomIndex,
+        markerIdx: post.markerIdx,
       });
       router.replace({
         pathname: './complete',

@@ -3,6 +3,7 @@ export interface PostRequestType {
   content: string;
   address: string;
   iconIdx: number;
+  markerIdx: number;
   latitude: number;
   longitude: number;
 }
@@ -15,6 +16,7 @@ export interface PostResponseType {
 export interface GetPostResponseType {
   id: number;
   iconIdx: number;
+  markerIdx: number;
   title: string;
   content: string;
   createdAt: string;

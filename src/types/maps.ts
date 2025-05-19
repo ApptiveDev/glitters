@@ -23,6 +23,7 @@ export type InstitutionBoundType = {
 export type MarkerType = {
   id: number;
   iconIdx: number;
+  markerIdx: number;
   postId: number;
   latitude: number;
   longitude: number;
