@@ -7,8 +7,8 @@ export const getSchoolList = async (): Promise<SchoolListResponse> => {
     const response = await apiInstance.get('/institutions');
     return response.data;
   } catch (error) {
-    console.error('Error fetching school list:', error);
-    throw new Error('Failed to fetch school list');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -19,8 +19,8 @@ export const verifyEmail = async (email: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error verifying email:', error);
-    throw new Error('Failed to verify email');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -32,8 +32,8 @@ export const checkAuthCode = async (email: string, code: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error verifying auth code:', error);
-    throw new Error('Failed to verify auth code');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -49,8 +49,8 @@ export const registerUser = async (user: UserRegistrationRequest) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error registering user:', error);
-    throw new Error('Failed to register user');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -62,8 +62,9 @@ export const loginUser = async (userLogin: UserLoginRequest) => {
       password,
     });
     return response.data;
-  } catch {
-    throw new Error('Failed to login user');
+  } catch (error) {
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -72,8 +73,8 @@ export const withdrawUser = async () => {
     const response = await apiInstance.delete('/members/me');
     return response.data;
   } catch (error) {
-    console.error('Error withdrawing user:', error);
-    throw new Error('Failed to withdraw user');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -82,7 +83,7 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
     const response = await apiInstance.get('/members/me');
     return response.data;
   } catch (error) {
-    console.error('Error fetching user info:', error);
-    throw new Error('Failed to fetch user info');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };

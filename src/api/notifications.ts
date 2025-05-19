@@ -4,8 +4,8 @@ export const updateNotificationToken = async (token: string) => {
   try {
     await apiInstance.put('/notifications', { token });
   } catch (error) {
-    console.error('Error updating notification token:', error);
-    throw new Error('Failed to update notification token');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -13,7 +13,7 @@ export const postLocation = async (latitude: number, longitude: number) => {
   try {
     await apiInstance.post('/locations', { latitude, longitude });
   } catch (error) {
-    console.error('Error posting location:', error);
-    throw new Error('Failed to post location');
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };

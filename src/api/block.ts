@@ -21,8 +21,8 @@ export const blockUser = async ({ blockType, postId, chatroomId }: BlockUserRequ
     const response = await apiInstance.post(`/blocks?${queryParams.toString()}`);
     return response.data;
   } catch (error) {
-    console.error('Error blocking user:', error);
-    throw error;
+    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
 
