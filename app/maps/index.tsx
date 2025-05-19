@@ -10,13 +10,12 @@ import Toast from 'react-native-toast-message';
 import { createChat } from '@/api/chat';
 import { getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
-import GlitterIcon from '@/assets/icons/glitter.svg';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
 import SendIcon from '@/assets/icons/send.svg';
 import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
-import { CommonButton } from '@/components/common/Button';
 import { Spacing } from '@/components/common/Spacing';
 import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
+import CreateGlitterButton from '@/components/features/CreateGlitterButton';
 import Loading from '@/components/features/Loading';
 import { MapPostBottomSheet } from '@/components/features/MapPostBottomSheet';
 import { useLayout } from '@/contexts/LayoutContext';
@@ -240,19 +239,9 @@ const MapSearch = () => {
         setContentHeight={setContentHeight}
         contentHeight={contentHeight}
       />
-      <CommonButton
-        title="반짝이 기록하기"
+      <CreateGlitterButton
         onPress={handleButtonPress}
-        variant="maps"
-        style={{
-          position: 'absolute',
-          bottom: isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16,
-          left: '50%',
-          transform: [{ translateX: -70 }],
-          borderWidth: 0,
-        }}
-        fontSize={16}
-        buttonIcon={<GlitterIcon width={20} height={20} style={{ marginRight: 3 }} />}
+        bottom={isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16}
       />
       <ClusteredMarkerModal
         isVisible={isListOpen}
