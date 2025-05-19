@@ -1,14 +1,14 @@
 import apiInstance from '@/api/apiInstance';
 import { UserInfoResponse, UserLoginRequest, UserRegistrationRequest } from '@/types/auth';
 import { SchoolListResponse } from '@/types/utils';
+import { getErrorMessage } from '@/utils/errorMessage';
 
 export const getSchoolList = async (): Promise<SchoolListResponse> => {
   try {
     const response = await apiInstance.get('/institutions');
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -19,8 +19,7 @@ export const verifyEmail = async (email: string) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -32,8 +31,7 @@ export const checkAuthCode = async (email: string, code: string) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -49,8 +47,7 @@ export const registerUser = async (user: UserRegistrationRequest) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -63,8 +60,7 @@ export const loginUser = async (userLogin: UserLoginRequest) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -73,8 +69,7 @@ export const withdrawUser = async () => {
     const response = await apiInstance.delete('/members/me');
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -83,7 +78,6 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
     const response = await apiInstance.get('/members/me');
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };

@@ -3,7 +3,7 @@ import { PrivacyPolicy } from 'app/guide/(info)/PrivacyPolicy';
 import { TermsOfService } from 'app/guide/(info)/TermsOfService';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Dimensions, Modal, Text, View } from 'react-native';
+import { Dimensions, Modal, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
@@ -20,6 +20,7 @@ import { useFormFields } from '@/hooks/useFormFields';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { storeToken } from '@/utils/authStorage';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 import styles from './styles';
 
@@ -69,8 +70,7 @@ export const SignInfo = () => {
       storeToken(response.token);
       router.replace('/sign-complete');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-      Alert.alert('회원가입 실패', errorMessage);
+      showErrorAlert('오류', error);
     }
   };
 

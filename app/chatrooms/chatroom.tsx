@@ -14,6 +14,7 @@ import { useLayout } from '@/contexts/LayoutContext';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { ChatMessage } from '@/types/chat';
 import colors from '@/types/colors';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (message: string) => void }) => {
   const [message, setMessage] = useState('');
@@ -102,8 +103,6 @@ export const Chatroom = () => {
   const currentRoomMessage = messagesByChatroom[selectedChatroom?.id ?? 0];
   const { readChat } = useWebSocketContext();
 
-  console.log('selectedChatroom', selectedChatroom);
-
   useEffect(() => {
     if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
       if (selectedChatroom?.id !== undefined) {
@@ -155,7 +154,7 @@ export const Chatroom = () => {
         const response = await getChatMessages(selectedChatroom.id, undefined, 20);
         setChatMessages(response.chats.reverse());
       } catch (error) {
-        console.error('Error fetching chat messages:', error);
+        showErrorAlert('오류', error);
       }
     };
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
 
 import { getPostCreationStatus } from '@/api/posts';
 import GlitterIcon from '@/assets/icons/glitter.svg';
 import { CommonButton } from '@/components/common/Button';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 interface CreateGlitterButtonProps {
   onPress: () => void;
@@ -23,8 +23,7 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
         const response = await getPostCreationStatus();
         setPostCreationStatus(response);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-        Alert.alert('오류', errorMessage);
+        showErrorAlert('오류', error);
       }
     };
 

@@ -1,5 +1,6 @@
 import apiInstance from '@/api/apiInstance';
 import { ChatListResponse, ChatMessageResponse, CreateChatRequest } from '@/types/chat';
+import { getErrorMessage } from '@/utils/errorMessage';
 
 export const createChat = async ({ postId, content }: CreateChatRequest) => {
   try {
@@ -9,8 +10,7 @@ export const createChat = async ({ postId, content }: CreateChatRequest) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -19,8 +19,7 @@ export const getChatList = async (): Promise<ChatListResponse> => {
     const response = await apiInstance.get('/chatrooms');
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -39,8 +38,7 @@ export const getChatMessages = async (
 
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };
 
@@ -49,7 +47,6 @@ export const deleteChatroom = async (chatroomId: number) => {
     const response = await apiInstance.delete(`/chatrooms/${chatroomId}`);
     return response.data;
   } catch (error) {
-    const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+    throw new Error(getErrorMessage(error));
   }
 };

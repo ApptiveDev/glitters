@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/common/Checkbox';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import colors from '@/types/colors';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 export const Report = () => {
   const [text, setText] = useState('');
@@ -41,7 +42,7 @@ export const Report = () => {
       Alert.alert('신고가 완료되었습니다.', '24시간 이내에 담당자가 처리할 예정입니다.');
       router.back();
     } catch (error) {
-      console.error('Error reporting marker:', error);
+      showErrorAlert('오류', error);
     }
   };
   return (

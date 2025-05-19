@@ -24,6 +24,7 @@ import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
+import { showErrorAlert } from '@/utils/errorMessage';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
 import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
@@ -75,8 +76,7 @@ const MapSearch = () => {
         const response = await getBoundMarkers();
         setBound(response[user.institution.id]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-        Alert.alert('오류', errorMessage);
+        showErrorAlert('오류', error);
       }
     };
 
@@ -160,8 +160,7 @@ const MapSearch = () => {
         text2: '상대방이 확인할 수 있어요.',
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-      Alert.alert('오류', errorMessage);
+      showErrorAlert('오류', error);
       setMessage('');
       setSendChatModalVisible(false);
     }

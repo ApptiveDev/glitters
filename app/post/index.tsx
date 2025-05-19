@@ -17,6 +17,7 @@ import { Spacing } from '@/components/common/Spacing';
 import { CustomTextArea } from '@/components/common/TextArea';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
+import { showErrorAlert } from '@/utils/errorMessage';
 import { markerIcons } from '@/utils/markerIcons';
 import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
@@ -31,8 +32,7 @@ export const PostPage = () => {
         const response = await getPostById({ postId: Number(postId) });
         setPost(response);
       } catch (error) {
-        const errorMessage = (error as any)?.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-        Alert.alert('오류', errorMessage);
+        showErrorAlert('오류', error);
       }
     };
 
@@ -52,8 +52,6 @@ export const PostPage = () => {
 
     return iconsArray[index] ?? HeartIcon;
   }, [post?.iconIdx, post?.markerIdx]);
-
-  console.log('Post:', post);
 
   const getButtonText = (isWrittenBySelf: boolean, isLikedBySelf: boolean) => {
     if (isWrittenBySelf) {
