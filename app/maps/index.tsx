@@ -4,12 +4,14 @@ import { queryClient } from 'app/_layout';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { SvgProps } from 'react-native-svg';
+import Toast from 'react-native-toast-message';
 
+import { createChat } from '@/api/chat';
 import { addLike, deleteMarker, getBoundMarkers, getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
@@ -19,7 +21,10 @@ import GlitterIcon from '@/assets/icons/glitter.svg';
 import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
 import MarkerIcon from '@/assets/icons/marker.png';
 import MarkerBySelfIcon from '@/assets/icons/marker_by_self.png';
+import SendIcon from '@/assets/icons/send.svg';
+import SimpleExitIcon from '@/assets/icons/simple_exit.svg';
 import { CommonButton } from '@/components/common/Button';
+import { Spacing } from '@/components/common/Spacing';
 import { CustomTextArea } from '@/components/common/TextArea';
 import CustomBottomSheet from '@/components/features/BottomSheet';
 import Loading from '@/components/features/Loading';
@@ -39,6 +44,7 @@ const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
   const { insetBottom } = useLayout();
+  const [sendChatModalVisible, setSendChatModalVisible] = useState(false);
 
   const { bound, setBound } = usePost();
   const [currentPosition, setCurrentPosition] = useState<{
@@ -51,6 +57,7 @@ const MapSearch = () => {
   const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
   const { user } = useUser();
+  const [message, setMessage] = useState('');
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { data: markers, isLoading } = useQuery({
@@ -218,6 +225,28 @@ const MapSearch = () => {
     setIsListOpen(true);
   };
 
+  const startChat = async () => {
+    if (!post) return;
+    try {
+      await createChat({
+        postId: post?.id,
+        content: message,
+      });
+      setMessage('');
+      setSendChatModalVisible(false);
+      Toast.show({
+        type: 'success',
+        text1: '쪽지를 보냈어요',
+        text2: '상대방이 확인할 수 있어요.',
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      Alert.alert('오류', errorMessage);
+      setMessage('');
+      setSendChatModalVisible(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <MapView
@@ -363,9 +392,8 @@ const MapSearch = () => {
               <CommonButton
                 title="  채팅하기"
                 variant="view"
-                onPress={() => {}}
+                onPress={() => setSendChatModalVisible(true)}
                 buttonIcon={<BubbleIcon />}
-                disabled={post?.isLikedBySelf}
                 style={{
                   flex: 6,
                 }}
@@ -479,6 +507,137 @@ const MapSearch = () => {
           </ScrollView>
         </View>
       )}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={sendChatModalVisible}
+        onRequestClose={() => {
+          setSendChatModalVisible(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          }}
+        >
+          <View
+            style={{
+              width: '80%',
+              height: 200,
+              backgroundColor: colors.background,
+              borderRadius: 12,
+              paddingVertical: 25,
+              paddingHorizontal: 28,
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 4,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 10,
+                color: colors.text.white,
+                fontWeight: 'bold',
+              }}
+            >
+              채팅 시작하기
+            </Text>
+            <Spacing height={25} />
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: colors.text.white,
+                  fontWeight: 'bold',
+                  marginBottom: 16,
+                }}
+                ellipsizeMode="tail"
+              >
+                {post?.title}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={{ position: 'absolute', right: 28, top: 25 }}
+              onPress={() => setSendChatModalVisible(false)}
+            >
+              <SimpleExitIcon width={16} height={16} />
+            </TouchableOpacity>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                width: '100%',
+                gap: 8,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 12,
+                  paddingTop: 8,
+                  paddingBottom: 10,
+                  backgroundColor: colors.backgroundLight,
+                  borderRadius: 20,
+                  gap: 8,
+                  flex: 1,
+                  justifyContent: 'center',
+                }}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    color: colors.text.white,
+                    fontSize: 10,
+                    paddingVertical: 0,
+                  }}
+                  placeholder="채팅을 입력하세요."
+                  placeholderTextColor="rgba(255,255,255,0.6)"
+                  value={message}
+                  onChangeText={setMessage}
+                  numberOfLines={1}
+                  multiline
+                />
+                <TouchableOpacity
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 999,
+                    backgroundColor: message ? colors.yellow.dark : colors.primary.main,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={startChat}
+                  disabled={!message}
+                >
+                  <SendIcon width={13} height={13} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Spacing height={20} />
+            <Text
+              style={{
+                fontSize: 10,
+                color: colors.text.gray,
+              }}
+            >
+              채팅 목록에서 보낸 내용을 확인할 수 있어요.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

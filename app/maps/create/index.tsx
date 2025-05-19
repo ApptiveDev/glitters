@@ -50,7 +50,7 @@ export const CreateMarker = () => {
       setIsFetchingPlace(false);
       setBottomSheetVisible(true);
     } catch {
-      setPlaceName('기본값');
+      setPlaceName('어디인가요?');
       setIsFetchingPlace(false);
       setBottomSheetVisible(true);
     }
