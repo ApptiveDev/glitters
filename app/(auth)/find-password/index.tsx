@@ -179,6 +179,33 @@ export const FindPassword = () => {
           </TouchableOpacity>
         </View>
         {/* )} */}
+        <Spacing height={24} />
+        {/* {formFields.authCode.isVerified && ( */}
+        <TouchableOpacity
+          onPress={() => {
+            router.push('/(auth)/find-password/reset-password');
+          }}
+          style={{
+            backgroundColor: colors.yellow.main,
+            borderRadius: 4,
+            width: '100%',
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 12,
+              color: colors.background,
+              textAlign: 'center',
+              fontWeight: 'bold',
+            }}
+          >
+            비밀번호 재설정하기
+          </Text>
+        </TouchableOpacity>
+        {/* )} */}
       </KeyboardAvoidingView>
     </View>
   );
