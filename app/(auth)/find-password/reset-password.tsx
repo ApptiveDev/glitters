@@ -1,14 +1,17 @@
-import { router } from 'expo-router';
-import { Dimensions, KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Alert, Dimensions, KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { resetPassword } from '@/api/auth';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import CommonInput from '@/components/common/Input';
 import { Spacing } from '@/components/common/Spacing';
 import { useFormFields } from '@/hooks/useFormFields';
 import colors from '@/types/colors';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 export const ResetPassword = () => {
+  const { email } = useLocalSearchParams();
   const { formFields, setFieldValue, setFieldVerified, setRecheckPassword } = useFormFields();
   const { width } = Dimensions.get('window');
 
@@ -29,6 +32,20 @@ export const ResetPassword = () => {
     }
   };
 
+  const handleResetPassword = async () => {
+    try {
+      await resetPassword(email.toString(), formFields.password.value);
+      Toast.show({
+        type: 'success',
+        text1: '비밀번호 재설정 완료',
+        text2: '변경된 비밀번호로 로그인 해주세요.',
+      });
+      router.push('/login');
+    } catch (error) {
+      showErrorAlert('비밀번호 재설정 오류', error);
+    }
+  };
+
   return (
     <View
       style={{
@@ -45,7 +62,16 @@ export const ResetPassword = () => {
           alignItems: 'flex-start',
         }}
         onTouchEnd={() => {
-          router.back();
+          Alert.alert('로그인 화면으로 돌아갑니다.', '', [
+            {
+              text: '취소',
+              style: 'cancel',
+            },
+            {
+              text: '확인',
+              onPress: () => router.replace('/login'),
+            },
+          ]);
         }}
       >
         <CaretLeftIcon width={16} height={16} />
@@ -86,14 +112,7 @@ export const ResetPassword = () => {
         />
         <Spacing height={24} />
         <TouchableOpacity
-          onPress={() => {
-            Toast.show({
-              type: 'success',
-              text1: '비밀번호 재설정 완료',
-              text2: '변경된 비밀번호로 로그인 해주세요.',
-            });
-            router.push('/login');
-          }}
+          onPress={handleResetPassword}
           style={{
             backgroundColor: formFields.password.isVerified ? colors.yellow.main : colors.gray.light,
             borderRadius: 4,

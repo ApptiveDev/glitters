@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, KeyboardAvoidingView, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { checkAuthCode, verifyEmail } from '@/api/auth';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
@@ -20,7 +21,8 @@ export const FindPassword = () => {
 
   const useCheckAuthCodeMutation = () => {
     return useMutation({
-      mutationFn: ({ email, code }: { email: string; code: string }) => checkAuthCode(email, code),
+      mutationFn: ({ email, code, type }: { email: string; code: string; type: 'REGISTER' | 'RESET_PASSWORD' }) =>
+        checkAuthCode(email, code, type),
     });
   };
   const { mutateAsync: checkAuthCodeMutate } = useCheckAuthCodeMutation();
@@ -38,13 +40,14 @@ export const FindPassword = () => {
     if (isValidFormat) {
       setAuthCode(text);
     }
+    setFieldValue('authCode', text, (val) => {
+      return val.length === 6;
+    });
   };
 
   const verifyAuthCode = async () => {
     try {
-      reset();
-      start();
-      await checkAuthCodeMutate({ email: formFields.email.value, code: authCode });
+      await checkAuthCodeMutate({ email: formFields.email.value, code: authCode, type: 'RESET_PASSWORD' });
       setFieldVerified('authCode', true);
     } catch (error) {
       showErrorAlert('인증번호 오류', error);
@@ -56,8 +59,15 @@ export const FindPassword = () => {
 
   const sendEmail = async () => {
     try {
+      reset();
+      start();
       setIsSend(true);
-      await verifyEmail(formFields.email.value);
+      Toast.show({
+        type: 'success',
+        text1: '인증번호 전송 완료',
+        text2: '메일함을 확인해주세요.',
+      });
+      await verifyEmail(formFields.email.value, 'RESET_PASSWORD');
       setFieldVerified('email', true);
     } catch (error) {
       setIsSend(true);
@@ -130,82 +140,87 @@ export const FindPassword = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* {formFields.email.isVerified && !formFields.authCode.isVerified && ( */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={{ gap: 8, marginTop: 12 }}>
-            <CommonInput
-              style={{ width: width - 136 }}
-              defaultValue=""
-              value={authCode}
-              onChangeText={onAuthCodeChangeText}
-              placeholder="인증번호를 입력하세요."
-              guideText={isRunning ? `${formatted}분 남음` : ''}
-              isGuide
-              editable={!formFields.authCode.isVerified && isRunning}
-            />
-            <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
-              <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
-              <Text
-                style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
-                onPress={sendEmail}
-              >
-                재전송하기
+        {formFields.email.isVerified && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ gap: 8, marginTop: 12 }}>
+              <CommonInput
+                style={{ width: width - 136 }}
+                defaultValue=""
+                value={authCode}
+                onChangeText={onAuthCodeChangeText}
+                placeholder="인증번호를 입력하세요."
+                guideText={isRunning ? `${formatted}분 남음` : ''}
+                isGuide
+                editable={!formFields.authCode.isVerified && isRunning}
+              />
+              <Text style={{ fontSize: 12, flexDirection: 'row', paddingHorizontal: 8 }}>
+                <Text style={{ color: colors.text.white }}>인증번호를 받지 못했나요? </Text>
+                <Text
+                  style={{ color: colors.text.white, fontWeight: 'bold', textDecorationLine: 'underline' }}
+                  onPress={sendEmail}
+                >
+                  재전송하기
+                </Text>
               </Text>
-            </Text>
+            </View>
+            <TouchableOpacity
+              onPress={verifyAuthCode}
+              style={{
+                backgroundColor: formFields.authCode.isValid ? colors.yellow.main : colors.gray.light,
+                borderRadius: 4,
+                width: 80,
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              disabled={formFields.authCode.isVerified || !isRunning}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  color: colors.background,
+                  lineHeight: 12,
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                }}
+              >
+                인증번호 확인
+              </Text>
+            </TouchableOpacity>
           </View>
+        )}
+        <Spacing height={24} />
+        {formFields.authCode.isVerified && (
           <TouchableOpacity
-            onPress={verifyAuthCode}
+            onPress={() => {
+              router.push({
+                pathname: '/(auth)/find-password/reset-password',
+                params: {
+                  email: formFields.email.value,
+                },
+              });
+            }}
             style={{
-              backgroundColor: formFields.authCode.isValid ? colors.yellow.main : colors.gray.light,
+              backgroundColor: colors.yellow.main,
               borderRadius: 4,
-              width: 80,
+              width: '100%',
               height: 40,
               justifyContent: 'center',
               alignItems: 'center',
             }}
-            disabled={formFields.authCode.isVerified || !isRunning}
           >
             <Text
               style={{
-                fontSize: 10,
+                fontSize: 12,
                 color: colors.background,
-                lineHeight: 12,
                 textAlign: 'center',
                 fontWeight: 'bold',
               }}
             >
-              인증번호 확인
+              비밀번호 재설정하기
             </Text>
           </TouchableOpacity>
-        </View>
-        {/* )} */}
-        <Spacing height={24} />
-        {/* {formFields.authCode.isVerified && ( */}
-        <TouchableOpacity
-          onPress={() => {
-            router.push('/(auth)/find-password/reset-password');
-          }}
-          style={{
-            backgroundColor: colors.yellow.main,
-            borderRadius: 4,
-            width: '100%',
-            height: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 12,
-              color: colors.background,
-              textAlign: 'center',
-              fontWeight: 'bold',
-            }}
-          >
-            비밀번호 재설정하기
-          </Text>
-        </TouchableOpacity>
-        {/* )} */}
+        )}
       </KeyboardAvoidingView>
     </View>
   );
