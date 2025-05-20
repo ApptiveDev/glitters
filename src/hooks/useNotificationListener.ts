@@ -1,22 +1,33 @@
 import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { Alert } from 'react-native';
+
+interface NotificationData {
+  type: 'chat' | 'posts' | 'likes' | 'views';
+  count: number;
+  postId?: number;
+}
 
 export const useNotificationListener = () => {
-  const router = useRouter();
-
   useEffect(() => {
-    const subscription1 = Notifications.addNotificationReceivedListener((notification) => {
-      const title = notification.request.content.title || '알림';
-      const body = notification.request.content.body || '내용 없음';
-      Alert.alert(title, body);
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as NotificationData;
+      if (data?.type === 'posts') {
+        router.push('/maps');
+      } else if (data?.type === 'likes' || data?.type === 'views') {
+        const postId = data.postId || 0;
+        router.push({
+          pathname: '/post',
+          params: {
+            postId,
+          },
+        });
+      }
     });
-
     return () => {
-      subscription1.remove();
+      Notifications.removeNotificationSubscription(responseListener);
     };
-  }, [router]);
+  }, []);
 };
 
 export default useNotificationListener;

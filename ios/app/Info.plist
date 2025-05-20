@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>현재 본인의 위치를 지도상에 포기하고, 실시간으로 주변의 반짝이를 조회할 때 사용돼요. 제공된 위치정보는 저장되지 않아요.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>자신의 위치 주변에 올라온 반짝이에 대한 알림을 전달하기 위해서 필요해요. 제공된 위치 정보는 저장되지 않아요. </string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>지도상에 본인의 위치를 표기하고, 주변의 반짝이를 조회할 때 사용돼요. 제공된 위치정보는 저장되지 않아요.</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
