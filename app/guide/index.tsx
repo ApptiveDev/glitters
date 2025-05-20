@@ -5,6 +5,7 @@ import { withdrawUser } from '@/api/auth';
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
 import { Spacing } from '@/components/common/Spacing';
+import { AdminList } from '@/components/features/AdminList';
 import { useLayout } from '@/contexts/LayoutContext';
 import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
@@ -101,6 +102,7 @@ export const Guide = () => {
           <LabelValue label="성별" value={user?.gender === 0 ? '남성' : '여성'} />
           <LabelValue label="이메일" value={user.email ?? ''} />
           <LabelValue label="소속학교" value={user.institution.name ?? ''} />
+          {user.isAdmin ? <AdminList /> : null}
         </View>
         <ListItem text="도움말" onPress={handleHelpPress} />
       </View>

@@ -9,6 +9,7 @@ const initialUserState: User = {
   password: '',
   birth: '',
   gender: 0,
+  isAdmin: false,
   institution: {
     id: 0,
     name: '',
