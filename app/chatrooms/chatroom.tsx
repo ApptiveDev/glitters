@@ -6,6 +6,7 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { getChatMessages } from '@/api/chat';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import MenuIcon from '@/assets/icons/menu.svg';
+import RefreshIcon from '@/assets/icons/refresh.svg';
 import SendIcon from '@/assets/icons/send.svg';
 import { ChatMessageItem } from '@/components/features/ChatMessageItem';
 import { ChatroomSideBar } from '@/components/features/ChatroomSideBar';
@@ -102,6 +103,9 @@ export const Chatroom = () => {
   const { messagesByChatroom } = useWebSocketContext();
   const currentRoomMessage = messagesByChatroom[selectedChatroom?.id ?? 0];
   const { readChat } = useWebSocketContext();
+  const [lastMessageId, setLastMessageId] = useState(0);
+  const [scrollToTop, setScrollToTop] = useState(false);
+  const [moreChatButtonVisible, setMoreChatButtonVisible] = useState(true);
 
   useEffect(() => {
     if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
@@ -126,12 +130,6 @@ export const Chatroom = () => {
     }
   }, [currentRoomMessage, readChat, selectedChatroom?.id]);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollToEnd({ animated: true });
-    }
-  }, [chatMessages]);
-
   if (!selectedChatroom) {
     Alert.alert('에러', '채팅방을 불러올 수 없습니다.');
     router.back();
@@ -153,6 +151,7 @@ export const Chatroom = () => {
       try {
         const response = await getChatMessages(selectedChatroom.id, undefined, 20);
         setChatMessages(response.chats.reverse());
+        setLastMessageId(response.lastChatId);
       } catch (error) {
         showErrorAlert('오류', error);
       }
@@ -160,6 +159,22 @@ export const Chatroom = () => {
 
     fetchChatMessages();
   }, [selectedChatroom]);
+
+  const handleGetPreviousMessages = async () => {
+    if (!selectedChatroom) return;
+    try {
+      const response = await getChatMessages(selectedChatroom.id, lastMessageId, 20);
+      if (response.chats.length === 0) {
+        setMoreChatButtonVisible(false);
+      } else {
+        setChatMessages((prev) => [...response.chats.reverse(), ...prev]);
+        setLastMessageId(response.lastChatId);
+        setScrollToTop(true);
+      }
+    } catch (error) {
+      showErrorAlert('오류', error);
+    }
+  };
 
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
@@ -175,22 +190,59 @@ export const Chatroom = () => {
         <MenuIcon width={24} height={24} onPress={() => setSidebarVisible(true)} />
       </View>
       <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 12 }}>커뮤니티 가이드를 준수해주세요.</Text>
+      {moreChatButtonVisible ? (
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            padding: 4,
+            marginTop: 12,
+            height: 20,
+            borderRadius: 999,
+            gap: 2,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.primary.main,
+          }}
+          onPress={handleGetPreviousMessages}
+        >
+          <RefreshIcon width={12} height={12} />
+          <Text
+            style={{
+              fontSize: 10,
+              color: colors.background,
+              lineHeight: 12,
+              textAlign: 'center',
+              marginRight: 4,
+              fontWeight: 'bold',
+            }}
+          >
+            이전 채팅 더보기
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={{ height: 32 }} />
+      )}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 0}
         style={{
           flex: 1,
           width: '100%',
-          paddingTop: 24,
+          paddingTop: 12,
         }}
       >
         <ScrollView
           ref={scrollRef}
-          style={{ flex: 1, width: '100%', paddingTop: 24, marginBottom: 20 }}
+          style={{ flex: 1, width: '100%', paddingTop: 12, marginBottom: 20 }}
           contentContainerStyle={{ gap: 8 }}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => {
-            scrollRef.current?.scrollToEnd({ animated: true });
+            if (scrollToTop) {
+              scrollRef.current?.scrollTo({ y: 0, animated: true });
+              setScrollToTop(false);
+            } else {
+              scrollRef.current?.scrollToEnd({ animated: true });
+            }
           }}
         >
           {chatMessages.length > 0 ? (

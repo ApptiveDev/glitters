@@ -1,3 +1,5 @@
+import { SchoolListType } from './utils';
+
 export interface User {
   id: number;
   name: string;
@@ -5,18 +7,12 @@ export interface User {
   password: string;
   birth: string;
   gender: number;
+  isAdmin: boolean;
   termsAccepted: boolean;
   joinedAt: string;
   reportedCount: number;
   isDeactivated: boolean;
-  institution: {
-    id: number;
-    name: string;
-    emailDomain: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-  };
+  institution: SchoolListType;
   hasUnreadChat: boolean;
 }
 

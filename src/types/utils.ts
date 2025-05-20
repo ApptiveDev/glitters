@@ -3,8 +3,8 @@ export interface SchoolListType {
   name: string;
   emailDomain: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SchoolListResponse {
