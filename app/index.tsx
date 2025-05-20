@@ -12,7 +12,7 @@ import { postLocation } from '@/api/notifications';
 import Splash from '@/components/features/Splash';
 import { useUser } from '@/contexts/UserContext';
 import { useNotificationListener } from '@/hooks/useNotificationListener';
-import { requestBackgroundLocationPermission } from '@/utils/asyncStorage';
+import { registerForPushNotificationsAsync, requestBackgroundLocationPermission } from '@/utils/asyncStorage';
 import { getToken } from '@/utils/authStorage';
 
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -44,9 +44,8 @@ export const Index = () => {
   useEffect(() => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
-
       await requestBackgroundLocationPermission();
-      // await registerForPushNotificationsAsync();
+      await registerForPushNotificationsAsync();
 
       setIsReady(true);
     };
