@@ -12,10 +12,11 @@ export const getSchoolList = async (): Promise<SchoolListResponse> => {
   }
 };
 
-export const verifyEmail = async (email: string) => {
+export const verifyEmail = async (email: string, type: 'REGISTER' | 'RESET_PASSWORD') => {
   try {
     const response = await apiInstance.post('/verify-email', {
       email,
+      type,
     });
     return response.data;
   } catch (error) {
@@ -23,11 +24,12 @@ export const verifyEmail = async (email: string) => {
   }
 };
 
-export const checkAuthCode = async (email: string, code: string) => {
+export const checkAuthCode = async (email: string, code: string, type: 'REGISTER' | 'RESET_PASSWORD') => {
   try {
     const response = await apiInstance.put('/verify-email', {
       email,
       code,
+      type,
     });
     return response.data;
   } catch (error) {
@@ -76,6 +78,20 @@ export const withdrawUser = async () => {
 export const getUserInfo = async (): Promise<UserInfoResponse> => {
   try {
     const response = await apiInstance.get('/members/me');
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+export const resetPassword = async (email: string, password: string) => {
+  try {
+    console.log('email', email);
+    console.log('password', password);
+    const response = await apiInstance.put('/password', {
+      email,
+      password,
+    });
     return response.data;
   } catch (error) {
     throw new Error(getErrorMessage(error));

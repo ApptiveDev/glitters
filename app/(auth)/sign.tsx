@@ -44,13 +44,14 @@ export const Sign = () => {
 
   const useVerifyEmailMutation = () => {
     return useMutation({
-      mutationFn: (email: string) => verifyEmail(email),
+      mutationFn: ({ email, type }: { email: string; type: 'REGISTER' | 'RESET_PASSWORD' }) => verifyEmail(email, type),
     });
   };
 
   const useCheckAuthCodeMutation = () => {
     return useMutation({
-      mutationFn: ({ email, code }: { email: string; code: string }) => checkAuthCode(email, code),
+      mutationFn: ({ email, code, type }: { email: string; code: string; type: 'REGISTER' | 'RESET_PASSWORD' }) =>
+        checkAuthCode(email, code, type),
     });
   };
 
@@ -83,7 +84,7 @@ export const Sign = () => {
     reset();
     start();
     try {
-      await verifyEmailMutate(`${localPart}${domain}`);
+      await verifyEmailMutate({ email: `${localPart}${domain}`, type: 'REGISTER' });
       setFieldVerified('email', true);
     } catch (error) {
       showErrorAlert('이메일 인증 오류', error);
@@ -94,7 +95,7 @@ export const Sign = () => {
     debounce(async (email: string, code: string) => {
       try {
         setInputStatus({ loading: true, checked: false });
-        await checkAuthCodeMutate({ email, code });
+        await checkAuthCodeMutate({ email, code, type: 'REGISTER' });
         await sleep(500);
         setInputStatus({ loading: false, checked: true });
         setFieldVerified('authCode', true);

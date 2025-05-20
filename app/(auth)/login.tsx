@@ -56,6 +56,10 @@ export const Login = () => {
     router.push('/sign');
   };
 
+  const goToFindPasswordPage = () => {
+    router.push('/(auth)/find-password');
+  };
+
   return (
     <KeyboardScrollContainer>
       <Spacing height={84} />
@@ -93,6 +97,9 @@ export const Login = () => {
       />
       <Text style={styles.signText} onPress={goToSignUpPage}>
         반짝이맵이 처음이신가요?
+      </Text>
+      <Text style={styles.signText} onPress={goToFindPasswordPage}>
+        비밀번호 찾기
       </Text>
     </KeyboardScrollContainer>
   );
