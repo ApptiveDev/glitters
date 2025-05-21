@@ -68,7 +68,7 @@ const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (messag
             maxHeight: 20 * 5 + 10,
             paddingVertical: 0,
           }}
-          placeholder="채팅을 입력하세요."
+          placeholder="보내고 싶은 말을 입력하세요."
           placeholderTextColor="rgba(255,255,255,0.6)"
           value={message}
           onChangeText={setMessage}
@@ -216,7 +216,7 @@ export const Chatroom = () => {
               fontWeight: 'bold',
             }}
           >
-            이전 채팅 더보기
+            메시지 더보기
           </Text>
         </TouchableOpacity>
       ) : (

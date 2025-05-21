@@ -193,7 +193,7 @@ export const MapPostBottomSheet = ({
               }}
             />
             <CommonButton
-              title="  채팅하기"
+              title="  쪽지 보내기"
               variant="view"
               onPress={() => setSendChatModalVisible(true)}
               buttonIcon={<BubbleIcon />}

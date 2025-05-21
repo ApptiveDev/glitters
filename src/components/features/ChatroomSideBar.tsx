@@ -135,7 +135,7 @@ export const ChatroomSideBar = ({
             fontWeight: 'bold',
           }}
         >
-          채팅 참여자
+          참여자
         </Text>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
           <Scope3DIcon width={44} height={44} />

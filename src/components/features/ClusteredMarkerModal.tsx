@@ -5,6 +5,7 @@ import { Image, Modal, Text, TouchableOpacity, TouchableWithoutFeedback, View } 
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import CaretRightIcon from '@/assets/icons/caret_right.svg';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
+import ExitIcon from '@/assets/icons/simple_exit.svg';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
 import { markerIcons } from '@/utils/markerIcons';
@@ -98,12 +99,13 @@ export const ClusteredMarkerModal = ({
             alignItems: 'center',
             flexDirection: 'row',
             gap: 8,
+            paddingHorizontal: 12,
           }}
         >
           <CaretLeftIcon width={24} height={24} onPress={handleLeftPress} />
           <View
             style={{
-              width: '100%',
+              flex: 1,
               alignItems: 'flex-start',
               justifyContent: 'flex-start',
               height: 226,
@@ -113,7 +115,7 @@ export const ClusteredMarkerModal = ({
             {paginatedPosts.map((clusterPost) => (
               <TouchableOpacity
                 key={clusterPost.id + clusterPost.title}
-                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
+                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8, width: '100%' }}
                 onPress={() => {
                   setPost(clusterPost);
                   setIsVisible(true);
@@ -130,6 +132,7 @@ export const ClusteredMarkerModal = ({
                     fontSize: 12,
                     color: colors.text.white,
                     fontWeight: 'bold',
+                    flexShrink: 1,
                   }}
                   ellipsizeMode="tail"
                   numberOfLines={1}
@@ -153,6 +156,7 @@ export const ClusteredMarkerModal = ({
             </Text>
           </View>
           <CaretRightIcon width={24} height={24} onPress={handleRightPress} />
+          <ExitIcon width={16} height={16} onPress={closeModal} style={{ position: 'absolute', top: 16, right: 16 }} />
         </View>
       </View>
     </Modal>
