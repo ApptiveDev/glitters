@@ -216,7 +216,7 @@ export const Chatroom = () => {
               fontWeight: 'bold',
             }}
           >
-            메시지 더보기
+            이전 채팅 더보기
           </Text>
         </TouchableOpacity>
       ) : (

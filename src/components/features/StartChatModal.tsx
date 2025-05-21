@@ -77,13 +77,12 @@ export const StartChatModal = ({ visible, setVisible, postId, markerIdx, title }
         >
           <Text
             style={{
-              fontSize: 10,
+              fontSize: 14,
               color: colors.text.white,
               fontWeight: 'bold',
-              lineHeight: 12,
             }}
           >
-            쪽지 보내기
+            첫 쪽지 보내기
           </Text>
           <Spacing height={25} />
           <View
