@@ -52,7 +52,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>지도상에 본인의 위치를 표기하고, 주변의 반짝이를 조회할 때 사용돼요. 제공된 위치정보는 저장되지 않아요.</string>
+	<string>본 앱은 사용자 위치를 지도에 표시하고, 현재 위치를 기준으로 핀을 조회하며, 현재 위치 주변에 핀을 생성하기 위해 위치 접근 권한을 요청합니다.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
