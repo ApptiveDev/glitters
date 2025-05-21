@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -23,6 +23,17 @@ export const ChatRooms = () => {
   const { setSelectedChatroom } = useChatroom();
   const { messagesByChatroom } = useWebSocketContext();
   const { insetTop } = useLayout();
+  const { chatroomId } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (chatroomId) {
+      const chatroom = data?.chatrooms.find((chatRoom) => chatRoom.id === Number(chatroomId));
+      if (chatroom) {
+        setSelectedChatroom(chatroom);
+        router.push('/chatrooms/chatroom');
+      }
+    }
+  }, [chatroomId, data, setSelectedChatroom]);
 
   const handleChatRoomPress = (chatroom: Chat) => {
     setSelectedChatroom(chatroom);

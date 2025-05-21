@@ -6,6 +6,7 @@ interface NotificationData {
   type: 'chat' | 'posts' | 'likes' | 'views';
   count: number;
   postId?: number;
+  chatroomId?: number;
 }
 
 export const useNotificationListener = () => {
@@ -20,6 +21,14 @@ export const useNotificationListener = () => {
           pathname: '/post',
           params: {
             postId,
+          },
+        });
+      } else if (data?.type === 'chat') {
+        const chatroomId = data.chatroomId || 0;
+        router.push({
+          pathname: '/chatrooms/chatroom',
+          params: {
+            chatroomId,
           },
         });
       }
