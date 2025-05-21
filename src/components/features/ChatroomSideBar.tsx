@@ -67,6 +67,7 @@ export const ChatroomSideBar = ({
       pathname: '/post',
       params: {
         postId,
+        from: 'chatroom',
       },
     });
   };

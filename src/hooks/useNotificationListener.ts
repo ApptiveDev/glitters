@@ -21,6 +21,7 @@ export const useNotificationListener = () => {
           pathname: '/post',
           params: {
             postId,
+            from: 'notification',
           },
         });
       } else if (data?.type === 'chat') {

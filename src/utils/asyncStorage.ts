@@ -16,7 +16,6 @@ export const registerForPushNotificationsAsync = async () => {
     }
 
     if (finalStatus !== 'granted') {
-      console.warn('푸시 알림 권한 거부됨');
       return;
     }
 

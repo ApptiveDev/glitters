@@ -3,11 +3,13 @@ import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SvgProps } from 'react-native-svg';
 
 import { addLike, deleteMarker } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import HeartIcon from '@/assets/icons/3d/heart_red.svg';
+import BubbleIcon from '@/assets/icons/bubble.svg';
 import LeftCaretIcon from '@/assets/icons/caret_left.svg';
 import EyeIcon from '@/assets/icons/eye.svg';
 import GlitterIcon from '@/assets/icons/glitter.svg';
@@ -15,6 +17,7 @@ import GlitterBlueIcon from '@/assets/icons/glitter_blue.svg';
 import { CommonButton } from '@/components/common/Button';
 import { Spacing } from '@/components/common/Spacing';
 import { CustomTextArea } from '@/components/common/TextArea';
+import { StartChatModal } from '@/components/features/StartChatModal';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
 import { showErrorAlert } from '@/utils/errorMessage';
@@ -23,8 +26,9 @@ import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const PostPage = () => {
   const [post, setPost] = useState<GetPostResponseType | null>(null);
-  const { postId } = useLocalSearchParams();
+  const { postId, from } = useLocalSearchParams();
   const [overrideButtonText, setOverrideButtonText] = useState<string | null>(null);
+  const [sendChatModalVisible, setSendChatModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -129,7 +133,7 @@ export const PostPage = () => {
   };
 
   return (
-    <View>
+    <ScrollView>
       <View
         style={{
           flexDirection: 'row',
@@ -156,7 +160,7 @@ export const PostPage = () => {
         <Image source={markerIcons[post?.markerIdx || 0].icon} style={{ width: 24, height: 24 }} />
         <Text style={{ fontSize: 12, fontWeight: 'bold', color: colors.text.white }}>{post?.address}</Text>
       </View>
-      <Spacing height={32} />
+      <Spacing height={24} />
       <Text numberOfLines={2} style={{ fontSize: 24, fontWeight: 'bold', color: colors.text.white, lineHeight: 32 }}>
         {post?.title}
       </Text>
@@ -221,7 +225,7 @@ export const PostPage = () => {
           <PostIcon width={400} height={400} />
         </View>
       </View>
-      <Spacing height={32} />
+      <Spacing height={24} />
       <CommonButton
         title={overrideButtonText ?? getButtonText(post?.isWrittenBySelf ?? false, post?.isLikedBySelf ?? false)}
         variant={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf ? 'primary' : 'view'}
@@ -230,13 +234,32 @@ export const PostPage = () => {
         disabled={overrideButtonText === ' 반짝반짝' || post?.isLikedBySelf}
         fontSize={12}
       />
+      {!post?.isWrittenBySelf && from !== 'chatroom' ? (
+        <>
+          <Spacing height={16} />
+          <CommonButton
+            title=" 쪽지 보내기"
+            variant="view"
+            onPress={() => setSendChatModalVisible(true)}
+            buttonIcon={<BubbleIcon />}
+            fontSize={12}
+          />
+        </>
+      ) : null}
       <Spacing height={16} />
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ fontSize: 12, color: colors.text.lightgray }} onPress={handleDeletePost}>
           {post?.isWrittenBySelf ? '게시글 삭제하기' : '게시글 신고하기'}
         </Text>
       </View>
-    </View>
+      <StartChatModal
+        visible={sendChatModalVisible}
+        setVisible={setSendChatModalVisible}
+        postId={post?.id}
+        markerIdx={post?.markerIdx}
+        title={post?.title}
+      />
+    </ScrollView>
   );
 };
 
