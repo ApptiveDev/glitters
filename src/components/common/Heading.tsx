@@ -22,7 +22,6 @@ export const Heading = ({
   return (
     <View
       style={{
-        flex: 1,
         justifyContent: styles.justifyContent,
         alignItems: styles.alignItems,
       }}

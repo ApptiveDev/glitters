@@ -8,7 +8,6 @@ import { View } from 'react-native';
 import { getUserInfo } from '@/api/auth';
 import Splash from '@/components/features/Splash';
 import { useUser } from '@/contexts/UserContext';
-import { registerForPushNotificationsAsync } from '@/utils/asyncStorage';
 import { getToken } from '@/utils/authStorage';
 
 export const Index = () => {
@@ -20,7 +19,7 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
       await Location.requestForegroundPermissionsAsync();
-      await registerForPushNotificationsAsync();
+      // await registerForPushNotificationsAsync();
 
       setIsReady(true);
     };

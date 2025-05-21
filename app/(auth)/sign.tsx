@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import debounce from 'lodash/debounce';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
 import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
@@ -11,6 +11,8 @@ import CustomDropdown from '@/components/common/Dropdown';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
+import { PageBack } from '@/components/common/PageBack';
+import { Spacing } from '@/components/common/Spacing';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import { useFormFields } from '@/hooks/useFormFields';
@@ -28,11 +30,11 @@ interface InputStatus {
 }
 
 export const Sign = () => {
-  const [domain, setDomain] = useState<string | null>(null);
   const [localPart, setLocalPart] = useState<string>('');
   const { width } = Dimensions.get('window');
   const [authCode, setAuthCode] = useState<string>('');
   const [inputStatus, setInputStatus] = useState<InputStatus>({ loading: false, checked: false });
+  const [schoolData, setSchoolData] = useState<{ name: string; domain: string } | null>(null);
 
   const { formFields, setFieldValue, setFieldVerified, setRecheckPassword } = useFormFields();
 
@@ -84,7 +86,7 @@ export const Sign = () => {
     reset();
     start();
     try {
-      await verifyEmailMutate({ email: `${localPart}${domain}`, type: 'REGISTER' });
+      await verifyEmailMutate({ email: `${localPart}${schoolData?.domain}`, type: 'REGISTER' });
       setFieldVerified('email', true);
     } catch (error) {
       showErrorAlert('이메일 인증 오류', error);
@@ -121,7 +123,7 @@ export const Sign = () => {
     if (isValidFormat) {
       setAuthCode(text);
       if (text.length === 6) {
-        const email = `${localPart}${domain}`;
+        const email = `${localPart}${schoolData?.domain}`;
         setFieldValue('authCode', text, () => true);
         debouncedCheckRef.current(email, text);
       }
@@ -150,7 +152,7 @@ export const Sign = () => {
 
   const goToNextScreen = () => {
     updateUser({
-      email: `${localPart}${domain}`,
+      email: `${localPart}${schoolData?.domain}`,
       password: formFields.password.value,
     });
   };
@@ -167,25 +169,33 @@ export const Sign = () => {
         flex: 1,
       }}
     >
+      <PageBack />
+      <Spacing height={24} />
       <KeyboardScrollContainer
         viewStyle={{
           gap: 16,
         }}
       >
-        {!domain && (
+        {!schoolData?.domain && (
           <View style={styles.element}>
             <Heading title="학교 선택하기" />
             <CustomDropdown
               data={formattedList || []}
-              value={domain}
-              setValue={setDomain}
+              value={schoolData?.domain}
+              setValue={setSchoolData}
               style={{ width: width - 56 }}
             />
           </View>
         )}
 
-        {domain && (
+        {schoolData?.domain && (
           <View style={styles.element}>
+            <TouchableOpacity
+              style={{ width: '100%', backgroundColor: colors.primary.darker, padding: 16, borderRadius: 12 }}
+            >
+              <Text style={{ color: colors.text.white, fontSize: 16 }}>{schoolData?.name}</Text>
+            </TouchableOpacity>
+            <Spacing height={12} />
             <Heading title="학교 이메일 입력하기" />
             <View style={[styles.inputContainer, { flexDirection: 'row' }]}>
               <CommonInput
@@ -198,7 +208,7 @@ export const Sign = () => {
               />
               <CommonInput
                 style={{ flex: 1, width: width / 2 - 28 }}
-                defaultValue={domain}
+                value={schoolData?.domain || ''}
                 isValid={formFields.email.isValid}
                 editable={false}
               />

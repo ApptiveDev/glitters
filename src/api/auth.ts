@@ -38,7 +38,7 @@ export const checkAuthCode = async (email: string, code: string, type: 'REGISTER
 };
 
 export const registerUser = async (user: UserRegistrationRequest) => {
-  const { email, password, name, birth, termsAccepted } = user;
+  const { email, password, name, birth, termsAccepted, gender } = user;
   try {
     const response = await apiInstance.post('/register', {
       email,
@@ -46,6 +46,7 @@ export const registerUser = async (user: UserRegistrationRequest) => {
       name,
       birth,
       termsAccepted,
+      gender,
     });
     return response.data;
   } catch (error) {

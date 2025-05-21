@@ -10,8 +10,8 @@ interface DropdownItem {
 
 interface CustomDropdownProps {
   data: DropdownItem[];
-  value: string | null;
-  setValue: (val: string) => void;
+  value: string | undefined;
+  setValue: (value: { name: string; domain: string }) => void;
   placeholder?: string;
   style?: object;
 }
@@ -23,18 +23,16 @@ const styles = StyleSheet.create({
   },
   selector: {
     width: '100%',
-    backgroundColor: colors.background,
+    backgroundColor: colors.primary.darker,
     padding: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FBFBFB',
   },
   placeholderText: {
-    color: '#aaa',
+    color: colors.primary.main,
     fontSize: 16,
   },
   selectedText: {
-    color: 'white',
+    color: colors.text.white,
     fontSize: 16,
   },
   overlay: {
@@ -43,7 +41,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
   bottomList: {
-    backgroundColor: 'white',
+    backgroundColor: colors.text.white,
     paddingVertical: 52,
     paddingHorizontal: 24,
     borderTopLeftRadius: 16,
@@ -63,8 +61,12 @@ const CustomDropdown = ({ data, value, setValue, placeholder = '학교를 선택
   const [open, setOpen] = useState(false);
   const selectedLabel = data.find((item) => item.value === value)?.label;
 
-  const handleSelect = (val: string) => {
-    setValue(val);
+  const handleSelect = (name: string, domain: string) => {
+    console.log('Selected value:', name, domain);
+    setValue({
+      name,
+      domain,
+    });
     setOpen(false);
   };
 
@@ -81,7 +83,7 @@ const CustomDropdown = ({ data, value, setValue, placeholder = '학교를 선택
               data={data}
               keyExtractor={(item) => item.value}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.item} onPress={() => handleSelect(item.value)}>
+                <TouchableOpacity style={styles.item} onPress={() => handleSelect(item.label, item.value)}>
                   <Text style={styles.itemText}>{item.label}</Text>
                 </TouchableOpacity>
               )}

@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, View } from 'react-native';
 import MapView from 'react-native-map-clustering';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -54,6 +54,8 @@ const MapSearch = () => {
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
+
+  const memoizedMarkers = useMemo(() => markers, [markers]);
 
   const handleButtonPress = () => {
     router.push({
@@ -159,6 +161,7 @@ const MapSearch = () => {
         tracksViewChanges={false}
         preserveClusterPressBehavior
         showsUserLocation
+        moveOnMarkerPress={false}
         onPress={handleMapPress}
         onRegionChangeComplete={(region) => {
           const { latitude, longitude } = region;
@@ -184,8 +187,8 @@ const MapSearch = () => {
         clusterColor={colors.primary.main}
         onClusterPress={handleClusterPress}
       >
-        {markers &&
-          markers
+        {memoizedMarkers &&
+          memoizedMarkers
             .filter((marker): marker is MarkerType => !!marker)
             .map((marker) => (
               <Marker
@@ -228,9 +231,9 @@ const MapSearch = () => {
       <StartChatModal
         visible={sendChatModalVisible}
         setVisible={setSendChatModalVisible}
-        postId={post?.id}
-        markerIdx={post?.markerIdx}
-        title={post?.title}
+        postId={post?.id || 0}
+        markerIdx={post?.markerIdx || 0}
+        title={post?.title || ''}
       />
     </View>
   );

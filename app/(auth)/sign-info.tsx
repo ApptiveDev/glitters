@@ -13,6 +13,8 @@ import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
 import { KeyboardScrollContainer } from '@/components/common/KeyboardScrollContainer';
+import { PageBack } from '@/components/common/PageBack';
+import { Spacing } from '@/components/common/Spacing';
 import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
@@ -90,9 +92,11 @@ export const SignInfo = () => {
         flex: 1,
       }}
     >
+      <PageBack />
+      <Spacing height={24} />
       <KeyboardScrollContainer
         viewStyle={{
-          gap: 28,
+          gap: 16,
         }}
       >
         <View style={styles.heading}>
