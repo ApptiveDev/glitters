@@ -101,7 +101,7 @@ export const CommunityGuide = () => {
 
         <Text style={styles.title}>5. 제재 기준 및 이의제기</Text>
         <Text style={styles.content}>
-          1) 신고 즉시 비공개 → 관리자 검토 → 제재(경고, 정지, 영구정지){'\n'}
+          1) 신고 시 24시간 이내 관리자 검토 → 제재(경고, 정지, 영구정지){'\n'}
           2) 블랙리스트: 누적 10회 신고 시 영구 이용 불가{'\n'}
           3) 이의제기: 고객센터{' '}
           <Text
