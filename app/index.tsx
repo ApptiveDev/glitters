@@ -12,6 +12,7 @@ import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
 import { registerForPushNotificationsAsync } from '@/utils/asyncStorage';
 import { getToken, removeToken } from '@/utils/authStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const Index = () => {
   const router = useRouter();
@@ -23,8 +24,7 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
       await Location.requestForegroundPermissionsAsync();
-      await registerForPushNotificationsAsync();
-
+      // await registerForPushNotificationsAsync();
       setIsReady(true);
     };
 
@@ -33,8 +33,9 @@ export const Index = () => {
 
   const onLayoutRootView = useCallback(async () => {
     if (!isReady) return;
-
+    console.log('Getting Token');
     const token = await getToken();
+    console.log(`Token: ${token}`);
 
     if (token) {
       const userRes = await getUserInfo();
