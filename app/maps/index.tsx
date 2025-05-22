@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, Text, View } from 'react-native';
 import { Marker, MarkerPressEvent } from 'react-native-maps';
@@ -36,6 +36,7 @@ const MapSearch = () => {
   const [visibleRegion, setVisibleRegion] = useState(null);
   const [isLoadingMarkers, setIsLoadingMarkers] = useState(false);
   const isAnimatingRef = useRef(false);
+  const { postId } = useLocalSearchParams();
 
   const { insetBottom } = useLayout();
   const { bound } = usePost();
@@ -50,6 +51,22 @@ const MapSearch = () => {
     refetchOnWindowFocus: true,
     staleTime: 0,
   });
+
+  useEffect(() => {
+    if (!postId) return;
+    async function fetchPost() {
+      const selectedPost = await getPostById({ postId: Number(postId) });
+      if (selectedPost) {
+        setPost(selectedPost);
+        setIsVisible(true);
+        setCurrentPosition({
+          latitude: selectedPost.latitude,
+          longitude: selectedPost.longitude,
+        });
+      }
+    }
+    fetchPost();
+  }, [postId]);
 
   const memoizedMarkers = useMemo(() => {
     if (!markers) return [];
@@ -239,11 +256,12 @@ const MapSearch = () => {
         minZoomLevel={14}
         maxZoomLevel={20}
         maxZoom={20}
-        radius={80}
+        radius={60}
         minZoom={14}
         onClusterPress={handleClusterPress}
         animateClusters={false}
         isHideCollidedMarkers
+        showsCompass={false}
       />
       <RemainPost />
       <MapPostBottomSheet

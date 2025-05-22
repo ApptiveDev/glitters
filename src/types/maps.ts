@@ -35,3 +35,8 @@ export type MarkerType = {
   isLikedBySelf: boolean;
   title: string;
 };
+
+export type PostCreateResponseType = {
+  markerId: number;
+  postId: number;
+};

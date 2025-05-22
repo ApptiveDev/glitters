@@ -9,13 +9,15 @@ import { markerIcons } from '@/utils/markerIcons';
 import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
 export const Complete = () => {
+  const { iconIndex, postId, markerIdx } = useLocalSearchParams();
+
   useEffect(() => {
     queryClient.refetchQueries({ queryKey: ['markers'] });
     const timeout = setTimeout(() => {
-      router.replace('/maps');
+      router.replace(`/maps?isCreated=true&markerIdx=${markerIdx}&postId=${postId}`);
     }, 3000);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [postId, markerIdx]);
 
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -37,8 +39,6 @@ export const Complete = () => {
       ]),
     ).start();
   }, [translateY]);
-
-  const { iconIndex, markerIdx } = useLocalSearchParams();
 
   const RandomIcon = useMemo(() => {
     if (markerIcons[Number(markerIdx)].name === 'festival') {

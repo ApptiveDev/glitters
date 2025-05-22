@@ -1,5 +1,5 @@
 import apiInstance from '@/api/apiInstance';
-import { InstitutionBoundType, MarkerType } from '@/types/maps';
+import { InstitutionBoundType, MarkerType, PostCreateResponseType } from '@/types/maps';
 import { PostRequestType, ReportRequestType } from '@/types/post';
 import { getErrorMessage } from '@/utils/errorMessage';
 
@@ -12,9 +12,10 @@ export const getMarkers = async (): Promise<MarkerType[]> => {
   }
 };
 
-export const createMarker = async (marker: PostRequestType): Promise<void> => {
+export const createMarker = async (marker: PostRequestType): Promise<PostCreateResponseType> => {
   try {
-    await apiInstance.post('/posts', marker);
+    const response = await apiInstance.post('/posts', marker);
+    return response.data;
   } catch (error) {
     throw new Error(getErrorMessage(error));
   }

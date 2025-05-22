@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
@@ -66,21 +65,13 @@ export const Write = () => {
     ).start();
   }, [translateY]);
 
-  const usePostMutation = () => {
-    return useMutation({
-      mutationFn: createMarker,
-    });
-  };
-
-  const { mutateAsync } = usePostMutation();
-
   const handleButtonPress = async () => {
     try {
       if (!post) {
         return;
       }
 
-      await mutateAsync({
+      const data = await createMarker({
         title: formFields.title.value,
         content: formFields.content.value,
         address: post.address,
@@ -89,9 +80,10 @@ export const Write = () => {
         iconIdx: randomIndex,
         markerIdx: post.markerIdx,
       });
+      const { postId } = data;
       router.replace({
         pathname: './complete',
-        params: { iconIndex: randomIndex, markerIdx: post.markerIdx },
+        params: { iconIndex: randomIndex, postId, markerIdx: post.markerIdx },
       });
     } catch (error) {
       showErrorAlert('오류', error);
