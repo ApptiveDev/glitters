@@ -72,6 +72,7 @@ export const withdrawUser = async () => {
     const response = await apiInstance.delete('/members/me');
     return response.data;
   } catch (error) {
+    console.error('Error withdrawing user:', error);
     throw new Error(getErrorMessage(error));
   }
 };

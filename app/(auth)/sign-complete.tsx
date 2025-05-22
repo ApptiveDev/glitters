@@ -11,7 +11,7 @@ export const SignComplete = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.replace('/maps');
+      router.replace('/');
     }, 3000);
     return () => clearTimeout(timeout);
   }, []);

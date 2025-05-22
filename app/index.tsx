@@ -1,9 +1,6 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { router, SplashScreen } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 import { getUserInfo } from '@/api/auth';
 import { getBoundMarkers } from '@/api/markers';
@@ -14,59 +11,58 @@ import { hasSeenAppStory, registerForPushNotificationsAsync } from '@/utils/asyn
 import { getToken, removeToken } from '@/utils/authStorage';
 
 export const Index = () => {
-  const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
   const { setUser } = useUser();
   const { setBound } = usePost();
-  const [seenAppStory, setSeenAppStory] = useState(false);
+  const [isRoutingDone, setIsRoutingDone] = useState(false);
 
   useEffect(() => {
-    const prepare = async () => {
-      await SplashScreen.preventAutoHideAsync();
-      await Location.requestForegroundPermissionsAsync();
-      await registerForPushNotificationsAsync();
+    const init = async () => {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+        await Location.requestForegroundPermissionsAsync();
+        await registerForPushNotificationsAsync();
 
-      setIsReady(true);
-    };
-    const checkTutorialSeen = async () => {
-      const seen = await hasSeenAppStory();
-      setSeenAppStory(seen);
-    };
-    prepare();
-    checkTutorialSeen();
-  }, []);
+        const seen = await hasSeenAppStory();
+        if (!seen) {
+          await SplashScreen.hideAsync();
+          router.replace('/app-story');
+          return;
+        }
 
-  console.log('seenAppStory', seenAppStory);
+        const token = await getToken();
+        if (!token) {
+          await SplashScreen.hideAsync();
+          router.replace('/login');
+          return;
+        }
 
-  const onLayoutRootView = useCallback(async () => {
-    if (!isReady) return;
+        const userRes = await getUserInfo();
+        if (!userRes) {
+          await SplashScreen.hideAsync();
+          removeToken();
+          router.replace('/login');
+          return;
+        }
 
-    const token = await getToken();
-
-    if (!seenAppStory) {
-      router.replace('/app-story');
-      return;
-    }
-
-    if (token) {
-      const userRes = await getUserInfo();
-      if (userRes) {
         setUser(userRes.member);
-
         const bounds = await getBoundMarkers();
         setBound(bounds[userRes.member.institution.id]);
-        router.replace('/maps');
-      } else {
-        router.replace('/login');
-      }
-    } else {
-      removeToken();
-      router.replace('/login');
-    }
-  }, [isReady, router, setBound, setUser]);
 
-  if (!isReady) return <Splash />;
-  return <View style={{ flex: 1 }} onLayout={onLayoutRootView} />;
+        await SplashScreen.hideAsync();
+        router.replace('/maps');
+      } catch {
+        await SplashScreen.hideAsync();
+        router.replace('/');
+      } finally {
+        setIsRoutingDone(true);
+      }
+    };
+
+    init();
+  }, [setUser, setBound]);
+
+  if (!isRoutingDone) return <Splash />;
+  return null;
 };
 
 export default Index;

@@ -4,13 +4,12 @@ import { Image, View } from 'react-native';
 import ExitIcon from '@/assets/icons/simple_exit_white.svg';
 import MapTutorialImage from '@/assets/images/tutorial.png';
 import { useLayout } from '@/contexts/LayoutContext';
-import { hasSeenTutorial, setTutorialSeen } from '@/utils/asyncStorage';
+import { setTutorialSeen } from '@/utils/asyncStorage';
 
 export const MapTutorial = () => {
   const { insetTop } = useLayout();
   const handleExit = () => {
     setTutorialSeen();
-    console.log(hasSeenTutorial());
     router.replace('/');
   };
   return (

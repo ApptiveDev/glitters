@@ -81,3 +81,11 @@ export const setSeenAppStory = async () => {
     console.error('앱 스토리 확인 실패', e);
   }
 };
+
+export const unsetSeenAppStory = async () => {
+  try {
+    await AsyncStorage.removeItem('appStory');
+  } catch (e) {
+    console.error('앱 스토리 확인 실패', e);
+  }
+};

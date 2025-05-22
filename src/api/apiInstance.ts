@@ -1,7 +1,8 @@
+import { queryClient } from 'app/_layout';
 import axios, { AxiosInstance } from 'axios';
 import { router } from 'expo-router';
 
-import { getToken } from '@/utils/authStorage';
+import { getToken, removeToken } from '@/utils/authStorage';
 
 const apiInstance: AxiosInstance = axios.create({
   baseURL: `https://banjjak.me:8444/api/`,
@@ -20,17 +21,20 @@ apiInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 apiInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
+      await removeToken();
+      if (queryClient) {
+        queryClient.clear();
+      }
       router.replace('/login');
     }
+
     return Promise.reject(error);
   },
 );

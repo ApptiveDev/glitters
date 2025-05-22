@@ -9,7 +9,9 @@ import { AdminList } from '@/components/features/AdminList';
 import { useLayout } from '@/contexts/LayoutContext';
 import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
+import { unsetSeenAppStory } from '@/utils/asyncStorage';
 import { removeToken } from '@/utils/authStorage';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 interface LabelValueProps {
   label: string;
@@ -77,12 +79,13 @@ export const Guide = () => {
           text: '확인',
           onPress: async () => {
             try {
-              await removeToken();
               await withdrawUser();
+              await removeToken();
+              await unsetSeenAppStory();
               Alert.alert('탈퇴 완료', '회원 탈퇴가 정상적으로 처리되었습니다.');
               router.replace('/login');
-            } catch {
-              Alert.alert('탈퇴 실패', '회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
+            } catch (error) {
+              showErrorAlert('오류', error);
             }
           },
         },
