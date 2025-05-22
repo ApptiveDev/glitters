@@ -1,12 +1,11 @@
-import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, View } from 'react-native';
-import MapView from 'react-native-map-clustering';
-import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Image, Text, View } from 'react-native';
+import { Marker, MarkerPressEvent } from 'react-native-maps';
+import ClusteredMapView from 'react-native-maps-super-cluster';
 
-import { getBoundMarkers, getMarkers } from '@/api/markers';
+import { getMarkers } from '@/api/markers';
 import { getPostById } from '@/api/posts';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
 import { ClusteredMarkerModal } from '@/components/features/ClusteredMarkerModal';
@@ -17,11 +16,9 @@ import { RemainPost } from '@/components/features/RemainPost';
 import { StartChatModal } from '@/components/features/StartChatModal';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
-import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
-import { showErrorAlert } from '@/utils/errorMessage';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
 import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
@@ -31,22 +28,21 @@ import styles from './styles';
 const MapSearch = () => {
   const [contentHeight, setContentHeight] = useState(300);
   const [hasAnimatedBack, setHasAnimatedBack] = useState(false);
-  const { insetBottom } = useLayout();
   const [sendChatModalVisible, setSendChatModalVisible] = useState(false);
-
-  const { bound, setBound } = usePost();
-  const [currentPosition, setCurrentPosition] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
   const [post, setPost] = useState<GetPostResponseType>();
   const [isVisible, setIsVisible] = useState(false);
-  const mapRef = useRef<any>(null);
-  const [clusterPosts, setClusterPosts] = useState<GetPostResponseType[]>([]);
+  const [clusterMarkers, setClusterMakers] = useState<MarkerType[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
-  const { user } = useUser();
+  const [visibleRegion, setVisibleRegion] = useState(null);
+  const [isLoadingMarkers, setIsLoadingMarkers] = useState(false);
+  const isAnimatingRef = useRef(false);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const { insetBottom } = useLayout();
+  const { bound } = usePost();
+  const mapRef = useRef<ClusteredMapView | null>(null);
+
+  const [currentPosition, setCurrentPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+
   const { data: markers, isLoading } = useQuery({
     queryKey: ['markers'],
     queryFn: getMarkers,
@@ -55,158 +51,200 @@ const MapSearch = () => {
     staleTime: 0,
   });
 
-  const memoizedMarkers = useMemo(() => markers, [markers]);
+  const memoizedMarkers = useMemo(() => {
+    if (!markers) return [];
+
+    return markers
+      .filter((m): m is MarkerType => !!m && typeof m.latitude === 'number' && typeof m.longitude === 'number')
+      .map((m) => ({
+        ...m,
+        location: {
+          latitude: m.latitude,
+          longitude: m.longitude,
+        },
+      }));
+  }, [markers]);
+
+  const visibleMarkers = useMemo(() => {
+    if (!visibleRegion) return [];
+
+    const { latitude, longitude, latitudeDelta, longitudeDelta } = visibleRegion;
+    const latMin = latitude - latitudeDelta / 2;
+    const latMax = latitude + latitudeDelta / 2;
+    const lonMin = longitude - longitudeDelta / 2;
+    const lonMax = longitude + longitudeDelta / 2;
+
+    return memoizedMarkers.filter(
+      ({ location }) =>
+        location.latitude >= latMin &&
+        location.latitude <= latMax &&
+        location.longitude >= lonMin &&
+        location.longitude <= lonMax,
+    );
+  }, [visibleRegion, memoizedMarkers]);
+
+  const handleRegionChange = (region: any) => {
+    setVisibleRegion(region);
+
+    const { latitude, longitude } = region;
+
+    if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack && !isAnimatingRef.current) {
+      setHasAnimatedBack(true);
+      isAnimatingRef.current = true;
+
+      Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
+        {
+          text: '확인',
+          onPress: () => {
+            setHasAnimatedBack(false);
+            mapRef.current?.getMapRef?.()?.animateToRegion(
+              {
+                latitude: currentPosition?.latitude,
+                longitude: currentPosition?.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              },
+              500,
+            );
+          },
+        },
+      ]);
+      setTimeout(() => {
+        isAnimatingRef.current = false;
+      }, 600);
+    }
+  };
+
+  const onPressMarker = async (marker: MarkerType) => {
+    const response = await getPostById({ postId: marker.id });
+    if (response) setPost(response);
+  };
+
+  useEffect(() => {
+    setIsLoadingMarkers(true);
+
+    const timeout = setTimeout(() => {
+      setIsLoadingMarkers(false);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [visibleMarkers.length]);
+
+  const renderMarker = useCallback((marker: MarkerType) => {
+    const icon = marker.isWrittenBySelf ? MarkerBySelfIcon : markerIcons[marker.markerIdx]?.icon;
+    if (!icon) return null;
+    return (
+      <Marker
+        key={`marker-${marker.id}`}
+        coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+        tracksViewChanges={false}
+        onPress={() => onPressMarker(marker)}
+      >
+        <Image source={icon} style={{ width: 40, height: 40 }} />
+      </Marker>
+    );
+  }, []);
+
+  const renderCluster = useCallback(
+    (cluster: { coordinate: any; pointCount: any }, onPress?: (event: MarkerPressEvent) => void) => {
+      const { coordinate, pointCount } = cluster;
+      return (
+        <Marker coordinate={coordinate} onPress={onPress}>
+          <View
+            style={{
+              backgroundColor: colors.primary.main,
+              borderRadius: 999,
+              width: Math.min(60, 30 + pointCount),
+              height: Math.min(60, 30 + pointCount),
+              justifyContent: 'center',
+              alignItems: 'center',
+              opacity: 0.8,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: colors.primary.darker,
+                borderRadius: 999,
+                width: Math.min(45, 20 + pointCount),
+                height: Math.min(45, 20 + pointCount),
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: 0.8,
+              }}
+            >
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>{pointCount}</Text>
+            </View>
+          </View>
+        </Marker>
+      );
+    },
+    [],
+  );
 
   const handleButtonPress = () => {
+    if (!currentPosition) return;
     router.push({
       pathname: '/maps/create',
       params: {
-        currentLat: String(currentPosition?.latitude),
-        currentLon: String(currentPosition?.longitude),
+        currentLat: String(currentPosition.latitude),
+        currentLon: String(currentPosition.longitude),
       },
     });
   };
 
   useEffect(() => {
-    if (!user) return;
-    const fetchBound = async () => {
-      try {
-        const response = await getBoundMarkers();
-        setBound(response[user.institution.id]);
-      } catch (error) {
-        showErrorAlert('오류', error);
-      }
-    };
-
-    fetchBound();
-  }, [setBound, user, user.institution.id]);
-
-  useEffect(() => {
-    const fetchLocation = async () => {
-      if (!bound) return;
-      const { location, errorMsg } = await getCurrentLocation({ bound });
-      if (location) {
-        setCurrentPosition(location);
-      } else {
-        Alert.alert('위치 정보 오류', errorMsg || '위치 정보를 가져오는 데 실패했습니다.');
-      }
-    };
-
-    fetchLocation();
+    if (!bound) return;
+    getCurrentLocation({ bound }).then(({ location, errorMsg }) => {
+      if (location) setCurrentPosition(location);
+      else Alert.alert('위치 정보 오류', errorMsg || '위치 정보를 가져오는 데 실패했습니다.');
+    });
   }, [bound]);
 
   useEffect(() => {
-    if (post) {
-      setIsVisible(true);
-    }
+    if (post) setIsVisible(true);
   }, [post]);
 
-  if (!currentPosition || isLoading || !markers) {
-    return <Loading />;
-  }
+  if (!currentPosition || isLoading || !bound) return <Loading />;
 
-  if (!bound) {
-    return <Loading />;
-  }
+  const handleClusterPress = async (clusterId: any) => {
+    const engine = mapRef.current?.getClusteringEngine();
+    const leaves = engine.getLeaves(clusterId, 100);
 
-  const onPressMarker = async (marker: MarkerType) => {
-    const response = await getPostById(marker);
-    setPost(response);
-  };
+    const postIds = leaves.map((leaf: { properties: { item: any } }) => leaf.properties?.item?.postId).filter(Boolean);
 
-  const handleMapPress = () => {
-    bottomSheetRef.current?.close();
-  };
+    const clusterMarker = markers?.filter((marker) => postIds.includes(marker.id)) ?? [];
 
-  const handleClusterPress = async (cluster: any, geoJsonMarkers: any[] = []) => {
-    const matchedMarkers = geoJsonMarkers
-      .map((geoMarker) => {
-        const coord = geoMarker.properties.coordinate;
-        return markers.find(
-          (original) =>
-            Math.abs(original.latitude - coord.latitude) < 0.00001 &&
-            Math.abs(original.longitude - coord.longitude) < 0.00001,
-        );
-      })
-      .filter((m): m is MarkerType => !!m);
-
-    const seen = new Set<number>();
-    const uniqueMarkers = matchedMarkers.filter((marker) => {
-      if (seen.has(marker.postId)) return false;
-      seen.add(marker.postId);
-      return true;
-    });
-
-    const posts = await Promise.all(uniqueMarkers.map((m) => getPostById({ postId: m.postId })));
-
-    setClusterPosts(posts);
+    setClusterMakers(clusterMarker);
     setIsListOpen(true);
   };
 
   return (
     <View style={styles.container}>
-      <MapView
-        provider={PROVIDER_GOOGLE}
+      <ClusteredMapView
+        ref={mapRef}
         style={styles.map}
+        data={visibleMarkers.length === 0 ? memoizedMarkers : visibleMarkers}
         initialRegion={{
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        maxZoomLevel={18}
-        maxZoom={18}
-        minZoom={0}
-        minZoomLevel={15}
+        renderMarker={renderMarker}
+        renderCluster={renderCluster}
+        onRegionChangeComplete={handleRegionChange}
         tracksViewChanges={false}
-        preserveClusterPressBehavior
+        preserveClusterPressBehavior={false}
         showsUserLocation
-        moveOnMarkerPress={false}
-        onPress={handleMapPress}
-        onRegionChangeComplete={(region) => {
-          const { latitude, longitude } = region;
-          if (isOutOfBound(latitude, longitude, bound) && !hasAnimatedBack) {
-            setHasAnimatedBack(true);
-            Alert.alert('지도 범위를 벗어났어요', '기본 위치로 돌아가요.', [
-              {
-                text: '확인',
-                onPress: () => {
-                  setHasAnimatedBack(false);
-                },
-              },
-            ]);
-            mapRef.current?.animateToRegion({
-              latitude: bound.defaultLat,
-              longitude: bound.defaultLon,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
-          }
-        }}
-        ref={mapRef}
-        clusterColor={colors.primary.main}
+        minZoomLevel={14}
+        maxZoomLevel={20}
+        maxZoom={20}
+        radius={80}
+        minZoom={14}
         onClusterPress={handleClusterPress}
-      >
-        {memoizedMarkers &&
-          memoizedMarkers
-            .filter((marker): marker is MarkerType => !!marker)
-            .map((marker) => (
-              <Marker
-                key={marker.id}
-                coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude,
-                }}
-                onPress={() => onPressMarker(marker)}
-              >
-                {marker.isWrittenBySelf ? (
-                  <Image source={MarkerBySelfIcon} style={{ width: 40, height: 40 }} />
-                ) : (
-                  <Image source={markerIcons[marker.markerIdx].icon} style={{ width: 40, height: 40 }} />
-                )}
-              </Marker>
-            ))}
-      </MapView>
+        animateClusters={false}
+        isHideCollidedMarkers
+      />
       <RemainPost />
       <MapPostBottomSheet
         isVisible={isVisible}
@@ -217,13 +255,29 @@ const MapSearch = () => {
         setContentHeight={setContentHeight}
         contentHeight={contentHeight}
       />
+      {isLoadingMarkers && (
+        <View
+          pointerEvents="auto"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            zIndex: 9999,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        />
+      )}
       <CreateGlitterButton
         onPress={handleButtonPress}
         bottom={isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16}
       />
       <ClusteredMarkerModal
         isVisible={isListOpen}
-        clusterPosts={clusterPosts}
+        clusterMarkers={clusterMarkers}
         setPost={setPost}
         setIsVisible={setIsVisible}
         setIsListOpen={setIsListOpen}

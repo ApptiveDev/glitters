@@ -87,8 +87,6 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
 
 export const resetPassword = async (email: string, password: string) => {
   try {
-    console.log('email', email);
-    console.log('password', password);
     const response = await apiInstance.put('/password', {
       email,
       password,

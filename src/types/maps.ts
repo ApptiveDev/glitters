@@ -33,4 +33,5 @@ export type MarkerType = {
   likeCount: number;
   viewCount: number;
   isLikedBySelf: boolean;
+  title: string;
 };

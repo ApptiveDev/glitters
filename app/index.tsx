@@ -6,7 +6,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { getUserInfo } from '@/api/auth';
+import { getBoundMarkers } from '@/api/markers';
 import Splash from '@/components/features/Splash';
+import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
 import { getToken } from '@/utils/authStorage';
 
@@ -14,6 +16,7 @@ export const Index = () => {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const { setUser } = useUser();
+  const { setBound } = usePost();
 
   useEffect(() => {
     const prepare = async () => {
@@ -33,13 +36,22 @@ export const Index = () => {
     const token = await getToken();
 
     if (token) {
-      const user = await getUserInfo();
-      setUser(user.member);
+      const userRes = await getUserInfo();
+      if (userRes) {
+        setUser(userRes.member);
+
+        const bounds = await getBoundMarkers();
+        setBound(bounds[userRes.member.institution.id]);
+
+        router.replace('/maps');
+      } else {
+        router.replace('/login');
+      }
       router.replace('/maps');
     } else {
       router.replace('/login');
     }
-  }, [isReady, router, setUser]);
+  }, [isReady, router, setBound, setUser]);
 
   if (!isReady) return <Splash />;
   return <View style={{ flex: 1 }} onLayout={onLayoutRootView} />;
