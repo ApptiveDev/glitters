@@ -1,4 +1,5 @@
 import { Slot } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, StyleSheet, View } from 'react-native';
 
 import { BottomNav } from '@/components/features/BottomNav';
@@ -18,7 +19,17 @@ const styles = StyleSheet.create({
 
 export const MapLayout = () => {
   const { isKeyboardVisible } = useKeyboardVisible();
-  const seenTutorial = hasSeenTutorial();
+  const [seenTutorial, setSeenTutorial] = useState(false);
+
+  useEffect(() => {
+    const checkTutorialSeen = async () => {
+      const seen = await hasSeenTutorial();
+      setSeenTutorial(seen);
+    };
+
+    checkTutorialSeen();
+  }, []);
+
   return (
     <>
       {!seenTutorial ? <MapTutorial /> : null}

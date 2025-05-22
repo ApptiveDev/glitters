@@ -16,9 +16,9 @@ import { RemainPost } from '@/components/features/RemainPost';
 import { StartChatModal } from '@/components/features/StartChatModal';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
-import colors from '@/types/colors';
 import { MarkerType } from '@/types/maps';
 import { GetPostResponseType } from '@/types/post';
+import { getClusterColor } from '@/utils/getClusterColor';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
 import { markerIcons } from '@/utils/markerIcons';
 import { isOutOfBound } from '@/utils/markers';
@@ -128,7 +128,7 @@ const MapSearch = () => {
       ]);
       setTimeout(() => {
         isAnimatingRef.current = false;
-      }, 600);
+      }, 800);
     }
   };
 
@@ -142,7 +142,7 @@ const MapSearch = () => {
 
     const timeout = setTimeout(() => {
       setIsLoadingMarkers(false);
-    }, 500);
+    }, 800);
 
     return () => clearTimeout(timeout);
   }, [visibleMarkers.length]);
@@ -165,14 +165,15 @@ const MapSearch = () => {
   const renderCluster = useCallback(
     (cluster: { coordinate: any; pointCount: any }, onPress?: (event: MarkerPressEvent) => void) => {
       const { coordinate, pointCount } = cluster;
+      const colorAndSize = getClusterColor(pointCount);
       return (
         <Marker coordinate={coordinate} onPress={onPress}>
           <View
             style={{
-              backgroundColor: colors.primary.main,
+              backgroundColor: colorAndSize.light,
               borderRadius: 999,
-              width: Math.min(60, 30 + pointCount),
-              height: Math.min(60, 30 + pointCount),
+              width: colorAndSize.outerSize,
+              height: colorAndSize.outerSize,
               justifyContent: 'center',
               alignItems: 'center',
               opacity: 0.8,
@@ -180,10 +181,10 @@ const MapSearch = () => {
           >
             <View
               style={{
-                backgroundColor: colors.primary.darker,
+                backgroundColor: colorAndSize.dark,
                 borderRadius: 999,
-                width: Math.min(45, 20 + pointCount),
-                height: Math.min(45, 20 + pointCount),
+                width: colorAndSize.innerSize,
+                height: colorAndSize.innerSize,
                 justifyContent: 'center',
                 alignItems: 'center',
                 opacity: 0.8,
@@ -239,6 +240,7 @@ const MapSearch = () => {
     <View style={styles.container}>
       <ClusteredMapView
         ref={mapRef}
+        provider="google"
         style={styles.map}
         data={visibleMarkers.length === 0 ? memoizedMarkers : visibleMarkers}
         initialRegion={{
@@ -248,14 +250,15 @@ const MapSearch = () => {
           longitudeDelta: 0.01,
         }}
         renderMarker={renderMarker}
+        customMapStyle="standard"
         renderCluster={renderCluster}
         onRegionChangeComplete={handleRegionChange}
         tracksViewChanges={false}
         preserveClusterPressBehavior={false}
         showsUserLocation
         minZoomLevel={14}
-        maxZoomLevel={18}
-        maxZoom={18}
+        maxZoomLevel={17}
+        maxZoom={17}
         radius={80}
         minZoom={14}
         onClusterPress={handleClusterPress}
@@ -282,7 +285,7 @@ const MapSearch = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.1)',
+            backgroundColor: 'rgba(0,0,0,0.2)',
             zIndex: 9999,
             justifyContent: 'center',
             alignItems: 'center',
