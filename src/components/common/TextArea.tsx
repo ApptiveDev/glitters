@@ -20,14 +20,13 @@ interface TextAreaProps {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 50,
+    minHeight: 52,
     borderRadius: 8,
     paddingVertical: 16,
     paddingHorizontal: 20,
     color: colors.text.white,
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
     fontSize: 14,
-    lineHeight: 20,
   },
 });
 

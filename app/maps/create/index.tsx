@@ -76,7 +76,7 @@ export const CreateMarker = () => {
       latitude: markerPlace?.latitude || 0,
       longitude: markerPlace?.longitude || 0,
     });
-    router.replace('/maps/create/write');
+    router.push('/maps/create/write');
   };
 
   const handleInputChange = (text: string) => {

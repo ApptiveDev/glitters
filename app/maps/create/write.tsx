@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
+import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
+import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import CustomBottomSheet from '@/components/common/BottomSheet';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
@@ -105,10 +106,30 @@ export const Write = () => {
     setFieldValue('content', text, (val) => val.length >= 2 && val.length <= 255);
   };
 
+  const handleBackPress = () => {
+    Alert.alert('작성을 취소하시겠습니까?', '지금까지 작성한 내용이 삭제됩니다.', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: () => router.back(),
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, height: safeHeight - 120 + insetBottom }}>
-      <KeyboardScrollContainer paddingTop={12}>
+      <Spacing height={12} />
+      <View style={{ position: 'relative', width: '100%', height: 48, justifyContent: 'center' }}>
         <Heading title="반짝이 기록하기" alignItems="center" />
+        <CaretLeftIcon
+          style={{ position: 'absolute', left: 24, top: '50%', transform: [{ translateY: -12 }] }}
+          onPress={handleBackPress}
+        />
+      </View>
+      <KeyboardScrollContainer paddingTop={12}>
         <Spacing height={16} />
         <TextArea
           numberOfLines={1}
