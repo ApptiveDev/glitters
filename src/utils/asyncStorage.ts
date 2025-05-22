@@ -63,3 +63,21 @@ export const hasSeenTutorial = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export const hasSeenAppStory = async (): Promise<boolean> => {
+  try {
+    const value = await AsyncStorage.getItem('appStory');
+    return value === 'true';
+  } catch (e) {
+    console.error('앱 스토리 확인 실패', e);
+    return false;
+  }
+};
+
+export const setSeenAppStory = async () => {
+  try {
+    await AsyncStorage.setItem('appStory', 'true');
+  } catch (e) {
+    console.error('앱 스토리 확인 실패', e);
+  }
+};
