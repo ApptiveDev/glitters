@@ -31,7 +31,7 @@ export const RemainPost = () => {
     <View
       style={{
         position: 'absolute',
-        top: insetTop + 20,
+        top: insetTop + 8,
         right: 24,
         flexDirection: 'row',
         gap: 4,

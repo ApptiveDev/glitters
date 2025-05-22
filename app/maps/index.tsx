@@ -254,9 +254,9 @@ const MapSearch = () => {
         preserveClusterPressBehavior={false}
         showsUserLocation
         minZoomLevel={14}
-        maxZoomLevel={20}
-        maxZoom={20}
-        radius={60}
+        maxZoomLevel={18}
+        maxZoom={18}
+        radius={80}
         minZoom={14}
         onClusterPress={handleClusterPress}
         animateClusters={false}
@@ -291,7 +291,7 @@ const MapSearch = () => {
       )}
       <CreateGlitterButton
         onPress={handleButtonPress}
-        bottom={isVisible ? 96 - insetBottom + 16 + contentHeight + 40 : 120 - insetBottom + 16}
+        bottom={isVisible ? 96 - insetBottom + 24 + contentHeight + 40 : 120 - insetBottom + 24}
       />
       <ClusteredMarkerModal
         isVisible={isListOpen}

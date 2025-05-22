@@ -10,7 +10,8 @@ import { getBoundMarkers } from '@/api/markers';
 import Splash from '@/components/features/Splash';
 import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
-import { getToken } from '@/utils/authStorage';
+import { registerForPushNotificationsAsync } from '@/utils/asyncStorage';
+import { getToken, removeToken } from '@/utils/authStorage';
 
 export const Index = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ export const Index = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
       await Location.requestForegroundPermissionsAsync();
-      // await registerForPushNotificationsAsync();
+      await registerForPushNotificationsAsync();
 
       setIsReady(true);
     };
@@ -42,13 +43,12 @@ export const Index = () => {
 
         const bounds = await getBoundMarkers();
         setBound(bounds[userRes.member.institution.id]);
-
         router.replace('/maps');
       } else {
         router.replace('/login');
       }
-      router.replace('/maps');
     } else {
+      removeToken();
       router.replace('/login');
     }
   }, [isReady, router, setBound, setUser]);

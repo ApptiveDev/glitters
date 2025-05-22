@@ -62,7 +62,6 @@ const CustomDropdown = ({ data, value, setValue, placeholder = '학교를 선택
   const selectedLabel = data.find((item) => item.value === value)?.label;
 
   const handleSelect = (name: string, domain: string) => {
-    console.log('Selected value:', name, domain);
     setValue({
       name,
       domain,
