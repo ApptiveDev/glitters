@@ -14,7 +14,7 @@ export const useWebSocket = (token: string) => {
   useEffect(() => {
     if (!token) return;
 
-    const ws = new WebSocket(`wss://banjjak.me:8444?token=${token}`);
+    const ws = new WebSocket(`wss://banjjak.me:8443?token=${token}`);
     socketRef.current = ws;
 
     ws.onopen = () => console.log('연결됨');

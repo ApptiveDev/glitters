@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { getToken, removeToken } from '@/utils/authStorage';
 
 const apiInstance: AxiosInstance = axios.create({
-  baseURL: `https://banjjak.me:8444/api/`,
+  baseURL: `https://banjjak.me:8443/api/`,
   headers: {
     'Content-Type': 'application/json',
   },
