@@ -4,7 +4,9 @@ import { router } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, Text, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
+import Toast from 'react-native-toast-message';
 
+import { blockUser } from '@/api/block';
 import { addLike, deleteMarker } from '@/api/markers';
 import HeartIcon from '@/assets/icons/3d/heart.svg';
 import BubbleIcon from '@/assets/icons/bubble.svg';
@@ -16,6 +18,7 @@ import { CommonButton } from '@/components/common/Button';
 import { CustomTextArea } from '@/components/common/TextArea';
 import colors from '@/types/colors';
 import { GetPostResponseType } from '@/types/post';
+import { showErrorAlert } from '@/utils/errorMessage';
 import { markerIcons } from '@/utils/markerIcons';
 import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 
@@ -110,6 +113,33 @@ export const MapPostBottomSheet = ({
           onPress: goToReportPage,
         },
       ]);
+    }
+  };
+
+  const handleBlockUser = async (postId: number) => {
+    try {
+      Alert.alert('차단하시겠어요?', '한 번 차단한 사용자는 해제할 수 없어요', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            blockUser({
+              blockType: 'post',
+              postId: Number(postId),
+            });
+            Toast.show({
+              type: 'success',
+              text1: '사용자를 차단했습니다.',
+            });
+            router.replace('/maps');
+          },
+        },
+      ]);
+    } catch (error) {
+      showErrorAlert('오류', error);
     }
   };
 
@@ -219,6 +249,10 @@ export const MapPostBottomSheet = ({
             gap: 8,
           }}
         >
+          <Text style={{ fontSize: 12, color: colors.text.lightgray }} onPress={() => handleBlockUser(post?.id ?? 0)}>
+            {post?.isWrittenBySelf ? '' : '작성자 차단하기'}
+          </Text>
+          <Text style={{ fontSize: 12, color: colors.text.lightgray }}>|</Text>
           <Text
             style={{ fontSize: 12, color: colors.text.lightgray }}
             onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}
