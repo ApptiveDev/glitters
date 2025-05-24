@@ -1,4 +1,5 @@
 /* eslint-disable global-require */
+import * as Device from 'expo-device';
 import { router } from 'expo-router';
 import { Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -39,7 +40,7 @@ const AppStart = () => {
         style={{ width: 230, height: 64 }}
         resizeMode={FastImage.resizeMode.cover}
       />
-      <Spacing height={430} />
+      <Spacing height={Device.modelName?.includes('iPad') ? 330 : 430} />
       <View
         style={{
           position: 'relative',
