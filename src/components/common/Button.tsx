@@ -19,6 +19,7 @@ const baseStyle: ViewStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   flexDirection: 'row',
+  borderRadius: 12,
 };
 
 const buttonStyles = StyleSheet.create({

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SvgProps } from 'react-native-svg';
 
 import { createMarker } from '@/api/markers';
@@ -121,38 +122,38 @@ export const Write = () => {
           onPress={handleBackPress}
         />
       </View>
-      <KeyboardScrollContainer paddingTop={12}>
-        <Spacing height={16} />
-        <TextArea
-          numberOfLines={1}
-          value={formFields.title.value}
-          placeholder="제목을 입력하세요."
-          onChangeText={onTitleChangeText}
-          isError={!formFields.title.isValid && formFields.title.isTouched}
-          errorMessage="제목은 2자 이상 63자 이하로 입력해주세요."
-          maxLength={63}
-          backgroundColor={colors.backgroundLight}
-        />
-        <Animated.View style={{ transform: [{ translateY }] }}>
-          <RandomIcon width={216} height={216} />
-        </Animated.View>
-        <TextArea
-          value={formFields.content.value}
-          maxLength={255}
-          numberOfLines={4}
-          multiline
-          height={240}
-          onChangeText={onContentChangeText}
-          placeholder="당신의 반짝이를 소개해주세요 (255자 이내)"
-          isError={!formFields.content.isValid && formFields.content.isTouched}
-          errorMessage="내용은 2자 이상 255자 이하로 입력해주세요."
-          backgroundColor={colors.backgroundLight}
-        />
-        <Spacing height={8} />
-        <Text style={{ fontSize: 10, color: colors.text.lightgray }}>
-          한 번 작성된 반짝이는 수정할 수 없어요. 24시간 동안만 유지됩니다.
-        </Text>
-      </KeyboardScrollContainer>
+      <ScrollView>
+        <KeyboardScrollContainer paddingTop={12}>
+          <TextArea
+            numberOfLines={1}
+            value={formFields.title.value}
+            placeholder="제목을 입력하세요."
+            onChangeText={onTitleChangeText}
+            isError={!formFields.title.isValid && formFields.title.isTouched}
+            errorMessage="제목은 2자 이상 63자 이하로 입력해주세요."
+            maxLength={63}
+            backgroundColor={colors.backgroundLight}
+          />
+          <Animated.View style={{ transform: [{ translateY }] }}>
+            <RandomIcon width={216} height={216} />
+          </Animated.View>
+          <TextArea
+            value={formFields.content.value}
+            maxLength={255}
+            numberOfLines={4}
+            multiline
+            height={240}
+            onChangeText={onContentChangeText}
+            placeholder="당신의 반짝이를 소개해주세요 (255자 이내)"
+            isError={!formFields.content.isValid && formFields.content.isTouched}
+            errorMessage="내용은 2자 이상 255자 이하로 입력해주세요."
+            backgroundColor={colors.backgroundLight}
+          />
+          <Text style={{ fontSize: 10, color: colors.text.lightgray }}>
+            한 번 작성된 반짝이는 수정할 수 없어요. 24시간 동안만 유지됩니다.
+          </Text>
+        </KeyboardScrollContainer>
+      </ScrollView>
       <KeyboardAvoidingView
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 120 - insetBottom}
@@ -168,7 +169,6 @@ export const Write = () => {
           onPress={handleButtonPress}
           variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
           style={{}}
-          isKeyboardVisible={isKeyboardVisible}
         />
       </KeyboardAvoidingView>
       <CustomBottomSheet
