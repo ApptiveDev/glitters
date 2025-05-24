@@ -218,7 +218,7 @@ export const ChatroomSideBar = ({
       <View
         style={{
           position: 'absolute',
-          bottom: insetBottom + 10,
+          bottom: insetBottom + 24,
           flexDirection: 'row',
           alignSelf: 'center',
           alignItems: 'center',

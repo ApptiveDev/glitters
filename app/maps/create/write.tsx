@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, SafeAreaView, Text, View } from 'react-native';
+import { Alert, Animated, Easing, SafeAreaView, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SvgProps } from 'react-native-svg';
 
@@ -152,25 +152,22 @@ export const Write = () => {
           <Text style={{ fontSize: 10, color: colors.text.lightgray }}>
             한 번 작성된 반짝이는 수정할 수 없어요. 24시간 동안만 유지됩니다.
           </Text>
+          <Spacing height={12} />
         </KeyboardScrollContainer>
+        <View
+          style={{
+            width: '100%',
+            paddingHorizontal: 28,
+          }}
+        >
+          <CommonButton
+            title="등록하기"
+            onPress={handleButtonPress}
+            variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
+            style={{}}
+          />
+        </View>
       </ScrollView>
-      <KeyboardAvoidingView
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 120 - insetBottom}
-        style={{
-          position: 'absolute',
-          width: '100%',
-          bottom: Platform.OS === 'ios' ? 120 - insetBottom : 0,
-          paddingHorizontal: isKeyboardVisible ? 0 : 28,
-        }}
-      >
-        <CommonButton
-          title="등록하기"
-          onPress={handleButtonPress}
-          variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
-          style={{}}
-        />
-      </KeyboardAvoidingView>
       <CustomBottomSheet
         isVisible={bottomSheetVisible}
         onClose={() => setBottomSheetVisible(false)}
