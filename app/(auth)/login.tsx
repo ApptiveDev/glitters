@@ -93,6 +93,7 @@ export const Login = () => {
       <CommonButton
         title="로그인"
         onPress={handleLogin}
+        style={{ borderRadius: 12 }}
         variant={formFields.email.isValid && formFields.password.isValid ? 'primary' : 'disable'}
       />
       <Text style={styles.signText} onPress={goToSignUpPage}>

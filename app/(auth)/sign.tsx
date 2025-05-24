@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 
 import { checkAuthCode, getSchoolList, verifyEmail } from '@/api/auth';
-import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import CustomDropdown from '@/components/common/Dropdown';
 import { Heading } from '@/components/common/Heading';
@@ -16,7 +15,6 @@ import { Spacing } from '@/components/common/Spacing';
 import { useUser } from '@/contexts/UserContext';
 import { useCountdownTimer } from '@/hooks/useCountDownTimer';
 import { useFormFields } from '@/hooks/useFormFields';
-import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { SchoolListResponse } from '@/types/utils';
 import { showErrorAlert } from '@/utils/errorMessage';
@@ -39,8 +37,6 @@ export const Sign = () => {
   const { formFields, setFieldValue, setFieldVerified, setRecheckPassword } = useFormFields();
 
   const { user, updateUser } = useUser();
-
-  const { isKeyboardVisible } = useKeyboardVisible();
 
   const { formatted, isRunning, start, reset } = useCountdownTimer(300);
 
@@ -275,16 +271,13 @@ export const Sign = () => {
             )}
           </>
         )}
-      </KeyboardScrollContainer>
-
-      <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
         {formFields.email.isValid && !formFields.email.isVerified && (
-          <CommonButton title="인증번호 받기" onPress={buttonPress} isKeyboardVisible={isKeyboardVisible} />
+          <CommonButton title="인증번호 받기" style={{ borderRadius: 12 }} onPress={buttonPress} />
         )}
         {formFields.password.isVerified && (
-          <CommonButton title="정보 입력하기" onPress={goToNextScreen} isKeyboardVisible={isKeyboardVisible} />
+          <CommonButton title="정보 입력하기" style={{ borderRadius: 12 }} onPress={goToNextScreen} />
         )}
-      </BottomButtonContainer>
+      </KeyboardScrollContainer>
     </View>
   );
 };

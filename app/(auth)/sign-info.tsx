@@ -8,7 +8,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { registerUser } from '@/api/auth';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
-import { BottomButtonContainer } from '@/components/common/BottomButtonContainer';
 import { CommonButton } from '@/components/common/Button';
 import { Heading } from '@/components/common/Heading';
 import CommonInput from '@/components/common/Input';
@@ -19,7 +18,6 @@ import GenderSelector from '@/components/GenderSelector';
 import { TermsItem } from '@/components/TermsItem';
 import { useUser } from '@/contexts/UserContext';
 import { useFormFields } from '@/hooks/useFormFields';
-import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { storeToken } from '@/utils/authStorage';
 import { showErrorAlert } from '@/utils/errorMessage';
@@ -30,7 +28,6 @@ export const SignInfo = () => {
   const { user, setUser } = useUser();
   const { formFields, setFieldValue, setAgreedToPrivacyPolicy, setAgreedToTermsOfService } = useFormFields();
   const { width } = Dimensions.get('window');
-  const { isKeyboardVisible } = useKeyboardVisible();
   const [currentModal, setCurrentModal] = useState<'policy' | 'terms' | null>(null);
   const insets = useSafeAreaInsets();
 
@@ -126,7 +123,7 @@ export const SignInfo = () => {
         <View style={styles.heading}>
           <Heading title="성별 선택하기" />
           <GenderSelector
-            selected={Number(formFields.gender.value)}
+            selected={formFields.gender.value ? Number(formFields.gender.value) : -1}
             onSelect={(val) => setFieldValue('gender', String(val), (value) => value === '0' || value === '1')}
             isError={!formFields.gender.value && formFields.gender.isTouched}
             errorMessage="성별을 선택해주세요."
@@ -153,12 +150,14 @@ export const SignInfo = () => {
             />
           </View>
         )}
-      </KeyboardScrollContainer>
-      <BottomButtonContainer isKeyboardVisible={isKeyboardVisible}>
         {formFields.agreedToPrivacyPolicy && formFields.agreedToTermsOfService && (
-          <CommonButton title="회원가입 완료하기" onPress={handleButtonPress} isKeyboardVisible={isKeyboardVisible} />
+          <CommonButton
+            title="회원가입 완료하기"
+            style={{ borderRadius: 12, width: '100%' }}
+            onPress={handleButtonPress}
+          />
         )}
-      </BottomButtonContainer>
+      </KeyboardScrollContainer>
       <Modal visible={currentModal !== null} animationType="slide">
         <View
           style={{
