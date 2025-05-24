@@ -1,5 +1,4 @@
 /* eslint-disable global-require */
-import * as Device from 'expo-device';
 import { router } from 'expo-router';
 import { Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -12,7 +11,6 @@ import { setSeenAppStory } from '@/utils/asyncStorage';
 const AppStart = () => {
   const { width, height } = useWindowDimensions();
   const { insetTop } = useLayout();
-  const isTablet = Device.deviceType === Device.DeviceType.TABLET;
   return (
     <View
       style={{
@@ -41,7 +39,7 @@ const AppStart = () => {
         style={{ width: 230, height: 64 }}
         resizeMode={FastImage.resizeMode.cover}
       />
-      <Spacing height={isTablet ? 330 : 430} />
+      <Spacing height={330} />
       <View
         style={{
           position: 'relative',
