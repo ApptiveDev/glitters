@@ -20,6 +20,8 @@ export const blockUser = async ({ blockType, postId, chatroomId }: BlockUserRequ
       queryParams.append('chatroomId', chatroomId.toString());
     }
 
+    console.log('blockUser queryParams', queryParams.toString());
+
     const response = await apiInstance.post(`/blocks?${queryParams.toString()}`);
     return response.data;
   } catch (error) {

@@ -134,6 +134,7 @@ export const MapPostBottomSheet = ({
               type: 'success',
               text1: '사용자를 차단했습니다.',
             });
+            queryClient.refetchQueries({ queryKey: ['markers'] });
             router.replace('/maps');
           },
         },

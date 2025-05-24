@@ -1,12 +1,16 @@
+import { queryClient } from 'app/_layout';
 import { router } from 'expo-router';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
+import { blockUser } from '@/api/block';
 import { deleteChatroom } from '@/api/chat';
 import Heart3DIcon from '@/assets/icons/3d/heart_red.svg';
 import Scope3DIcon from '@/assets/icons/3d/scope_3d.svg';
 import { SlidingSidebar } from '@/components/common/SlidingSidebar';
 import { useLayout } from '@/contexts/LayoutContext';
 import colors from '@/types/colors';
+import { showErrorAlert } from '@/utils/errorMessage';
 
 interface ChatroomSideBarProps {
   title: string;
@@ -78,6 +82,35 @@ export const ChatroomSideBar = ({
     return currentDate > expirationDate;
   };
 
+  const handleBlockUser = async () => {
+    try {
+      Alert.alert('차단하시겠어요?', '한 번 차단한 사용자는 해제할 수 없어요', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            blockUser({
+              blockType: 'chatroom',
+              postId: undefined,
+              chatroomId,
+            });
+            Toast.show({
+              type: 'success',
+              text1: '사용자를 차단했습니다.',
+            });
+            queryClient.refetchQueries({ queryKey: ['chatRooms'] });
+            router.replace('/chatrooms');
+          },
+        },
+      ]);
+    } catch (error) {
+      showErrorAlert('오류', error);
+    }
+  };
+
   return (
     <SlidingSidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)}>
       <View
@@ -108,7 +141,6 @@ export const ChatroomSideBar = ({
           style={{
             width: '100%',
             backgroundColor: isExpired() ? colors.gray.light : colors.yellow.light,
-            paddingHorizontal: 60,
             height: 38,
             justifyContent: 'center',
             alignItems: 'center',
@@ -183,30 +215,51 @@ export const ChatroomSideBar = ({
           </View>
         </View>
       </View>
-      <Text
+      <View
         style={{
           position: 'absolute',
           bottom: insetBottom + 10,
-          left: 36,
-          color: colors.text.grayblue,
-          fontWeight: 'bold',
+          flexDirection: 'row',
+          alignSelf: 'center',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          paddingHorizontal: 36,
         }}
-        onPress={handleExitPress}
       >
-        나가기
-      </Text>
-      <Text
-        style={{
-          position: 'absolute',
-          bottom: insetBottom + 10,
-          right: 36,
-          color: colors.text.grayblue,
-          fontWeight: 'bold',
-        }}
-        onPress={handleReportPress}
-      >
-        신고하기
-      </Text>
+        <Text
+          style={{
+            color: colors.text.grayblue,
+            fontWeight: 'bold',
+            marginVertical: 5,
+          }}
+          onPress={handleExitPress}
+        >
+          나가기
+        </Text>
+
+        <Text
+          style={{
+            color: colors.text.grayblue,
+            fontWeight: 'bold',
+            marginVertical: 5,
+          }}
+          onPress={handleBlockUser}
+        >
+          차단하기
+        </Text>
+
+        <Text
+          style={{
+            color: colors.text.grayblue,
+            fontWeight: 'bold',
+            marginVertical: 5,
+          }}
+          onPress={handleReportPress}
+        >
+          신고하기
+        </Text>
+      </View>
     </SlidingSidebar>
   );
 };
