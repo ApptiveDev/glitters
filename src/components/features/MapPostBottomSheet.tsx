@@ -253,7 +253,7 @@ export const MapPostBottomSheet = ({
           <Text style={{ fontSize: 12, color: colors.text.lightgray }} onPress={() => handleBlockUser(post?.id ?? 0)}>
             {post?.isWrittenBySelf ? '' : '작성자 차단하기'}
           </Text>
-          <Text style={{ fontSize: 12, color: colors.text.lightgray }}>|</Text>
+          <Text style={{ fontSize: 12, color: colors.text.lightgray }}>{post?.isWrittenBySelf ? '' : '|'}</Text>
           <Text
             style={{ fontSize: 12, color: colors.text.lightgray }}
             onPress={() => handleDeletePost(post?.id ?? 0, post?.isWrittenBySelf ?? false)}

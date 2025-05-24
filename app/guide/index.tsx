@@ -1,12 +1,11 @@
 import { router } from 'expo-router';
-import { Alert, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 
 import { withdrawUser } from '@/api/auth';
 import { logout } from '@/api/login';
 import { ListItem } from '@/components/common/ListItem';
 import { Spacing } from '@/components/common/Spacing';
 import { AdminList } from '@/components/features/AdminList';
-import { useLayout } from '@/contexts/LayoutContext';
 import { useUser } from '@/contexts/UserContext';
 import colors from '@/types/colors';
 import { unsetSeenAppStory } from '@/utils/asyncStorage';
@@ -36,7 +35,6 @@ const LabelValue = ({ label, value }: LabelValueProps) => {
 };
 
 export const Guide = () => {
-  const { insetBottom } = useLayout();
   const { user } = useUser();
 
   const handleHelpPress = () => {
@@ -95,9 +93,9 @@ export const Guide = () => {
   };
 
   return (
-    <>
-      <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.text.white }}>마이페이지</Text>
+    <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.text.white }}>마이페이지</Text>
+      <ScrollView>
         <Spacing height={28} />
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <LabelValue label="이름" value={user.name ?? ''} />
@@ -108,49 +106,30 @@ export const Guide = () => {
           {user.isAdmin ? <AdminList /> : null}
         </View>
         <ListItem text="도움말" onPress={handleHelpPress} />
-      </View>
-      <View
-        style={{
-          position: 'absolute',
-          bottom: insetBottom + 24,
-          flexDirection: 'row',
-          gap: 2,
-          left: '50%',
-          transform: [{ translateX: -12 }],
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+        <Spacing height={8} />
         <Text
           style={{
-            fontSize: 10,
-            color: colors.text.lightblue,
-            marginTop: 2,
+            fontSize: 14,
+            padding: 16,
+            color: colors.text.white,
           }}
           onPress={onPressLogout}
         >
           로그아웃
         </Text>
+        <Spacing height={8} />
         <Text
           style={{
-            fontSize: 10,
-            color: colors.text.lightblue,
-          }}
-        >
-          |
-        </Text>
-        <Text
-          style={{
-            color: colors.text.lightblue,
-            fontSize: 10,
-            marginTop: 2,
+            fontSize: 14,
+            padding: 16,
+            color: colors.text.white,
           }}
           onPress={handleWithdraw}
         >
           회원탈퇴
         </Text>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 };
 
