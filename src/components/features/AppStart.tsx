@@ -12,6 +12,7 @@ import { setSeenAppStory } from '@/utils/asyncStorage';
 const AppStart = () => {
   const { width, height } = useWindowDimensions();
   const { insetTop } = useLayout();
+  const isTablet = Device.deviceType === Device.DeviceType.TABLET;
   return (
     <View
       style={{
@@ -40,7 +41,7 @@ const AppStart = () => {
         style={{ width: 230, height: 64 }}
         resizeMode={FastImage.resizeMode.cover}
       />
-      <Spacing height={Device.modelName?.includes('iPad') ? 330 : 430} />
+      <Spacing height={isTablet ? 330 : 430} />
       <View
         style={{
           position: 'relative',
