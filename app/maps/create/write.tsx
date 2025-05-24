@@ -16,7 +16,6 @@ import { WritePolicyList } from '@/components/features/WritePolicyList';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import { useFormFields } from '@/hooks/useFormFields';
-import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import colors from '@/types/colors';
 import { showErrorAlert } from '@/utils/errorMessage';
 import { markerIcons } from '@/utils/markerIcons';
@@ -25,7 +24,6 @@ import { festivalIcons, threeDIcons } from '@/utils/threeDIcons';
 export const Write = () => {
   const { formFields, setFieldValue } = useFormFields();
   const { post } = usePost();
-  const { isKeyboardVisible } = useKeyboardVisible();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(true);
   const [contentHeight, setContentHeight] = useState(300);
   const { safeHeight, insetBottom } = useLayout();
@@ -153,20 +151,20 @@ export const Write = () => {
             한 번 작성된 반짝이는 수정할 수 없어요. 24시간 동안만 유지됩니다.
           </Text>
           <Spacing height={12} />
+          <View
+            style={{
+              width: '100%',
+              paddingBottom: insetBottom + 120,
+            }}
+          >
+            <CommonButton
+              title="등록하기"
+              onPress={handleButtonPress}
+              variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
+              style={{}}
+            />
+          </View>
         </KeyboardScrollContainer>
-        <View
-          style={{
-            width: '100%',
-            paddingHorizontal: 28,
-          }}
-        >
-          <CommonButton
-            title="등록하기"
-            onPress={handleButtonPress}
-            variant={formFields.title.isValid && formFields.content.isValid ? 'primary' : 'disable'}
-            style={{}}
-          />
-        </View>
       </ScrollView>
       <CustomBottomSheet
         isVisible={bottomSheetVisible}
