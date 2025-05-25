@@ -26,7 +26,7 @@ node_require('react-native-permissions/scripts/setup.rb')
 
 target 'app' do
   use_expo_modules!
-  pod 'Google-Maps-iOS-Utils', '5.0.0'
+  pod 'Google-Maps-iOS-Utils', '4.2.2'
   rn_maps_path = '../node_modules/react-native-maps'
   pod 'react-native-google-maps', :path => rn_maps_path
   config = use_native_modules!
