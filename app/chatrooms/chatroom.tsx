@@ -107,6 +107,7 @@ export const Chatroom = () => {
   const [scrollToTop, setScrollToTop] = useState(false);
   const [moreChatButtonVisible, setMoreChatButtonVisible] = useState(true);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [inputHeight, setInputHeight] = useState(0);
 
   useEffect(() => {
     if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
@@ -326,8 +327,12 @@ export const Chatroom = () => {
           )}
         </ScrollView>
         <View
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setInputHeight(height);
+          }}
           style={{
-            paddingBottom: Platform.OS === 'android' ? 16 : 0,
+            paddingBottom: Platform.OS === 'ios' ? 0 : inputHeight,
           }}
         >
           <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
