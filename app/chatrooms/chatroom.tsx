@@ -204,6 +204,14 @@ export const Chatroom = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const listener = Keyboard.addListener('keyboardDidShow', () => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    });
+
+    return () => listener.remove();
+  }, []);
+
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <View
@@ -274,7 +282,7 @@ export const Chatroom = () => {
       )}
       <KeyboardAvoidingView
         behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : keyboardHeight + 44}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 0}
         style={{
           flex: 1,
           width: '100%',
@@ -317,7 +325,13 @@ export const Chatroom = () => {
             </View>
           )}
         </ScrollView>
-        <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
+        <View
+          style={{
+            paddingBottom: Platform.OS === 'android' ? keyboardHeight + 16 : 0,
+          }}
+        >
+          <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
+        </View>
       </KeyboardAvoidingView>
       <ChatroomSideBar
         title={selectedChatroom?.post.title || ''}
@@ -333,6 +347,3 @@ export const Chatroom = () => {
 };
 
 export default Chatroom;
-function setKeyboardHeight(height: any) {
-  throw new Error('Function not implemented.');
-}
