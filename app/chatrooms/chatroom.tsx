@@ -249,8 +249,10 @@ export const Chatroom = () => {
           scrollRef.current = ref;
         }}
         style={{ flex: 1, width: '100%', paddingTop: 12 }}
+        enableOnAndroid
         contentContainerStyle={{ gap: 8, paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
+        keyboardOpeningTime={0}
         onContentSizeChange={() => {
           if (scrollToTop) {
             scrollRef.current.scrollToPosition(0, 0, true);
