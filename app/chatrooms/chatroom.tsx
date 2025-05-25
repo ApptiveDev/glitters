@@ -1,9 +1,7 @@
-/* eslint-disable react/no-this-in-sfc */
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 import { getChatMessages } from '@/api/chat';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
@@ -13,6 +11,7 @@ import SendIcon from '@/assets/icons/send.svg';
 import { ChatMessageItem } from '@/components/features/ChatMessageItem';
 import { ChatroomSideBar } from '@/components/features/ChatroomSideBar';
 import { useChatroom } from '@/contexts/ChatroomContext';
+import { useLayout } from '@/contexts/LayoutContext';
 import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { ChatMessage } from '@/types/chat';
 import colors from '@/types/colors';
@@ -98,6 +97,8 @@ const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (messag
 export const Chatroom = () => {
   const { selectedChatroom } = useChatroom();
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const { insetTop } = useLayout();
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const { messagesByChatroom } = useWebSocketContext();
   const currentRoomMessage = messagesByChatroom[selectedChatroom?.id ?? 0];
@@ -105,7 +106,7 @@ export const Chatroom = () => {
   const [lastMessageId, setLastMessageId] = useState(0);
   const [scrollToTop, setScrollToTop] = useState(false);
   const [moreChatButtonVisible, setMoreChatButtonVisible] = useState(true);
-  const scrollRef = useRef<any>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     if (currentRoomMessage && currentRoomMessage.type === 'receivedChat') {
@@ -177,21 +178,29 @@ export const Chatroom = () => {
   };
 
   useEffect(() => {
-    const showSub = Keyboard.addListener(
+    const handleShow = (event: KeyboardEvent) => {
+      const { height } = event.endCoordinates;
+      console.log('📏 키보드 높이:', height);
+      setKeyboardHeight(height);
+    };
+
+    const handleHide = () => {
+      console.log('⌨️ 키보드 내려감');
+      setKeyboardHeight(0);
+    };
+
+    const showListener = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e: KeyboardEvent) => {
-        const keyboardHeight = e.endCoordinates.height;
-        console.log('🧠 키보드 높이:', keyboardHeight);
-      },
+      handleShow,
+    );
+    const hideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      handleHide,
     );
 
-    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => {
-      console.log('⌨️ 키보드 내려감');
-    });
-
     return () => {
-      showSub.remove();
-      hideSub.remove();
+      showListener.remove();
+      hideListener.remove();
     };
   }, []);
 
@@ -263,47 +272,53 @@ export const Chatroom = () => {
       ) : (
         <View style={{ height: 32 }} />
       )}
-      <KeyboardAwareScrollView
-        innerRef={(ref) => {
-          scrollRef.current = ref;
-        }}
-        style={{ flex: 1, width: '100%', paddingTop: 12 }}
-        enableOnAndroid
-        contentContainerStyle={{ gap: 8, paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-        keyboardOpeningTime={0}
-        onContentSizeChange={() => {
-          if (scrollToTop) {
-            scrollRef.current.scrollToPosition(0, 0, true);
-            setScrollToTop(false);
-          } else {
-            scrollRef.current.scrollToEnd(true);
-          }
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : keyboardHeight + 44}
+        style={{
+          flex: 1,
+          width: '100%',
+          paddingTop: 12,
         }}
       >
-        {chatMessages.length > 0 ? (
-          chatMessages.map((message) => (
-            <ChatMessageItem
-              key={message.id}
-              content={message.content}
-              isMine={message.type === 'sentChat'}
-              createdAt={message.createdAt}
-              peerNickname={selectedChatroom?.peerNickname || ''}
-            />
-          ))
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ color: colors.text.lightgray, fontSize: 14 }}>아직 메시지가 없습니다.</Text>
-          </View>
-        )}
+        <ScrollView
+          ref={scrollRef}
+          style={{ flex: 1, width: '100%', paddingTop: 12, marginBottom: 20 }}
+          contentContainerStyle={{ gap: 8 }}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() => {
+            if (scrollToTop) {
+              scrollRef.current?.scrollTo({ y: 0, animated: true });
+              setScrollToTop(false);
+            } else {
+              scrollRef.current?.scrollToEnd({ animated: true });
+            }
+          }}
+        >
+          {chatMessages.length > 0 ? (
+            chatMessages.map((message) => (
+              <ChatMessageItem
+                key={message.id}
+                content={message.content}
+                isMine={message.type === 'sentChat'}
+                createdAt={message.createdAt}
+                peerNickname={selectedChatroom?.peerNickname || ''}
+              />
+            ))
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: colors.text.lightgray, fontSize: 14 }}>아직 메시지가 없습니다.</Text>
+            </View>
+          )}
+        </ScrollView>
         <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
-      </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
       <ChatroomSideBar
         title={selectedChatroom?.post.title || ''}
         peerNickname={selectedChatroom?.peerNickname || ''}
@@ -318,3 +333,6 @@ export const Chatroom = () => {
 };
 
 export default Chatroom;
+function setKeyboardHeight(height: any) {
+  throw new Error('Function not implemented.');
+}
