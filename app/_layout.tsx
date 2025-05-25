@@ -1,39 +1,52 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Slot } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { LayoutProvider, useLayout } from '@/contexts/LayoutContext';
+import { PostProvider } from '@/contexts/PostContext';
+import { UserProvider } from '@/contexts/UserContext';
+import colors from '@/types/colors';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+export const queryClient = new QueryClient();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+const InnerLayout = () => {
+  const { insetTop } = useLayout();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <>
+      <Slot />
+      <Toast topOffset={insetTop || 60} />
+    </>
   );
-}
+};
+
+export const RootLayout = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaView
+          edges={['bottom']}
+          style={{
+            flex: 1,
+            backgroundColor: colors.background,
+          }}
+        >
+          <BottomSheetModalProvider>
+            <LayoutProvider>
+              <PostProvider>
+                <UserProvider>
+                  <InnerLayout />
+                </UserProvider>
+              </PostProvider>
+            </LayoutProvider>
+          </BottomSheetModalProvider>
+        </SafeAreaView>
+      </GestureHandlerRootView>
+    </QueryClientProvider>
+  );
+};
+
+export default RootLayout;
