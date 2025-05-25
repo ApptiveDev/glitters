@@ -1,7 +1,7 @@
 /* eslint-disable react/no-this-in-sfc */
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Keyboard, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -175,6 +175,25 @@ export const Chatroom = () => {
       showErrorAlert('오류', error);
     }
   };
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e: KeyboardEvent) => {
+        const keyboardHeight = e.endCoordinates.height;
+        console.log('🧠 키보드 높이:', keyboardHeight);
+      },
+    );
+
+    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => {
+      console.log('⌨️ 키보드 내려감');
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
