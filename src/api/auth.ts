@@ -38,7 +38,7 @@ export const checkAuthCode = async (email: string, code: string, type: 'REGISTER
 };
 
 export const registerUser = async (user: UserRegistrationRequest) => {
-  const { email, password, name, birth, termsAccepted } = user;
+  const { email, password, name, birth, termsAccepted, gender } = user;
   try {
     const response = await apiInstance.post('/register', {
       email,
@@ -46,6 +46,7 @@ export const registerUser = async (user: UserRegistrationRequest) => {
       name,
       birth,
       termsAccepted,
+      gender,
     });
     return response.data;
   } catch (error) {
@@ -71,6 +72,7 @@ export const withdrawUser = async () => {
     const response = await apiInstance.delete('/members/me');
     return response.data;
   } catch (error) {
+    console.error('Error withdrawing user:', error);
     throw new Error(getErrorMessage(error));
   }
 };
@@ -86,8 +88,6 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
 
 export const resetPassword = async (email: string, password: string) => {
   try {
-    console.log('email', email);
-    console.log('password', password);
     const response = await apiInstance.put('/password', {
       email,
       password,

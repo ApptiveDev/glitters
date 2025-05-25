@@ -57,12 +57,10 @@ export const ChatLayout = () => {
         <ChatMessageProvider>
           <WebSocketProvider>
             <ChatroomProvider>
-              <KeyboardAvoidingView
-                style={[styles.content, pathname !== '/chatrooms/chatroom' && { marginBottom: 80 }]}
-              >
+              <KeyboardAvoidingView style={[styles.content, pathname === '/chatrooms' && { marginBottom: 80 }]}>
                 <Slot />
               </KeyboardAvoidingView>
-              {pathname !== '/chatrooms/chatroom' ? <BottomNav /> : null}
+              {pathname === '/chatrooms' ? <BottomNav /> : null}
             </ChatroomProvider>
           </WebSocketProvider>
         </ChatMessageProvider>

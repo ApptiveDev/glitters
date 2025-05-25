@@ -33,4 +33,10 @@ export type MarkerType = {
   likeCount: number;
   viewCount: number;
   isLikedBySelf: boolean;
+  title: string;
+};
+
+export type PostCreateResponseType = {
+  markerId: number;
+  postId: number;
 };

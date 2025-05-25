@@ -68,7 +68,7 @@ const ChatInput = ({ chatroomId, onSend }: { chatroomId: number; onSend: (messag
             maxHeight: 20 * 5 + 10,
             paddingVertical: 0,
           }}
-          placeholder="채팅을 입력하세요."
+          placeholder="보내고 싶은 말을 입력하세요."
           placeholderTextColor="rgba(255,255,255,0.6)"
           value={message}
           onChangeText={setMessage}
@@ -189,7 +189,29 @@ export const Chatroom = () => {
         <CaretLeftIcon width={24} height={24} onPress={() => router.back()} />
         <MenuIcon width={24} height={24} onPress={() => setSidebarVisible(true)} />
       </View>
-      <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 12 }}>커뮤니티 가이드를 준수해주세요.</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+        }}
+      >
+        <Text
+          style={{
+            color: colors.text.lightgray,
+            fontSize: 12,
+            marginTop: 12,
+            textDecorationLine: 'underline',
+            textDecorationColor: colors.text.lightgray,
+            textDecorationStyle: 'solid',
+          }}
+          onPress={() => {
+            router.push('/chatrooms/community-guide');
+          }}
+        >
+          커뮤니티 가이드
+        </Text>
+        <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 12 }}>를 준수해주세요.</Text>
+      </View>
+
       {moreChatButtonVisible ? (
         <TouchableOpacity
           style={{

@@ -8,7 +8,6 @@ interface ButtonProps {
   onPress: () => void;
   style?: object;
   variant?: 'primary' | 'disable' | 'maps' | 'view' | 'blueDisable' | 'blue';
-  isKeyboardVisible?: boolean;
   fontSize?: number;
   buttonIcon?: React.ReactNode;
   disabled?: boolean;
@@ -20,6 +19,7 @@ const baseStyle: ViewStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   flexDirection: 'row',
+  borderRadius: 12,
 };
 
 const buttonStyles = StyleSheet.create({
@@ -98,7 +98,6 @@ export const CommonButton = ({
   onPress,
   style = {},
   variant = 'primary',
-  isKeyboardVisible,
   fontSize = 12,
   buttonIcon = null,
   disabled = false,
@@ -109,7 +108,7 @@ export const CommonButton = ({
 
   return (
     <TouchableOpacity
-      style={[isKeyboardVisible ? { borderRadius: 0 } : { borderRadius: 12 }, buttonStyles[variant], style]}
+      style={[buttonStyles[variant], style]}
       onPress={onPress}
       disabled={variant === 'disable' || variant === 'blueDisable' || disabled}
     >

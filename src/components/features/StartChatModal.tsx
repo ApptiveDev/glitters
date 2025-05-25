@@ -77,13 +77,12 @@ export const StartChatModal = ({ visible, setVisible, postId, markerIdx, title }
         >
           <Text
             style={{
-              fontSize: 10,
+              fontSize: 14,
               color: colors.text.white,
               fontWeight: 'bold',
-              lineHeight: 12,
             }}
           >
-            채팅 시작하기
+            첫 쪽지 보내기
           </Text>
           <Spacing height={25} />
           <View
@@ -154,7 +153,7 @@ export const StartChatModal = ({ visible, setVisible, postId, markerIdx, title }
                   paddingVertical: 0,
                   lineHeight: 12,
                 }}
-                placeholder="채팅을 입력하세요."
+                placeholder="보내고 싶은 말을 입력하세요."
                 placeholderTextColor="rgba(255,255,255,0.6)"
                 value={message}
                 onChangeText={setMessage}
@@ -184,7 +183,7 @@ export const StartChatModal = ({ visible, setVisible, postId, markerIdx, title }
               color: colors.text.gray,
             }}
           >
-            채팅 목록에서 보낸 내용을 확인할 수 있어요.
+            쪽지함에서 보낸 내용을 확인할 수 있어요.
           </Text>
         </View>
       </View>

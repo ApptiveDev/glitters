@@ -28,5 +28,3 @@ export const getActivePost = async () => {
     throw new Error(getErrorMessage(error));
   }
 };
-
-export default getPostById;

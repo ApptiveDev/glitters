@@ -1,87 +1,68 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import * as TaskManager from 'expo-task-manager';
-import { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { router, SplashScreen } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 import { getUserInfo } from '@/api/auth';
-import { postLocation } from '@/api/notifications';
+import { getBoundMarkers } from '@/api/markers';
 import Splash from '@/components/features/Splash';
+import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
-import { useNotificationListener } from '@/hooks/useNotificationListener';
-import { registerForPushNotificationsAsync, requestBackgroundLocationPermission } from '@/utils/asyncStorage';
-import { getToken } from '@/utils/authStorage';
-
-const LOCATION_TASK_NAME = 'background-location-task';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-  if (error) return;
-
-  const { locations } = data as any;
-  const location = locations?.[0];
-
-  if (location) {
-    await postLocation(location.coords.latitude, location.coords.longitude);
-  }
-});
+import { hasSeenAppStory, registerForPushNotificationsAsync } from '@/utils/asyncStorage';
+import { getToken, removeToken } from '@/utils/authStorage';
 
 export const Index = () => {
-  const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
   const { setUser } = useUser();
+  const { setBound } = usePost();
+  const [isRoutingDone, setIsRoutingDone] = useState(false);
 
   useEffect(() => {
-    const prepare = async () => {
-      await SplashScreen.preventAutoHideAsync();
-      await requestBackgroundLocationPermission();
-      await registerForPushNotificationsAsync();
+    const init = async () => {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+        await Location.requestForegroundPermissionsAsync();
+        await registerForPushNotificationsAsync();
 
-      setIsReady(true);
+        const seen = await hasSeenAppStory();
+        if (!seen) {
+          await SplashScreen.hideAsync();
+          router.replace('/app-story');
+          return;
+        }
+
+        const token = await getToken();
+        if (!token) {
+          await SplashScreen.hideAsync();
+          router.replace('/login');
+          return;
+        }
+
+        const userRes = await getUserInfo();
+        if (!userRes) {
+          await SplashScreen.hideAsync();
+          removeToken();
+          router.replace('/login');
+          return;
+        }
+
+        setUser(userRes.member);
+        const bounds = await getBoundMarkers();
+        setBound(bounds[userRes.member.institution.id]);
+
+        await SplashScreen.hideAsync();
+        router.replace('/maps');
+      } catch {
+        await SplashScreen.hideAsync();
+        router.replace('/');
+      } finally {
+        setIsRoutingDone(true);
+      }
     };
 
-    prepare();
-  }, []);
+    init();
+  }, [setUser, setBound]);
 
-  useNotificationListener();
-
-  const onLayoutRootView = useCallback(async () => {
-    if (!isReady) return;
-
-    const token = await getToken();
-
-    if (token) {
-      const user = await getUserInfo();
-      setUser(user.member);
-      router.replace('/maps');
-
-      const isStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-      if (!isStarted) {
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          accuracy: Location.Accuracy.High,
-          deferredUpdatesInterval: 600000,
-          distanceInterval: 0,
-          showsBackgroundLocationIndicator: true,
-          pausesUpdatesAutomatically: false,
-        });
-      }
-    } else {
-      router.replace('/login');
-    }
-  }, [isReady, router, setUser]);
-
-  if (!isReady) return <Splash />;
-  return <View style={{ flex: 1 }} onLayout={onLayoutRootView} />;
+  if (!isRoutingDone) return <Splash />;
+  return null;
 };
 
 export default Index;

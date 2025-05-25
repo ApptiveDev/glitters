@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, SafeAreaView, Text, View } from 'react-native';
+import { Alert, SafeAreaView, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { blockUser } from '@/api/block';
@@ -8,6 +8,7 @@ import { reportMarker } from '@/api/markers';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import { CommonButton } from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
+import { Heading } from '@/components/common/Heading';
 import { Spacing } from '@/components/common/Spacing';
 import TextArea from '@/components/common/TextArea';
 import colors from '@/types/colors';
@@ -22,7 +23,16 @@ export const Report = () => {
   };
   const [checked, setChecked] = useState(false);
   const handleBackPress = () => {
-    router.back();
+    Alert.alert('신고를 취소하시겠습니까?', '신고를 취소하면 작성한 내용이 삭제됩니다.', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '확인',
+        onPress: () => router.back(),
+      },
+    ]);
   };
 
   const handleReportPress = async () => {
@@ -47,12 +57,15 @@ export const Report = () => {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ position: 'relative', width: '100%', height: 48, justifyContent: 'center' }}>
+        <Heading title="게시글 신고하기" alignItems="center" />
+        <CaretLeftIcon
+          style={{ position: 'absolute', left: 24, top: '50%', transform: [{ translateY: -12 }] }}
+          onPress={handleBackPress}
+        />
+      </View>
       <ScrollView>
         <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-            <CaretLeftIcon width={24} height={24} onPress={handleBackPress} />
-          </View>
-          <Text style={{ fontSize: 16, color: colors.text.white }}>게시글 신고하기</Text>
           <Spacing height={24} />
           <TextArea
             value={text}

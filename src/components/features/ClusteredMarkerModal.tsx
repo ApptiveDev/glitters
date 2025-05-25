@@ -2,11 +2,13 @@ import { BlurView } from 'expo-blur';
 import { useMemo, useState } from 'react';
 import { Image, Modal, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
+import { getPostById } from '@/api/posts';
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
 import CaretRightIcon from '@/assets/icons/caret_right.svg';
 import MarkerBySelfIcon from '@/assets/icons/marker/marker_by_self.png';
+import ExitIcon from '@/assets/icons/simple_exit.svg';
 import colors from '@/types/colors';
-import { GetPostResponseType } from '@/types/post';
+import { MarkerType } from '@/types/maps';
 import { markerIcons } from '@/utils/markerIcons';
 
 interface ClusteredMarkerModalProps {
@@ -14,7 +16,7 @@ interface ClusteredMarkerModalProps {
   setIsVisible: (isVisible: boolean) => void;
   isVisible: boolean;
   setPost: (post: any) => void;
-  clusterPosts: GetPostResponseType[];
+  clusterMarkers: MarkerType[];
 }
 
 export const ClusteredMarkerModal = ({
@@ -22,16 +24,16 @@ export const ClusteredMarkerModal = ({
   setIsVisible,
   setPost,
   isVisible,
-  clusterPosts,
+  clusterMarkers,
 }: ClusteredMarkerModalProps) => {
   const [page, setPage] = useState(0);
   const itemsPerPage = 4;
-  const totalPages = Math.ceil(clusterPosts.length / itemsPerPage);
+  const totalPages = Math.ceil(clusterMarkers.length / itemsPerPage);
 
   const paginatedPosts = useMemo(() => {
     const start = page * itemsPerPage;
-    return clusterPosts.slice(start, start + itemsPerPage);
-  }, [page, clusterPosts]);
+    return clusterMarkers.slice(start, start + itemsPerPage);
+  }, [page, clusterMarkers]);
 
   const handleLeftPress = () => {
     if (page > 0) {
@@ -39,7 +41,7 @@ export const ClusteredMarkerModal = ({
     }
   };
   const handleRightPress = () => {
-    if (page < Math.ceil(clusterPosts.length / itemsPerPage) - 1) {
+    if (page < Math.ceil(clusterMarkers.length / itemsPerPage) - 1) {
       setPage((prev) => prev + 1);
     }
   };
@@ -50,8 +52,15 @@ export const ClusteredMarkerModal = ({
     setPage(0);
   };
 
+  const handleListPress = async (item: any) => {
+    const post = await getPostById({ postId: item.postId });
+    setPost(post);
+    setIsVisible(true);
+    setIsListOpen(false);
+  };
+
   return (
-    <Modal animationType="fade" transparent visible={isVisible} onRequestClose={closeModal}>
+    <Modal transparent visible={isVisible} onRequestClose={closeModal}>
       <TouchableWithoutFeedback onPress={closeModal}>
         <BlurView
           intensity={20}
@@ -98,43 +107,43 @@ export const ClusteredMarkerModal = ({
             alignItems: 'center',
             flexDirection: 'row',
             gap: 8,
+            paddingHorizontal: 12,
           }}
         >
           <CaretLeftIcon width={24} height={24} onPress={handleLeftPress} />
           <View
             style={{
-              width: '100%',
+              flex: 1,
               alignItems: 'flex-start',
               justifyContent: 'flex-start',
               height: 226,
               paddingVertical: 40,
             }}
           >
-            {paginatedPosts.map((clusterPost) => (
+            {paginatedPosts.map((marker) => (
               <TouchableOpacity
-                key={clusterPost.id + clusterPost.title}
-                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}
+                key={marker.id + marker.title}
+                style={{ marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 8, width: '100%' }}
                 onPress={() => {
-                  setPost(clusterPost);
-                  setIsVisible(true);
-                  setIsListOpen(false);
+                  handleListPress(marker);
                 }}
               >
-                {clusterPost.isWrittenBySelf ? (
+                {marker.isWrittenBySelf ? (
                   <Image source={MarkerBySelfIcon} style={{ width: 24, height: 24 }} />
                 ) : (
-                  <Image source={markerIcons[clusterPost.markerIdx].icon} style={{ width: 24, height: 24 }} />
+                  <Image source={markerIcons[marker.markerIdx].icon} style={{ width: 24, height: 24 }} />
                 )}
                 <Text
                   style={{
                     fontSize: 12,
                     color: colors.text.white,
                     fontWeight: 'bold',
+                    flexShrink: 1,
                   }}
                   ellipsizeMode="tail"
                   numberOfLines={1}
                 >
-                  {clusterPost.title}
+                  {marker.title}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -153,6 +162,7 @@ export const ClusteredMarkerModal = ({
             </Text>
           </View>
           <CaretRightIcon width={24} height={24} onPress={handleRightPress} />
+          <ExitIcon width={16} height={16} onPress={closeModal} style={{ position: 'absolute', top: 16, right: 16 }} />
         </View>
       </View>
     </Modal>
