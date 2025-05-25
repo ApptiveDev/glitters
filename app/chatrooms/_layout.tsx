@@ -12,7 +12,7 @@ import colors from '@/types/colors';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.backgroundmypage,
+    backgroundColor: colors.background,
     flex: 1,
     position: 'relative',
   },
