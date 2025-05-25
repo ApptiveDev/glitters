@@ -327,7 +327,7 @@ export const Chatroom = () => {
         </ScrollView>
         <View
           style={{
-            paddingBottom: Platform.OS === 'android' ? keyboardHeight + 16 : 0,
+            paddingBottom: Platform.OS === 'android' ? keyboardHeight - 120 : 0,
           }}
         >
           <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
