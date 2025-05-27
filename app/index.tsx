@@ -7,7 +7,7 @@ import { getBoundMarkers } from '@/api/markers';
 import Splash from '@/components/features/Splash';
 import { usePost } from '@/contexts/PostContext';
 import { useUser } from '@/contexts/UserContext';
-import { hasSeenAppStory, registerForPushNotificationsAsync } from '@/utils/asyncStorage';
+import { hasSeenAppStory } from '@/utils/asyncStorage';
 import { getToken, removeToken } from '@/utils/authStorage';
 
 export const Index = () => {
@@ -20,7 +20,7 @@ export const Index = () => {
       try {
         await SplashScreen.preventAutoHideAsync();
         await Location.requestForegroundPermissionsAsync();
-        await registerForPushNotificationsAsync();
+        // await registerForPushNotificationsAsync();
 
         const seen = await hasSeenAppStory();
         if (!seen) {
