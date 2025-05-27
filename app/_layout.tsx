@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message';
 import { LayoutProvider, useLayout } from '@/contexts/LayoutContext';
 import { PostProvider } from '@/contexts/PostContext';
 import { UserProvider } from '@/contexts/UserContext';
+import { useNotificationListener } from '@/hooks/useNotificationListener';
 import colors from '@/types/colors';
 
 export const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const InnerLayout = () => {
 };
 
 export const RootLayout = () => {
+  useNotificationListener();
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
