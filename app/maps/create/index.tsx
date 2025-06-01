@@ -208,7 +208,9 @@ export const CreateMarker = () => {
               flexDirection: 'row',
             }}
           >
-            <CaretLeftIcon width={20} height={20} onPress={handlePrevButtonPress} />
+            <TouchableOpacity onPress={handlePrevButtonPress} >
+              <CaretLeftIcon width={20} height={20} onPress={handlePrevButtonPress} />
+            </TouchableOpacity>
             <View
               style={{
                 flexDirection: 'row',
@@ -223,7 +225,9 @@ export const CreateMarker = () => {
                 {markerIcons[currentMarkerIconIndex].explain}
               </Text>
             </View>
-            <CaretRightIcon width={20} height={20} onPress={handleNextButtonPress} />
+            <TouchableOpacity onPress={handleNextButtonPress} >
+              <CaretRightIcon width={20} height={20} onPress={handleNextButtonPress} />
+            </TouchableOpacity>
           </View>
           <TouchableOpacity
             style={{

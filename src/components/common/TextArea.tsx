@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     color: colors.text.white,
-    textAlignVertical: 'center',
     fontSize: 14,
+    textAlignVertical: "top",
   },
 });
 
@@ -53,7 +53,6 @@ export const CustomTextArea = ({
         maxLength={maxLength}
         numberOfLines={numberOfLines}
         multiline={multiline}
-        textAlignVertical="top"
         placeholderTextColor={colors.gray.main}
         style={{
           ...styles.container,

@@ -214,126 +214,114 @@ export const Chatroom = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center' }}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           width: '100%',
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingTop: insetTop + 10,
+          paddingBottom: 20,
         }}
       >
         <CaretLeftIcon width={24} height={24} onPress={() => router.back()} />
         <MenuIcon width={24} height={24} onPress={() => setSidebarVisible(true)} />
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-        }}
-      >
+
+      <View style={{ flexDirection: 'row', paddingHorizontal: 16, alignItems: "center", justifyContent: "center", paddingBottom: 20 }}>
         <Text
           style={{
             color: colors.text.lightgray,
             fontSize: 12,
-            marginTop: 12,
             textDecorationLine: 'underline',
-            textDecorationColor: colors.text.lightgray,
-            textDecorationStyle: 'solid',
+            marginRight: 4,
           }}
-          onPress={() => {
-            router.push('/chatrooms/community-guide');
-          }}
+          onPress={() => router.push('/chatrooms/community-guide')}
         >
           커뮤니티 가이드
         </Text>
-        <Text style={{ color: colors.text.lightgray, fontSize: 12, marginTop: 12 }}>를 준수해주세요.</Text>
+        <Text style={{ color: colors.text.lightgray, fontSize: 12 }}>
+          를 준수해주세요.
+        </Text>
       </View>
 
-      {moreChatButtonVisible ? (
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            padding: 4,
-            marginTop: 12,
-            height: 20,
-            borderRadius: 999,
-            gap: 2,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: colors.primary.main,
-          }}
-          onPress={handleGetPreviousMessages}
-        >
-          <RefreshIcon width={12} height={12} />
-          <Text
-            style={{
-              fontSize: 10,
-              color: colors.background,
-              lineHeight: 12,
-              textAlign: 'center',
-              marginRight: 4,
-              fontWeight: 'bold',
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 80}
+      >
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            ref={scrollRef}
+            contentContainerStyle={{ padding: 16, paddingBottom: 20, gap: 8 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            onContentSizeChange={() => {
+              if (scrollToTop) {
+                scrollRef.current?.scrollTo({ y: 0, animated: true });
+                setScrollToTop(false);
+              } else {
+                scrollRef.current?.scrollToEnd({ animated: true });
+              }
             }}
           >
-            이전 채팅 더보기
-          </Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={{ height: 32 }} />
-      )}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 0}
-        style={{
-          flex: 1,
-          width: '100%',
-          paddingTop: 0,
-        }}
-      >
-        <ScrollView
-          ref={scrollRef}
-          style={{ flex: 1, width: '100%', paddingTop: 12, marginBottom: 20 }}
-          contentContainerStyle={{ gap: 8 }}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => {
-            if (scrollToTop) {
-              scrollRef.current?.scrollTo({ y: 0, animated: true });
-              setScrollToTop(false);
-            } else {
-              scrollRef.current?.scrollToEnd({ animated: true });
-            }
-          }}
-        >
-          {chatMessages.length > 0 ? (
-            chatMessages.map((message) => (
-              <ChatMessageItem
-                key={message.id}
-                content={message.content}
-                isMine={message.type === 'sentChat'}
-                createdAt={message.createdAt}
-                peerNickname={selectedChatroom?.peerNickname || ''}
-              />
-            ))
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: colors.text.lightgray, fontSize: 14 }}>아직 메시지가 없습니다.</Text>
-            </View>
-          )}
-        </ScrollView>
-        <View
-          style={{
-            paddingBottom: Platform.OS === 'ios' ? 0 : 80,
-          }}
-        >
-          <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
+            {moreChatButtonVisible && (
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  padding: 4,
+                  height: 20,
+                  borderRadius: 999,
+                  gap: 2,
+                  alignSelf: 'center',
+                  marginBottom: 8,
+                  backgroundColor: colors.primary.main,
+                }}
+                onPress={handleGetPreviousMessages}
+              >
+                <RefreshIcon width={12} height={12} />
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: colors.background,
+                    lineHeight: 12,
+                    textAlign: 'center',
+                    marginRight: 4,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  이전 채팅 더보기
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {chatMessages.length > 0 ? (
+              chatMessages.map((message) => (
+                <ChatMessageItem
+                  key={message.id}
+                  content={message.content}
+                  isMine={message.type === 'sentChat'}
+                  createdAt={message.createdAt}
+                  peerNickname={selectedChatroom?.peerNickname || ''}
+                />
+              ))
+            ) : (
+              <View style={{ alignItems: 'center', marginTop: 40 }}>
+                <Text style={{ color: colors.text.lightgray, fontSize: 14 }}>
+                  아직 메시지가 없습니다.
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+
+          <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+            <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
+          </View>
         </View>
       </KeyboardAvoidingView>
+
       <ChatroomSideBar
         title={selectedChatroom?.post.title || ''}
         peerNickname={selectedChatroom?.peerNickname || ''}
@@ -345,6 +333,7 @@ export const Chatroom = () => {
       />
     </View>
   );
+
 };
 
 export default Chatroom;

@@ -64,23 +64,14 @@ const MapSearch = () => {
   };
 
   const handleButtonPress = () => {
-    if (!currentPosition) return;
     router.push({
       pathname: '/maps/create',
       params: {
-        currentLat: String(currentPosition.latitude),
-        currentLon: String(currentPosition.longitude),
+        currentLat: String(bound?.defaultLat),
+        currentLon: String(bound?.defaultLon),
       },
     });
   };
-
-  useEffect(() => {
-    if (!bound) return;
-    getCurrentLocation({ bound }).then(({ location, errorMsg }) => {
-      if (location) setCurrentPosition(location);
-      else Alert.alert('위치 정보 오류', errorMsg || '위치 정보를 가져오는 데 실패했습니다.');
-    });
-  }, [bound]);
 
   useEffect(() => {
     if (post) setIsVisible(true);
@@ -107,9 +98,12 @@ const MapSearch = () => {
       {token && (
         <WebView
           ref={webViewRef}
-          source={{ uri: 'https://webview.banjjak.me' }}
-          onLoad={sendMessage}
+          source={{ uri: `https://webview.banjjak.me?token=${token}` }}
+          onLoadEnd={() => {
+            setTimeout(sendMessage, 500)
+          }}
           onMessage={onMessage}
+          injectedJavaScript={`window.__TOKEN__=${token}; true;`}
         />
       )}
       <RemainPost />
