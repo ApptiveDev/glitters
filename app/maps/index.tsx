@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import WebView from 'react-native-webview';
 
 import { getPostById } from '@/api/posts';
 import { CreateGlitterButton } from '@/components/features/CreateGlitterButton';
@@ -12,8 +12,8 @@ import { StartChatModal } from '@/components/features/StartChatModal';
 import { useLayout } from '@/contexts/LayoutContext';
 import { usePost } from '@/contexts/PostContext';
 import { GetPostResponseType } from '@/types/post';
-import { getToken } from '@/utils/authStorage';
 import { getCurrentLocation } from '@/utils/getCurrentLocation';
+import { getToken } from '@/utils/authStorage';
 
 import styles from './styles';
 
@@ -23,14 +23,13 @@ const MapSearch = () => {
   const [post, setPost] = useState<GetPostResponseType>();
   const [isVisible, setIsVisible] = useState(false);
   const { postId } = useLocalSearchParams();
-  const [token, setToken] = useState<string | null>(null);
 
   const { insetBottom } = useLayout();
   const { bound } = usePost();
-  const webViewRef = useRef<WebView | null>(null);
 
   const [currentPosition, setCurrentPosition] = useState<{ latitude: number; longitude: number } | null>(null);
-
+  const [token, setToken] = useState<string | null>(null);
+  const webViewRef = useRef<WebView | null>(null);
 
   useEffect(() => {
     if (!postId) return;
@@ -58,12 +57,6 @@ const MapSearch = () => {
     fetchToken();
   }, []);
 
-  const sendMessage = () => {
-    if (token && webViewRef.current) {
-      webViewRef.current.postMessage(JSON.stringify({ token }));
-    }
-  };
-
   const handleButtonPress = () => {
     router.push({
       pathname: '/maps/create',
@@ -78,7 +71,11 @@ const MapSearch = () => {
     if (post) setIsVisible(true);
   }, [post]);
 
-  if (!token) return <Loading />;
+  const sendMessage = () => {
+    if (token && webViewRef.current) {
+      webViewRef.current.postMessage(JSON.stringify({ token }));
+    }
+  };
 
   const onMessage = async (event: any) => {
     const { data } = event.nativeEvent;
@@ -94,11 +91,16 @@ const MapSearch = () => {
       Alert.alert('오류', '메시지 데이터를 처리하는 중 오류가 발생했습니다.');
     }
   };
+
+  if (!token) return <Loading />;
+
   return (
     <View style={styles.container}>
         {token && (
           <WebView
             style={{ flex: 1 }}
+            androidLayerType="software"
+            pointerEvents={sendChatModalVisible ? 'none' : 'auto'}
             source={{ uri: `https://webview.banjjak.me?token=${token}` }}
             injectedJavaScript={`
               // WebGL 지원 여부 체크
@@ -123,34 +125,27 @@ const MapSearch = () => {
             onMessage={onMessage}
           />
         )}
-      <RemainPost />
-      <MapPostBottomSheet
-        isVisible={isVisible}
-        post={post}
-        setPost={setPost}
-        setIsVisible={setIsVisible}
-        setSendChatModalVisible={setSendChatModalVisible}
-        setContentHeight={setContentHeight}
-        contentHeight={contentHeight}
-      />
-      <CreateGlitterButton
-        onPress={handleButtonPress}
-        bottom={isVisible ? 80 - insetBottom - 12 + contentHeight + 40 : 80 - insetBottom + 24}
-      />
-      {/* <ClusteredMarkerModal
-        isVisible={isListOpen}
-        clusterMarkers={clusterMarkers}
-        setPost={setPost}
-        setIsVisible={setIsVisible}
-        setIsListOpen={setIsListOpen}
-      /> */}
-      <StartChatModal
-        visible={sendChatModalVisible}
-        setVisible={setSendChatModalVisible}
-        postId={post?.id || 0}
-        markerIdx={post?.markerIdx || 0}
-        title={post?.title || ''}
-      />
+        <RemainPost />
+        <MapPostBottomSheet
+          isVisible={isVisible}
+          post={post}
+          setPost={setPost}
+          setIsVisible={setIsVisible}
+          setSendChatModalVisible={setSendChatModalVisible}
+          setContentHeight={setContentHeight}
+          contentHeight={contentHeight}
+        />
+        <CreateGlitterButton
+          onPress={handleButtonPress}
+          bottom={isVisible ? 80 - insetBottom - 12 + contentHeight + 40 : 80 - insetBottom + 24}
+        />
+        <StartChatModal
+          visible={sendChatModalVisible}
+          setVisible={setSendChatModalVisible}
+          postId={post?.id || 0}
+          markerIdx={post?.markerIdx || 0}
+          title={post?.title || ''}
+        />
     </View>
   );
 };

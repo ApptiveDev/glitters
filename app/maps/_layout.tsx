@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
 
 export const MapLayout = () => {
   const { isKeyboardVisible } = useKeyboardVisible();
-  const [seenTutorial, setSeenTutorial] = useState(true); // 기본값을 true로 설정
+  const [seenTutorial, setSeenTutorial] = useState(true);
 
   useEffect(() => {
     const checkTutorialSeen = async () => {
@@ -28,7 +28,7 @@ export const MapLayout = () => {
         setSeenTutorial(seen);
       } catch (error) {
         console.error('튜토리얼 상태 확인 실패:', error);
-        setSeenTutorial(true); // 에러 발생 시 튜토리얼을 보이지 않게 함
+        setSeenTutorial(true);
       }
     };
 

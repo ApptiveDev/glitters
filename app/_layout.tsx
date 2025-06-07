@@ -4,6 +4,7 @@ import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import { LayoutProvider, useLayout } from '@/contexts/LayoutContext';
 import { PostProvider } from '@/contexts/PostContext';
@@ -28,6 +29,7 @@ export const RootLayout = () => {
   useNotificationListener();
   return (
     <QueryClientProvider client={queryClient}>
+      <PaperProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaView
           edges={['bottom']}
@@ -47,6 +49,7 @@ export const RootLayout = () => {
           </BottomSheetModalProvider>
         </SafeAreaView>
       </GestureHandlerRootView>
+      </PaperProvider>
     </QueryClientProvider>
   );
 };

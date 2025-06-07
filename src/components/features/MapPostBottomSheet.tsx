@@ -226,7 +226,10 @@ export const MapPostBottomSheet = ({
             <CommonButton
               title="  쪽지 보내기"
               variant="view"
-              onPress={() => setSendChatModalVisible(true)}
+              onPress={() => {
+                setIsVisible(false);
+                setSendChatModalVisible(true);
+              }}
               buttonIcon={<BubbleIcon />}
               style={{
                 flex: 6,
