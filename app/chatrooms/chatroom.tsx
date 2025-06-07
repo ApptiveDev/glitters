@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 
 import { getChatMessages } from '@/api/chat';
@@ -179,7 +179,7 @@ export const Chatroom = () => {
   };
 
   useEffect(() => {
-    const handleShow = (event: KeyboardEvent) => {
+    const handleShow = (event: any) => {
       const { height } = event.endCoordinates;
       console.log('📏 키보드 높이:', height);
       setKeyboardHeight(height);
@@ -293,8 +293,9 @@ export const Chatroom = () => {
         <ScrollView
           ref={scrollRef}
           style={{ flex: 1, width: '100%', paddingTop: 12, marginBottom: 20 }}
-          contentContainerStyle={{ gap: 8 }}
+          contentContainerStyle={{ gap: 8, paddingBottom: Platform.OS === 'android' ? 20 : 0 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           onContentSizeChange={() => {
             if (scrollToTop) {
               scrollRef.current?.scrollTo({ y: 0, animated: true });

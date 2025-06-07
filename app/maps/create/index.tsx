@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import CaretLeftIcon from '@/assets/icons/caret_left.svg';
@@ -172,12 +172,12 @@ export const CreateMarker = () => {
         onClose={() => setBottomSheetVisible(false)}
         height={contentHeight}
         isKeyboardVisible={isKeyboardVisible}
-        offset={isKeyboardVisible ? 120 : 0}
+        offset={isKeyboardVisible ? 60 : 0}
       >
         <View
           onLayout={(e) => {
             const measuredHeight = e.nativeEvent.layout.height;
-            setContentHeight(measuredHeight); // + padding
+            setContentHeight(measuredHeight);
           }}
           style={{ paddingVertical: 24, gap: 12 }}
         >
@@ -188,15 +188,23 @@ export const CreateMarker = () => {
             editable={isEditable}
             ref={inputRef}
           />
-          <Text
-            style={styles.bottomSheetSubText}
+          <TouchableOpacity
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             onPress={() => {
               setIsEditable(true);
-              setTimeout(() => inputRef.current?.focus(), 100);
+              setTimeout(() => {
+                inputRef.current?.focus();
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  inputRef.current?.focus();
+                }, 100);
+              }, 100);
             }}
           >
-            이 위치가 아닌가요?
-          </Text>
+            <Text style={styles.bottomSheetSubText}>
+              이 위치가 아닌가요?
+            </Text>
+          </TouchableOpacity>
           <View
             style={{
               width: '100%',

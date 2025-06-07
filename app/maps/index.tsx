@@ -31,6 +31,7 @@ const MapSearch = () => {
 
   const [currentPosition, setCurrentPosition] = useState<{ latitude: number; longitude: number } | null>(null);
 
+
   useEffect(() => {
     if (!postId) return;
     async function fetchPost() {
@@ -77,7 +78,7 @@ const MapSearch = () => {
     if (post) setIsVisible(true);
   }, [post]);
 
-  if (!token || !webViewRef) return <Loading />;
+  if (!token) return <Loading />;
 
   const onMessage = async (event: any) => {
     const { data } = event.nativeEvent;
@@ -95,17 +96,33 @@ const MapSearch = () => {
   };
   return (
     <View style={styles.container}>
-      {token && (
-        <WebView
-          ref={webViewRef}
-          source={{ uri: `https://webview.banjjak.me?token=${token}` }}
-          onLoadEnd={() => {
-            setTimeout(sendMessage, 500)
-          }}
-          onMessage={onMessage}
-          injectedJavaScript={`window.__TOKEN__=${token}; true;`}
-        />
-      )}
+        {token && (
+          <WebView
+            style={{ flex: 1 }}
+            source={{ uri: `https://webview.banjjak.me?token=${token}` }}
+            injectedJavaScript={`
+              // WebGL 지원 여부 체크
+              const canvas = document.createElement('canvas');
+              const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+              const webglSupported = !!(window.WebGLRenderingContext && gl);
+
+              // JS 에러 후킹
+              console.error = (function(orig) {
+                return function(...args) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({ jsError: args.join(" ") }));
+                  orig.apply(console, args);
+                };
+              })(console.error);
+
+              // WebGL 결과 전송
+              window.ReactNativeWebView.postMessage(JSON.stringify({ webgl: webglSupported }));
+
+              true;
+            `}
+            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+            onMessage={onMessage}
+          />
+        )}
       <RemainPost />
       <MapPostBottomSheet
         isVisible={isVisible}
@@ -118,7 +135,7 @@ const MapSearch = () => {
       />
       <CreateGlitterButton
         onPress={handleButtonPress}
-        bottom={isVisible ? 96 - insetBottom + 24 + contentHeight + 40 : 120 - insetBottom + 24}
+        bottom={isVisible ? 80 - insetBottom - 12 + contentHeight + 40 : 80 - insetBottom + 24}
       />
       {/* <ClusteredMarkerModal
         isVisible={isListOpen}

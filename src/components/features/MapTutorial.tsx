@@ -8,10 +8,16 @@ import { setTutorialSeen } from '@/utils/asyncStorage';
 
 export const MapTutorial = () => {
   const { insetTop } = useLayout();
-  const handleExit = () => {
-    setTutorialSeen();
-    router.replace('/');
+  
+  const handleExit = async () => {
+    try {
+      await setTutorialSeen();
+      router.replace('/');
+    } catch (error) {
+      console.error('튜토리얼 상태 저장 실패:', error);
+    }
   };
+
   return (
     <View
       style={{

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Modal, Pressable } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Modal, Pressable, View } from 'react-native';
 
 import { useLayout } from '@/contexts/LayoutContext';
 import colors from '@/types/colors';
@@ -16,23 +16,31 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDTH * 0.7 }: SlidingSidebarProps) => {
   const translateX = useRef(new Animated.Value(width)).current;
   const { insetBottom } = useLayout();
+const [mounted, setMounted] = useState(visible);
 
-  useEffect(() => {
-    if (!visible) {
-      translateX.setValue(width);
-    }
-  }, [translateX, visible, width]);
-
-  useEffect(() => {
+useEffect(() => {
+  if (visible) {
+    setMounted(true);
     Animated.timing(translateX, {
-      toValue: visible ? 0 : width,
+      toValue: 0,
       duration: 250,
       useNativeDriver: true,
     }).start();
-  }, [translateX, visible, width]);
+  } else {
+    Animated.timing(translateX, {
+      toValue: width,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => {
+      setMounted(false); // 애니메이션 끝나고 제거
+    });
+  }
+}, [visible]);
+
 
   return (
     <Modal visible={visible} animationType="none" transparent>
+    <View>
       <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }} />
       <Animated.View
         style={{
@@ -40,7 +48,7 @@ export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDT
           top: 0,
           bottom: 0,
           paddingBottom: insetBottom,
-          right: 0,
+          right: -width,
           width,
           backgroundColor: colors.backgroundmypage,
           transform: [{ translateX }],
@@ -55,6 +63,7 @@ export const SlidingSidebar = ({ visible, onClose, children, width = SCREEN_WIDT
       >
         {children}
       </Animated.View>
+      </View>
     </Modal>
   );
 };

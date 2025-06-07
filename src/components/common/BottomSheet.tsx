@@ -29,7 +29,7 @@ const CustomBottomSheet = ({
   const { safeHeight, insetBottom } = useLayout();
   const { keyboardHeight } = useKeyboardVisible();
 
-  const BOTTOM_OFFSET = 96 - insetBottom;
+  const BOTTOM_OFFSET = 80 - insetBottom - 24;
   const translateY = useSharedValue(safeHeight);
 
   useEffect(() => {
@@ -87,8 +87,8 @@ const CustomBottomSheet = ({
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: BOTTOM_OFFSET,
-            height: isKeyboardVisible ? safeHeight - keyboardHeight - offset : height + 40,
+            bottom: isKeyboardVisible ? 0 : BOTTOM_OFFSET,
+            height: height + 40,
             backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

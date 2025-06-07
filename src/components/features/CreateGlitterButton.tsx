@@ -77,8 +77,11 @@ export const CreateGlitterButton = ({ onPress, bottom }: CreateGlitterButtonProp
           alignItems: 'center',
           justifyContent: 'center',
           gap: 8,
+          minHeight: 48,
         }}
         disabled={!postCreationStatus.isAvailable}
+        activeOpacity={0.7}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         {postCreationStatus.isAvailable ? <GlitterIcon width={24} height={24} /> : <ClockIcon width={20} height={20} />}
         <Text

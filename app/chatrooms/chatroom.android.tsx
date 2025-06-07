@@ -124,6 +124,9 @@ export const Chatroom = () => {
             createdAt: currentRoomMessage.createdAt || new Date().toISOString(),
           },
         ]);
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 100);
       }
     }
     if (currentRoomMessage && currentRoomMessage.type === 'error') {
@@ -145,6 +148,9 @@ export const Chatroom = () => {
       type: 'sentChat',
     };
     setChatMessages((prev) => [...prev, newMessage]);
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
   useEffect(() => {
@@ -154,6 +160,9 @@ export const Chatroom = () => {
         const response = await getChatMessages(selectedChatroom.id, undefined, 20);
         setChatMessages(response.chats.reverse());
         setLastMessageId(response.lastChatId);
+        requestAnimationFrame(() => {
+          scrollRef.current?.scrollToEnd({ animated: false });
+        });
       } catch (error) {
         showErrorAlert('오류', error);
       }
@@ -161,6 +170,12 @@ export const Chatroom = () => {
 
     fetchChatMessages();
   }, [selectedChatroom]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollToEnd({ animated: false });
+    });
+  }, []);
 
   const handleGetPreviousMessages = async () => {
     if (!selectedChatroom) return;
@@ -179,7 +194,7 @@ export const Chatroom = () => {
   };
 
   useEffect(() => {
-    const handleShow = (event: KeyboardEvent) => {
+    const handleShow = (event: any) => {
       const { height } = event.endCoordinates;
       console.log('📏 키보드 높이:', height);
       setKeyboardHeight(height);
@@ -231,6 +246,7 @@ export const Chatroom = () => {
       </View>
 
       <View style={{ flexDirection: 'row', paddingHorizontal: 16, alignItems: "center", justifyContent: "center", paddingBottom: 20 }}>
+      <TouchableOpacity>
         <Text
           style={{
             color: colors.text.lightgray,
@@ -242,6 +258,7 @@ export const Chatroom = () => {
         >
           커뮤니티 가이드
         </Text>
+        </TouchableOpacity>
         <Text style={{ color: colors.text.lightgray, fontSize: 12 }}>
           를 준수해주세요.
         </Text>
@@ -249,13 +266,17 @@ export const Chatroom = () => {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insetTop + 44 : 80}
+        behavior="height"
+        keyboardVerticalOffset={Platform.OS === 'android' ? 60 : 20}
       >
         <View style={{ flex: 1 }}>
           <ScrollView
             ref={scrollRef}
-            contentContainerStyle={{ padding: 16, paddingBottom: 20, gap: 8 }}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ 
+              padding: 16,
+              gap: 8
+            }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={() => {
@@ -263,7 +284,7 @@ export const Chatroom = () => {
                 scrollRef.current?.scrollTo({ y: 0, animated: true });
                 setScrollToTop(false);
               } else {
-                scrollRef.current?.scrollToEnd({ animated: true });
+                scrollRef.current?.scrollToEnd({ animated: false });
               }
             }}
           >
@@ -316,7 +337,7 @@ export const Chatroom = () => {
             )}
           </ScrollView>
 
-          <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+          <View style={{ paddingHorizontal: 16, paddingBottom: Platform.OS === 'android' ? 8 : 0 }}>
             <ChatInput chatroomId={selectedChatroom?.id || 0} onSend={handleSend} />
           </View>
         </View>

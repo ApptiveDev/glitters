@@ -1,6 +1,6 @@
 import { queryClient } from 'app/_layout';
 import { router, usePathname } from 'expo-router';
-import { Alert, View } from 'react-native';
+import { Alert, View, TouchableOpacity } from 'react-native';
 
 import ChatIcon from '@/assets/icons/chat.svg';
 import MapIcon from '@/assets/icons/map.svg';
@@ -52,7 +52,7 @@ export const BottomNav = () => {
         bottom: 0,
         backgroundColor: colors.background,
         width: '100%',
-        height: 120 - insetBottom,
+        height: 80 - insetBottom,
         overflow: 'hidden',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
@@ -70,7 +70,14 @@ export const BottomNav = () => {
         }}
       >
         <View style={{ position: 'relative' }}>
-          {isSelected('/chatrooms') ? <SelectedChatIcon onPress={onPressChat} /> : <ChatIcon onPress={onPressChat} />}
+          <TouchableOpacity
+            onPress={onPressChat}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={{ padding: 8 }}
+          >
+            {isSelected('/chatrooms') ? <SelectedChatIcon /> : <ChatIcon />}
+          </TouchableOpacity>
           {user.hasUnreadChat && (
             <View
               style={{
@@ -85,12 +92,22 @@ export const BottomNav = () => {
             />
           )}
         </View>
-        {isSelected('/maps') ? <SelectedMapIcon onPress={onPressMap} /> : <MapIcon onPress={onPressMap} />}
-        {isSelected('/guide') ? (
-          <SelectedProfileIcon onPress={onPressProfile} />
-        ) : (
-          <ProfileIcon onPress={onPressProfile} />
-        )}
+        <TouchableOpacity
+          onPress={onPressMap}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={{ padding: 8 }}
+        >
+          {isSelected('/maps') ? <SelectedMapIcon /> : <MapIcon />}
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onPressProfile}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={{ padding: 8 }}
+        >
+          {isSelected('/guide') ? <SelectedProfileIcon /> : <ProfileIcon />}
+        </TouchableOpacity>
       </View>
     </View>
   );

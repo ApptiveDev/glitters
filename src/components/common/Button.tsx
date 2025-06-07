@@ -111,6 +111,8 @@ export const CommonButton = ({
       style={[buttonStyles[variant], style]}
       onPress={onPress}
       disabled={variant === 'disable' || variant === 'blueDisable' || disabled}
+      activeOpacity={0.7}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
       {buttonIcon}
       {title && <Text style={[textStyles[variant], { fontSize }]}>{title}</Text>}
